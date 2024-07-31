@@ -12,6 +12,7 @@ import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.tooling.preview.Preview
 import com.example.bgremover.di.appModule
+import com.example.bgremover.presentation.ui.screens.BgRemover
 import com.example.bgremover.ui.theme.BgRemoverTheme
 import org.koin.android.ext.koin.androidContext
 import org.koin.android.ext.koin.androidLogger
@@ -28,7 +29,7 @@ class MainActivity : ComponentActivity() {
         }
         setContent {
             BgRemoverTheme {
-
+                BgRemover()
             }
         }
     }

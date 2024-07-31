@@ -67,11 +67,11 @@ object BgRemoverApiClient {
         }
 
         val response: HttpResponse =
-            client.post("https://Universal-Background-Removal.proxy-production.allthingsdev.co/cutout/universal/common-image") {
+            client.post("https://Human-Background-Removal.proxy-production.allthingsdev.co/cutout/portrait/body") {
                 headers {
-                    append("x-apihub-key", "iD8GmEzCAPZM6byGbiw7hJ70nrbMXKknIAnzAwVc7a3UWlwL-8")
-                    append("x-apihub-host", "Universal-Background-Removal.allthingsdev.co")
-                    append("x-apihub-endpoint", "e94514b6-3c60-4076-9453-99dcaaa24b99")
+                    append("x-apihub-key", "fSu5mUcN3iMoxx0ZMJVRahfBjO8maLx4WXQnn6cXXp4w2999by")
+                    append("x-apihub-host", "Human-Background-Removal.allthingsdev.co")
+                    append("x-apihub-endpoint", "fde322f3-7402-43c6-87d1-23961c255735")
                 }
                 body = MultiPartFormDataContent(formData)
             }
