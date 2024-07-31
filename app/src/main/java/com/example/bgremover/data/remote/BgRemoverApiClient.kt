@@ -69,7 +69,7 @@ object BgRemoverApiClient {
         val response: HttpResponse =
             client.post("https://Human-Background-Removal.proxy-production.allthingsdev.co/cutout/portrait/body") {
                 headers {
-                    append("x-apihub-key", "fSu5mUcN3iMoxx0ZMJVRahfBjO8maLx4WXQnn6cXXp4w2999by")
+                    append("x-apihub-key", "iv2AzbVX1vv1TjNnK5QxQxvJKnw8ffE3OxKoWFtSHW1aDo4bI7")
                     append("x-apihub-host", "Human-Background-Removal.allthingsdev.co")
                     append("x-apihub-endpoint", "fde322f3-7402-43c6-87d1-23961c255735")
                 }

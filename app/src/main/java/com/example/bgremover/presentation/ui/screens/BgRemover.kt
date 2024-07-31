@@ -1,6 +1,9 @@
 package com.example.bgremover.presentation.ui.screens
 
+import android.app.DownloadManager
+import android.content.Context
 import android.net.Uri
+import android.os.Environment
 import android.util.Log
 import android.widget.Toast
 import androidx.activity.compose.rememberLauncherForActivityResult
@@ -33,6 +36,8 @@ import coil.compose.rememberImagePainter
 import com.example.bgremover.R
 import com.example.bgremover.domain.usecase.ResultState
 import com.example.bgremover.presentation.viewmodel.MainViewModel
+import org.json.JSONException
+import org.json.JSONObject
 import org.koin.compose.koinInject
 import java.io.File
 
@@ -61,6 +66,16 @@ fun BgRemover() {
         }
     }
 
+
+    fun extractImageUrl(response: String): String? {
+        return try {
+            val jsonObject = JSONObject(response)
+            jsonObject.getJSONObject("data").getString("image_url")
+        } catch (e: JSONException) {
+            null
+        }
+    }
+
     LaunchedEffect(bgRemovalState) {
         when (bgRemovalState) {
             is ResultState.Error -> {
@@ -75,10 +90,29 @@ fun BgRemover() {
 
             is ResultState.Success -> {
                 isLoading = false
-                bgRemovedImageUrl = (bgRemovalState as ResultState.Success<String>).success
+                val response = (bgRemovalState as ResultState.Success<String>).success
+                val imageUrl = extractImageUrl(response)
+                bgRemovedImageUrl = imageUrl
                 Toast.makeText(context, "$bgRemovedImageUrl", Toast.LENGTH_SHORT).show()
                 Log.d("TAG", "BgRemover: $bgRemovedImageUrl")
             }
+        }
+    }
+
+
+
+    fun downloadImage(url: String) {
+        try {
+            val request = DownloadManager.Request(Uri.parse(url))
+                .setTitle("Background Removed Image")
+                .setDescription("Downloading image...")
+                .setNotificationVisibility(DownloadManager.Request.VISIBILITY_VISIBLE_NOTIFY_COMPLETED)
+                .setDestinationInExternalPublicDir(Environment.DIRECTORY_DOWNLOADS, "bg_removed_image.png")
+
+            val downloadManager = context.getSystemService(Context.DOWNLOAD_SERVICE) as DownloadManager
+            downloadManager.enqueue(request)
+        } catch (e: Exception) {
+            Toast.makeText(context, "Error: ${e.message}", Toast.LENGTH_SHORT).show()
         }
     }
 
@@ -117,10 +151,15 @@ fun BgRemover() {
             CircularProgressIndicator()
         } else {
             bgRemovedImageUrl?.let { url ->
-                AsyncImage(model = url, contentDescription = null, modifier = Modifier.size(200.dp))
+                Column {
+                    AsyncImage(model = url, contentDescription = null, modifier = Modifier.size(200.dp))
+                    Spacer(modifier = Modifier.height(16.dp))
+                    Button(onClick = { downloadImage(url) }) {
+                        Text("Download Image")
+                    }
+                }
             }
         }
     }
 }
-
 
