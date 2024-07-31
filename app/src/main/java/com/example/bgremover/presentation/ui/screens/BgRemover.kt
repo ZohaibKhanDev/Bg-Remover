@@ -116,10 +116,11 @@ fun BgRemover() {
         if (isLoading) {
             CircularProgressIndicator()
         } else {
-            bgRemovedImageUrl?.let {
-                AsyncImage(model = it.length, contentDescription = "", modifier = Modifier.size(200.dp))
+            bgRemovedImageUrl?.let { url ->
+                AsyncImage(model = url, contentDescription = null, modifier = Modifier.size(200.dp))
             }
         }
     }
 }
+
 
