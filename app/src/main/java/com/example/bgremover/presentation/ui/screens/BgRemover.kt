@@ -12,7 +12,9 @@ import androidx.compose.foundation.Image
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Spacer
+import androidx.compose.foundation.layout.aspectRatio
 import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
@@ -51,6 +53,7 @@ fun BgRemover() {
     val bgRemovalState by viewModel.bgRemoval.collectAsState()
     val context = LocalContext.current
 
+
     val launcher = rememberLauncherForActivityResult(ActivityResultContracts.GetContent()) { uri ->
         imageUri = uri
         bgRemovedImageUrl = null
@@ -66,12 +69,12 @@ fun BgRemover() {
         }
     }
 
-
     fun extractImageUrl(response: String): String? {
         return try {
             val jsonObject = JSONObject(response)
-            jsonObject.getJSONObject("data").getString("image_url")
+            jsonObject.optString("data_url") // Ensure you are extracting the correct key
         } catch (e: JSONException) {
+            e.printStackTrace()
             null
         }
     }
@@ -83,23 +86,20 @@ fun BgRemover() {
                 val error = (bgRemovalState as ResultState.Error).error
                 Toast.makeText(context, "$error", Toast.LENGTH_SHORT).show()
             }
-
             ResultState.Loading -> {
                 isLoading = true
             }
-
             is ResultState.Success -> {
                 isLoading = false
                 val response = (bgRemovalState as ResultState.Success<String>).success
+                Log.d("BgRemover", "API Response: $response") // Log the full response
                 val imageUrl = extractImageUrl(response)
                 bgRemovedImageUrl = imageUrl
                 Toast.makeText(context, "$bgRemovedImageUrl", Toast.LENGTH_SHORT).show()
-                Log.d("TAG", "BgRemover: $bgRemovedImageUrl")
+                Log.d("BgRemover", "Extracted Image URL: $bgRemovedImageUrl")
             }
         }
     }
-
-
 
     fun downloadImage(url: String) {
         try {
@@ -162,4 +162,10 @@ fun BgRemover() {
         }
     }
 }
+
+
+
+
+
+
 

@@ -45,7 +45,6 @@ object BgRemoverApiClient {
                 override fun log(message: String) {
                     println(message)
                 }
-
             }
         }
 
@@ -59,22 +58,19 @@ object BgRemoverApiClient {
     @OptIn(InternalAPI::class)
     suspend fun removeBackground(imageFile: File): String {
         val formData = formData {
-            append("image", imageFile.readBytes(), Headers.build {
-                append(HttpHeaders.ContentType, "image/png")
+            append("image_file", imageFile.readBytes(), Headers.build {
+                append(HttpHeaders.ContentType, "image/jpeg")
                 append(HttpHeaders.ContentDisposition, "filename=\"${imageFile.name}\"")
             })
-            append("return_form", "")
+            append("size", "auto")
         }
 
-        val response: HttpResponse =
-            client.post("https://Human-Background-Removal.proxy-production.allthingsdev.co/cutout/portrait/body") {
-                headers {
-                    append("x-apihub-key", "iv2AzbVX1vv1TjNnK5QxQxvJKnw8ffE3OxKoWFtSHW1aDo4bI7")
-                    append("x-apihub-host", "Human-Background-Removal.allthingsdev.co")
-                    append("x-apihub-endpoint", "fde322f3-7402-43c6-87d1-23961c255735")
-                }
-                body = MultiPartFormDataContent(formData)
+        val response: HttpResponse = client.post("https://api.remove.bg/v1.0/removebg") {
+            headers {
+                append("X-API-Key", "nUN3azL5uyts2pPgaCFEqgni")
             }
+            body = MultiPartFormDataContent(formData)
+        }
 
         return response.bodyAsText()
     }

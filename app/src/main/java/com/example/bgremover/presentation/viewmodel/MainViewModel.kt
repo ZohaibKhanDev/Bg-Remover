@@ -14,7 +14,6 @@ class MainViewModel(private val repository: Repository) : ViewModel() {
     private val _bgRemoval = MutableStateFlow<ResultState<String>>(ResultState.Loading)
     val bgRemoval: StateFlow<ResultState<String>> = _bgRemoval.asStateFlow()
 
-
     fun removeBackground(imageFile: File) {
         viewModelScope.launch {
             _bgRemoval.value = ResultState.Loading

@@ -1,6 +1,8 @@
 package com.example.bgremover
 
 import android.graphics.Bitmap
+import android.graphics.Canvas
+import android.graphics.Matrix
 import android.os.Bundle
 import android.provider.MediaStore
 import androidx.activity.ComponentActivity
@@ -52,7 +54,7 @@ class MainActivity : ComponentActivity() {
         }
         setContent {
             BgRemoverTheme {
-                BackgroundRemoverApp()
+                BgRemover()
             }
         }
     }
@@ -61,7 +63,7 @@ class MainActivity : ComponentActivity() {
 
 @Composable
 fun BackgroundRemoverApp() {
-    val context= LocalContext.current
+    val context = LocalContext.current
     var originalBitmap by remember { mutableStateOf<Bitmap?>(null) }
     var processedBitmap by remember { mutableStateOf<Bitmap?>(null) }
     val launcher = rememberLauncherForActivityResult(
@@ -70,6 +72,7 @@ fun BackgroundRemoverApp() {
             uri?.let {
                 val bitmap = MediaStore.Images.Media.getBitmap(context.contentResolver, uri)
                 originalBitmap = bitmap
+                processedBitmap = null
             }
         }
     )
@@ -81,26 +84,14 @@ fun BackgroundRemoverApp() {
         verticalArrangement = Arrangement.Center,
         horizontalAlignment = Alignment.CenterHorizontally
     ) {
-        originalBitmap?.let { bitmap ->
+        (processedBitmap ?: originalBitmap)?.let { bitmap ->
             Image(
                 bitmap = bitmap.asImageBitmap(),
                 contentDescription = null,
                 modifier = Modifier
                     .fillMaxWidth()
                     .height(200.dp),
-                contentScale = ContentScale.Crop
-            )
-            Spacer(modifier = Modifier.height(16.dp))
-        }
-
-        processedBitmap?.let { bitmap ->
-            Image(
-                bitmap = bitmap.asImageBitmap(),
-                contentDescription = null,
-                modifier = Modifier
-                    .fillMaxWidth()
-                    .height(200.dp),
-                contentScale = ContentScale.Crop
+                contentScale = ContentScale.Fit  // Change this to ContentScale.Fit or ContentScale.Inside
             )
             Spacer(modifier = Modifier.height(16.dp))
         }
@@ -122,7 +113,7 @@ fun BackgroundRemoverApp() {
                         }
 
                         override fun onFailed(exception: Exception) {
-
+                            // Handle the exception
                         }
                     }
                 )
@@ -130,6 +121,31 @@ fun BackgroundRemoverApp() {
         }) {
             Text(text = "Remove Background", fontSize = 16.sp)
         }
-
     }
+}
+
+
+
+fun resizeBitmapTo4K(bitmap: Bitmap): Bitmap {
+    val width = 3840
+    val height = 2160
+    val scaledBitmap = Bitmap.createBitmap(width, height, Bitmap.Config.ARGB_8888)
+
+    val scaleX = width.toFloat() / bitmap.width
+    val scaleY = height.toFloat() / bitmap.height
+    val scale = Math.max(scaleX, scaleY)
+
+    val scaledWidth = scale * bitmap.width
+    val scaledHeight = scale * bitmap.height
+
+    val left = (width - scaledWidth) / 2
+    val top = (height - scaledHeight) / 2
+
+    val canvas = Canvas(scaledBitmap)
+    val matrix = Matrix()
+    matrix.postScale(scale, scale)
+    matrix.postTranslate(left, top)
+    canvas.drawBitmap(bitmap, matrix, null)
+
+    return scaledBitmap
 }
