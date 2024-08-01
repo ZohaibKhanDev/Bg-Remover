@@ -6,9 +6,6 @@ import android.content.ContentValues
 import android.content.Context
 import android.graphics.Bitmap
 import android.graphics.BitmapFactory
-import android.graphics.Canvas
-import android.graphics.Paint
-import android.graphics.Rect
 import android.net.Uri
 import android.os.Build
 import android.os.Environment
@@ -139,12 +136,7 @@ fun BgRemover() {
                     )
                     Spacer(modifier = Modifier.height(16.dp))
                     Button(onClick = {
-                        saveImage(bitmap, context, true)
-                    }) {
-                        Text("Download Image in 4K")
-                    }
-                    Button(onClick = {
-                        saveImage(bitmap, context, false)
+                        saveImage(bitmap, context)
                     }) {
                         Text("Download Image")
                     }
@@ -155,7 +147,7 @@ fun BgRemover() {
 }
 
 @SuppressLint("ServiceCast")
-fun saveImage(bitmap: Bitmap, context: Context, is4K: Boolean) {
+fun saveImage(bitmap: Bitmap, context: Context) {
     createNotificationChannel(context)
 
     val notificationManager = context.getSystemService(Context.NOTIFICATION_SERVICE) as NotificationManager
@@ -168,20 +160,8 @@ fun saveImage(bitmap: Bitmap, context: Context, is4K: Boolean) {
 
     notificationManager.notify(1, notificationBuilder.build())
 
-    val upscaledBitmap = if (is4K) {
-        val width = 3840
-        val height = 2160
-        val upscaledBitmap = Bitmap.createBitmap(width, height, Bitmap.Config.ARGB_8888)
-        val canvas = Canvas(upscaledBitmap)
-        val paint = Paint(Paint.FILTER_BITMAP_FLAG)
-        canvas.drawBitmap(bitmap, null, Rect(0, 0, width, height), paint)
-        upscaledBitmap
-    } else {
-        bitmap
-    }
-
     val contentValues = ContentValues().apply {
-        put(MediaStore.MediaColumns.DISPLAY_NAME, if (is4K) "bg_removed_image_4K.png" else "bg_removed_image.png")
+        put(MediaStore.MediaColumns.DISPLAY_NAME, "bg_removed_image.png")
         put(MediaStore.MediaColumns.MIME_TYPE, "image/png")
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.Q) {
             put(MediaStore.MediaColumns.RELATIVE_PATH, Environment.DIRECTORY_PICTURES)
@@ -193,7 +173,7 @@ fun saveImage(bitmap: Bitmap, context: Context, is4K: Boolean) {
 
     uri?.let {
         resolver.openOutputStream(it)?.use { outputStream ->
-            upscaledBitmap.compress(Bitmap.CompressFormat.PNG, 100, outputStream)
+            bitmap.compress(Bitmap.CompressFormat.PNG, 100, outputStream)
             Toast.makeText(context, "Image saved to Pictures", Toast.LENGTH_SHORT).show()
             notificationBuilder.setContentText("Download complete")
                 .setProgress(0, 0, false)
@@ -214,4 +194,3 @@ fun saveImage(bitmap: Bitmap, context: Context, is4K: Boolean) {
         notificationManager.notify(1, notificationBuilder.build())
     }
 }
-
