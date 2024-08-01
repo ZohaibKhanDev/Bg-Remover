@@ -2,6 +2,7 @@ package com.example.bgremover.data.remote
 
 import com.example.bgremover.utils.constant.TIMEOUT
 import io.ktor.client.HttpClient
+import io.ktor.client.call.body
 import io.ktor.client.engine.android.Android
 import io.ktor.client.plugins.HttpTimeout
 import io.ktor.client.plugins.contentnegotiation.ContentNegotiation
@@ -12,15 +13,21 @@ import io.ktor.client.request.forms.MultiPartFormDataContent
 import io.ktor.client.request.forms.formData
 import io.ktor.client.request.headers
 import io.ktor.client.request.post
+import io.ktor.client.request.setBody
 import io.ktor.client.statement.HttpResponse
 import io.ktor.client.statement.bodyAsText
 import io.ktor.client.utils.EmptyContent.headers
+import io.ktor.http.ContentType
 import io.ktor.http.Headers
 import io.ktor.http.HttpHeaders
+import io.ktor.http.isSuccess
 import io.ktor.serialization.kotlinx.json.json
 import io.ktor.util.InternalAPI
 import kotlinx.serialization.ExperimentalSerializationApi
 import kotlinx.serialization.json.Json
+import kotlinx.serialization.json.JsonObject
+import kotlinx.serialization.json.jsonObject
+import kotlinx.serialization.json.jsonPrimitive
 import org.koin.core.annotation.Single
 import java.io.File
 
@@ -45,6 +52,7 @@ object BgRemoverApiClient {
                 override fun log(message: String) {
                     println(message)
                 }
+
             }
         }
 
@@ -59,7 +67,7 @@ object BgRemoverApiClient {
     suspend fun removeBackground(imageFile: File): String {
         val formData = formData {
             append("image_file", imageFile.readBytes(), Headers.build {
-                append(HttpHeaders.ContentType, "image/jpeg")
+                append(HttpHeaders.ContentType, ContentType.Image.JPEG.toString())
                 append(HttpHeaders.ContentDisposition, "filename=\"${imageFile.name}\"")
             })
             append("size", "auto")
@@ -67,12 +75,17 @@ object BgRemoverApiClient {
 
         val response: HttpResponse = client.post("https://api.remove.bg/v1.0/removebg") {
             headers {
-                append("X-API-Key", "nUN3azL5uyts2pPgaCFEqgni")
+                append("X-API-Key", "m9it32g6pHyJ1rpMk4X5Yt98")
             }
-            body = MultiPartFormDataContent(formData)
+            setBody(MultiPartFormDataContent(formData))
         }
 
-        return response.bodyAsText()
+        if (response.status.isSuccess()) {
+            val responseBody = response.body<JsonObject>()
+            return responseBody["data"]?.jsonObject?.get("result_b64")?.jsonPrimitive?.content
+                ?: throw Exception("Failed to parse response")
+        } else {
+            throw Exception("Failed to remove background: ${response.status}")
+        }
     }
-
 }
