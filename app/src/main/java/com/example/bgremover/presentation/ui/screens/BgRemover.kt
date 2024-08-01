@@ -75,13 +75,35 @@ fun BgRemover() {
                 val error = (bgRemovalState as ResultState.Error).error
                 Toast.makeText(context, "$error", Toast.LENGTH_SHORT).show()
             }
+
             ResultState.Loading -> {
                 isLoading = true
             }
+
             is ResultState.Success -> {
                 isLoading = false
                 bgRemovedImageBase64 = (bgRemovalState as ResultState.Success<String>).success
             }
+        }
+    }
+
+    fun downloadImage(url: String, is4K: Boolean) {
+        try {
+            val downloadUrl = if (is4K) url.replace("size=auto", "size=4k") else url
+            val request = DownloadManager.Request(Uri.parse(downloadUrl))
+                .setTitle("Background Removed Image")
+                .setDescription("Downloading image...")
+                .setNotificationVisibility(DownloadManager.Request.VISIBILITY_VISIBLE_NOTIFY_COMPLETED)
+                .setDestinationInExternalPublicDir(
+                    Environment.DIRECTORY_DOWNLOADS,
+                    if (is4K) "bg_removed_image_4k.png" else "bg_removed_image.png"
+                )
+
+            val downloadManager =
+                context.getSystemService(Context.DOWNLOAD_SERVICE) as DownloadManager
+            downloadManager.enqueue(request)
+        } catch (e: Exception) {
+            Toast.makeText(context, "Error: ${e.message}", Toast.LENGTH_SHORT).show()
         }
     }
 
@@ -123,9 +145,13 @@ fun BgRemover() {
                 val imageBytes = Base64.decode(base64, Base64.DEFAULT)
                 val bitmap = BitmapFactory.decodeByteArray(imageBytes, 0, imageBytes.size)
                 Column {
-                    Image(bitmap = bitmap.asImageBitmap(), contentDescription = null, modifier = Modifier.size(200.dp))
+                    Image(
+                        bitmap = bitmap.asImageBitmap(),
+                        contentDescription = null,
+                        modifier = Modifier.size(200.dp)
+                    )
                     Spacer(modifier = Modifier.height(16.dp))
-                    Button(onClick = { /* handle download logic here */ }) {
+                    Button(onClick = { downloadImage(base64, true) }) {
                         Text("Download Image")
                     }
                 }
