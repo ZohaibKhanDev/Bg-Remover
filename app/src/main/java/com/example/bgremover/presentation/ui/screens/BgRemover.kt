@@ -67,6 +67,7 @@ fun BgRemover() {
             }
         }
     }
+    
 
     LaunchedEffect(bgRemovalState) {
         when (bgRemovalState) {
@@ -109,6 +110,7 @@ fun BgRemover() {
         }
     }
 
+    
     Column(
         modifier = Modifier
             .fillMaxSize()
