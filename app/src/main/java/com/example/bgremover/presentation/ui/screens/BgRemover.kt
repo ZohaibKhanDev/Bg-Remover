@@ -1,9 +1,9 @@
 package com.example.bgremover.presentation.ui.screens
 
-import android.app.DownloadManager
+import android.annotation.SuppressLint
+import android.app.NotificationManager
 import android.content.ContentValues
 import android.content.Context
-import android.content.Intent
 import android.graphics.Bitmap
 import android.graphics.BitmapFactory
 import android.net.Uri
@@ -11,7 +11,6 @@ import android.os.Build
 import android.os.Environment
 import android.provider.MediaStore
 import android.util.Base64
-import android.util.Log
 import android.widget.Toast
 import androidx.activity.compose.rememberLauncherForActivityResult
 import androidx.activity.result.contract.ActivityResultContracts
@@ -38,14 +37,14 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.asImageBitmap
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.unit.dp
-import androidx.core.content.FileProvider
+import androidx.core.app.NotificationCompat
 import coil.compose.rememberImagePainter
+import com.example.bgremover.R
+import com.example.bgremover.createNotificationChannel
 import com.example.bgremover.domain.usecase.ResultState
 import com.example.bgremover.presentation.viewmodel.MainViewModel
 import org.koin.compose.koinInject
 import java.io.File
-import java.io.FileOutputStream
-import java.io.IOException
 
 @Composable
 fun BgRemover() {
@@ -147,7 +146,20 @@ fun BgRemover() {
     }
 }
 
-fun saveImage(bitmap: Bitmap,context: Context) {
+@SuppressLint("ServiceCast")
+fun saveImage(bitmap: Bitmap, context: Context) {
+    createNotificationChannel(context)
+
+    val notificationManager = context.getSystemService(Context.NOTIFICATION_SERVICE) as NotificationManager
+    val notificationBuilder = NotificationCompat.Builder(context, "DOWNLOAD_CHANNEL")
+        .setSmallIcon(R.drawable.baseline_download_24)
+        .setContentTitle("Image Download")
+        .setContentText("Downloading...")
+        .setPriority(NotificationCompat.PRIORITY_HIGH)
+        .setOngoing(true)
+
+    notificationManager.notify(1, notificationBuilder.build())
+
     val contentValues = ContentValues().apply {
         put(MediaStore.MediaColumns.DISPLAY_NAME, "bg_removed_image.png")
         put(MediaStore.MediaColumns.MIME_TYPE, "image/png")
@@ -163,10 +175,22 @@ fun saveImage(bitmap: Bitmap,context: Context) {
         resolver.openOutputStream(it)?.use { outputStream ->
             bitmap.compress(Bitmap.CompressFormat.PNG, 100, outputStream)
             Toast.makeText(context, "Image saved to Pictures", Toast.LENGTH_SHORT).show()
+            notificationBuilder.setContentText("Download complete")
+                .setProgress(0, 0, false)
+                .setOngoing(false)
+            notificationManager.notify(1, notificationBuilder.build())
         } ?: run {
             Toast.makeText(context, "Error saving image", Toast.LENGTH_SHORT).show()
+            notificationBuilder.setContentText("Download failed")
+                .setProgress(0, 0, false)
+                .setOngoing(false)
+            notificationManager.notify(1, notificationBuilder.build())
         }
     } ?: run {
         Toast.makeText(context, "Error saving image", Toast.LENGTH_SHORT).show()
+        notificationBuilder.setContentText("Download failed")
+            .setProgress(0, 0, false)
+            .setOngoing(false)
+        notificationManager.notify(1, notificationBuilder.build())
     }
 }
