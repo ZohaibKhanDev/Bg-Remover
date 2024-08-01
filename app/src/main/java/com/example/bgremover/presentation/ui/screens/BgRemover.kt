@@ -1,24 +1,27 @@
 package com.example.bgremover.presentation.ui.screens
 
-
 import android.app.DownloadManager
+import android.content.ContentValues
 import android.content.Context
+import android.content.Intent
 import android.graphics.Bitmap
 import android.graphics.BitmapFactory
 import android.net.Uri
+import android.os.Build
 import android.os.Environment
+import android.provider.MediaStore
 import android.util.Base64
 import android.util.Log
 import android.widget.Toast
 import androidx.activity.compose.rememberLauncherForActivityResult
-import androidx.activity.result.contract.ActivityResultContracts  
+import androidx.activity.result.contract.ActivityResultContracts
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.height
-import androidx.compose.foundation.layout.padding                
+import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.material3.Button
 import androidx.compose.material3.CircularProgressIndicator
@@ -35,14 +38,14 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.asImageBitmap
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.unit.dp
-import coil.compose.AsyncImage
+import androidx.core.content.FileProvider
 import coil.compose.rememberImagePainter
 import com.example.bgremover.domain.usecase.ResultState
 import com.example.bgremover.presentation.viewmodel.MainViewModel
-import org.json.JSONException
-import org.json.JSONObject
 import org.koin.compose.koinInject
 import java.io.File
+import java.io.FileOutputStream
+import java.io.IOException
 
 @Composable
 fun BgRemover() {
@@ -68,7 +71,6 @@ fun BgRemover() {
             }
         }
     }
-    
 
     LaunchedEffect(bgRemovalState) {
         when (bgRemovalState) {
@@ -86,32 +88,10 @@ fun BgRemover() {
                 isLoading = false
                 bgRemovedImageBase64 = (bgRemovalState as ResultState.Success<String>).success
             }
+
         }
     }
 
-
-    
-    fun downloadImage(url: String, is4K: Boolean) {
-        try {
-            val downloadUrl = if (is4K) url.replace("size=auto", "size=4k") else url
-            val request = DownloadManager.Request(Uri.parse(downloadUrl))
-                .setTitle("Background Removed Image")
-                .setDescription("Downloading image...")
-                .setNotificationVisibility(DownloadManager.Request.VISIBILITY_VISIBLE_NOTIFY_COMPLETED)
-                .setDestinationInExternalPublicDir(
-                    Environment.DIRECTORY_DOWNLOADS,
-                    if (is4K) "bg_removed_image_4k.png" else "bg_removed_image.png"
-                )
-
-            val downloadManager =
-                context.getSystemService(Context.DOWNLOAD_SERVICE) as DownloadManager
-            downloadManager.enqueue(request)
-        } catch (e: Exception) {
-            Toast.makeText(context, "Error: ${e.message}", Toast.LENGTH_SHORT).show()
-        }
-    }
-
-    
     Column(
         modifier = Modifier
             .fillMaxSize()
@@ -156,7 +136,9 @@ fun BgRemover() {
                         modifier = Modifier.size(200.dp)
                     )
                     Spacer(modifier = Modifier.height(16.dp))
-                    Button(onClick = { downloadImage(base64, true) }) {
+                    Button(onClick = {
+                        saveImage(bitmap, context)
+                    }) {
                         Text("Download Image")
                     }
                 }
@@ -165,14 +147,26 @@ fun BgRemover() {
     }
 }
 
+fun saveImage(bitmap: Bitmap,context: Context) {
+    val contentValues = ContentValues().apply {
+        put(MediaStore.MediaColumns.DISPLAY_NAME, "bg_removed_image.png")
+        put(MediaStore.MediaColumns.MIME_TYPE, "image/png")
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.Q) {
+            put(MediaStore.MediaColumns.RELATIVE_PATH, Environment.DIRECTORY_PICTURES)
+        }
+    }
 
+    val resolver = context.contentResolver
+    val uri = resolver.insert(MediaStore.Images.Media.EXTERNAL_CONTENT_URI, contentValues)
 
-
-
-
-
-
-
-
-
-
+    uri?.let {
+        resolver.openOutputStream(it)?.use { outputStream ->
+            bitmap.compress(Bitmap.CompressFormat.PNG, 100, outputStream)
+            Toast.makeText(context, "Image saved to Pictures", Toast.LENGTH_SHORT).show()
+        } ?: run {
+            Toast.makeText(context, "Error saving image", Toast.LENGTH_SHORT).show()
+        }
+    } ?: run {
+        Toast.makeText(context, "Error saving image", Toast.LENGTH_SHORT).show()
+    }
+}
