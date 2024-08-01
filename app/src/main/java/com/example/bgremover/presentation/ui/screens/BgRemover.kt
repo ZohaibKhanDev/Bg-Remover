@@ -87,6 +87,8 @@ fun BgRemover() {
         }
     }
 
+
+    
     fun downloadImage(url: String, is4K: Boolean) {
         try {
             val downloadUrl = if (is4K) url.replace("size=auto", "size=4k") else url
