@@ -1,4 +1,4 @@
-package com.example.bgremover.presentation.ui.screens
+package com.example.bgremover.presentation.ui.screens.  
 
 import android.annotation.SuppressLint
 import android.app.NotificationManager
