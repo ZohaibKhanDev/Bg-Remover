@@ -171,6 +171,7 @@ fun saveImage(bitmap: Bitmap, context: Context) {
         }
     }
 
+
     val resolver = context.contentResolver
     val uri = resolver.insert(MediaStore.Images.Media.EXTERNAL_CONTENT_URI, contentValues)
 
@@ -191,7 +192,9 @@ fun saveImage(bitmap: Bitmap, context: Context) {
         }
     } ?: run {
         Toast.makeText(context, "Error saving image", Toast.LENGTH_SHORT).show()
-        notificationBuilder.setContentText("Download failed")
+       
+
+ notificationBuilder.setContentText("Download failed")
             .setProgress(0, 0, false)
             .setOngoing(false)
         notificationManager.notify(1, notificationBuilder.build())
