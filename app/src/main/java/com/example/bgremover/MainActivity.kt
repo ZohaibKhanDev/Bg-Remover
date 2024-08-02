@@ -39,6 +39,7 @@ import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.example.bgremover.di.appModule
+import com.example.bgremover.presentation.ui.navigation.Navigation
 import com.example.bgremover.presentation.ui.screens.BgRemover
 import com.example.bgremover.ui.theme.BgRemoverTheme
 import com.slowmac.autobackgroundremover.BackgroundRemover
@@ -58,7 +59,7 @@ class MainActivity : ComponentActivity() {
         }
         setContent {
             BgRemoverTheme {
-                BgRemover()
+                Navigation()
             }
         }
     }

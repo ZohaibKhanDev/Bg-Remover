@@ -1,9 +1,11 @@
 package com.example.bgremover.presentation.ui.screens
 
 import android.annotation.SuppressLint
+import android.app.Activity
 import android.app.NotificationManager
 import android.content.ContentValues
 import android.content.Context
+import android.content.Intent
 import android.graphics.Bitmap
 import android.graphics.BitmapFactory
 import android.net.Uri
@@ -59,10 +61,12 @@ import androidx.compose.ui.text.withStyle
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.core.app.NotificationCompat
+import androidx.navigation.NavController
 import coil.compose.rememberImagePainter
 import com.example.bgremover.R
 import com.example.bgremover.createNotificationChannel
 import com.example.bgremover.domain.usecase.ResultState
+import com.example.bgremover.presentation.ui.navigation.Screens
 import com.example.bgremover.presentation.viewmodel.MainViewModel
 import org.koin.compose.koinInject
 import java.io.File
@@ -70,7 +74,7 @@ import java.io.File
 @OptIn(ExperimentalMaterial3Api::class)
 @SuppressLint("UnusedMaterial3ScaffoldPaddingParameter")
 @Composable
-fun BgRemover() {
+fun BgRemover(navController: NavController) {
     val viewModel: MainViewModel = koinInject()
     var imageUri by remember { mutableStateOf<Uri?>(null) }
     var imageFile by remember { mutableStateOf<File?>(null) }
@@ -92,6 +96,9 @@ fun BgRemover() {
                 file
             }
         }
+        uri?.let {
+            navController.navigate(Screens.BgDetail.route + "/${Uri.encode(it.toString())}")
+        }
     }
 
     LaunchedEffect(bgRemovalState) {
@@ -101,19 +108,15 @@ fun BgRemover() {
                 val error = (bgRemovalState as ResultState.Error).error
                 Toast.makeText(context, "$error", Toast.LENGTH_SHORT).show()
             }
-
             ResultState.Loading -> {
                 isLoading = true
             }
-
             is ResultState.Success -> {
                 isLoading = false
                 bgRemovedImageBase64 = (bgRemovalState as ResultState.Success<String>).success
             }
-
         }
     }
-
 
     Scaffold(topBar = {
         TopAppBar(title = {
@@ -147,7 +150,6 @@ fun BgRemover() {
             )
         })
     }) {
-
         Column(
             modifier = Modifier
                 .fillMaxSize()
@@ -155,7 +157,6 @@ fun BgRemover() {
             verticalArrangement = Arrangement.spacedBy(7.dp),
             horizontalAlignment = Alignment.CenterHorizontally
         ) {
-
             Spacer(modifier = Modifier.height(45.dp))
 
             Image(
@@ -190,11 +191,10 @@ fun BgRemover() {
                 modifier = Modifier.align(Alignment.CenterHorizontally)
             )
 
-
             Spacer(modifier = Modifier.height(12.dp))
 
             Button(
-                onClick = { /*TODO*/ },
+                onClick = { launcher.launch("image/*") },
                 colors = ButtonDefaults.buttonColors(containerColor = Color(0XFF0e78e3)),
                 modifier = Modifier
                     .width(230.dp)
@@ -208,10 +208,7 @@ fun BgRemover() {
                 )
             }
 
-
-
             Spacer(modifier = Modifier.height(70.dp))
-
 
             Text(
                 text = "No image? Try one of these::",
@@ -233,7 +230,8 @@ fun BgRemover() {
                     modifier = Modifier
                         .clip(RoundedCornerShape(5.dp))
                         .width(50.dp)
-                        .height(45.dp), contentScale = ContentScale.Crop
+                        .height(45.dp),
+                    contentScale = ContentScale.Crop
                 )
 
                 Image(
@@ -242,7 +240,8 @@ fun BgRemover() {
                     modifier = Modifier
                         .clip(RoundedCornerShape(5.dp))
                         .width(50.dp)
-                        .height(45.dp), contentScale = ContentScale.Crop
+                        .height(45.dp),
+                    contentScale = ContentScale.Crop
                 )
 
                 Image(
@@ -251,7 +250,8 @@ fun BgRemover() {
                     modifier = Modifier
                         .clip(RoundedCornerShape(5.dp))
                         .width(50.dp)
-                        .height(45.dp), contentScale = ContentScale.Crop
+                        .height(45.dp),
+                    contentScale = ContentScale.Crop
                 )
 
                 Image(
@@ -260,7 +260,8 @@ fun BgRemover() {
                     modifier = Modifier
                         .clip(RoundedCornerShape(5.dp))
                         .width(50.dp)
-                        .height(45.dp), contentScale = ContentScale.Crop
+                        .height(45.dp),
+                    contentScale = ContentScale.Crop
                 )
             }
 
@@ -304,8 +305,8 @@ fun BgRemover() {
             )
         }
     }
-
 }
+
 
 
 @SuppressLint("ServiceCast")
