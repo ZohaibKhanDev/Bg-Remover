@@ -62,7 +62,6 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.core.app.NotificationCompat
 import androidx.navigation.NavController
-import coil.compose.AsyncImage
 import coil.compose.rememberImagePainter
 import com.example.bgremover.R
 import com.example.bgremover.createNotificationChannel
@@ -97,7 +96,7 @@ fun BgRemover(navController: NavController) {
             }
         }
         uri?.let {
-           /* navController.navigate(Screens.BgDetail.route + "/${Uri.encode(it.toString())}")*/
+            navController.navigate(Screens.BgDetail.route + "/${Uri.encode(it.toString())}")
         }
     }
 
@@ -195,10 +194,6 @@ fun BgRemover(navController: NavController) {
 
             Spacer(modifier = Modifier.height(70.dp))
 
-
-            bgRemovedImageBase64?.let {
-                AsyncImage(model = it, contentDescription = "")
-            }
 
             Text(
                 text = "No image? Try one of these::",

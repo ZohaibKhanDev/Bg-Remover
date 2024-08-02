@@ -17,7 +17,7 @@ fun Navigation() {
         composable(Screens.BgRemover.route) {
             BgRemover(navController)
         }
-     /*   composable(
+        composable(
             route = Screens.BgDetail.route + "/{imageUrl}",
             arguments = listOf(navArgument("imageUrl") { type = NavType.StringType })
         ) { backStackEntry ->
@@ -26,7 +26,7 @@ fun Navigation() {
                 navController = navController,
                 imageurl
             )
-        }*/
+        }
 
     }
 }
