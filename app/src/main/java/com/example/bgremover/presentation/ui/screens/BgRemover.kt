@@ -62,6 +62,7 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.core.app.NotificationCompat
 import androidx.navigation.NavController
+import coil.compose.AsyncImage
 import coil.compose.rememberImagePainter
 import com.example.bgremover.R
 import com.example.bgremover.createNotificationChannel
@@ -75,12 +76,11 @@ import java.io.File
 @SuppressLint("UnusedMaterial3ScaffoldPaddingParameter")
 @Composable
 fun BgRemover(navController: NavController) {
-    val viewModel: MainViewModel = koinInject()
     var imageUri by remember { mutableStateOf<Uri?>(null) }
     var imageFile by remember { mutableStateOf<File?>(null) }
     var isLoading by remember { mutableStateOf(false) }
     var bgRemovedImageBase64 by remember { mutableStateOf<String?>(null) }
-    val bgRemovalState by viewModel.bgRemoval.collectAsState()
+
     val context = LocalContext.current
 
     val launcher = rememberLauncherForActivityResult(ActivityResultContracts.GetContent()) { uri ->
@@ -97,26 +97,11 @@ fun BgRemover(navController: NavController) {
             }
         }
         uri?.let {
-            navController.navigate(Screens.BgDetail.route + "/${Uri.encode(it.toString())}")
+           /* navController.navigate(Screens.BgDetail.route + "/${Uri.encode(it.toString())}")*/
         }
     }
 
-    LaunchedEffect(bgRemovalState) {
-        when (bgRemovalState) {
-            is ResultState.Error -> {
-                isLoading = false
-                val error = (bgRemovalState as ResultState.Error).error
-                Toast.makeText(context, "$error", Toast.LENGTH_SHORT).show()
-            }
-            ResultState.Loading -> {
-                isLoading = true
-            }
-            is ResultState.Success -> {
-                isLoading = false
-                bgRemovedImageBase64 = (bgRemovalState as ResultState.Success<String>).success
-            }
-        }
-    }
+
 
     Scaffold(topBar = {
         TopAppBar(title = {
@@ -209,6 +194,11 @@ fun BgRemover(navController: NavController) {
             }
 
             Spacer(modifier = Modifier.height(70.dp))
+
+
+            bgRemovedImageBase64?.let {
+                AsyncImage(model = it, contentDescription = "")
+            }
 
             Text(
                 text = "No image? Try one of these::",
