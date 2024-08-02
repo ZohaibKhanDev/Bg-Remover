@@ -143,13 +143,50 @@ fun BgRemover() {
             modifier = Modifier
                 .fillMaxSize()
                 .padding(top = it.calculateTopPadding()),
-            verticalArrangement = Arrangement.spacedBy(16.dp),
+            verticalArrangement = Arrangement.spacedBy(7.dp),
             horizontalAlignment = Alignment.CenterHorizontally
         ) {
 
-            Spacer(modifier = Modifier.height(20.dp))
+            Spacer(modifier = Modifier.height(45.dp))
+
+            Image(
+                painter = painterResource(id = R.drawable.targets),
+                contentDescription = "",
+                contentScale = ContentScale.Crop,
+                modifier = Modifier.size(40.dp)
+            )
+
+            Spacer(modifier = Modifier.height(22.dp))
+
+            Text(
+                text = "Upload an image to",
+                fontSize = 40.sp,
+                fontWeight = FontWeight.Bold,
+                color = Color(0XFF454545)
+            )
+
+            Text(
+                text = "remove the",
+                color = Color(0XFF454545),
+                fontSize = 34.sp,
+                fontWeight = FontWeight.Bold,
+                modifier = Modifier.align(Alignment.CenterHorizontally)
+            )
+
+            Text(
+                text = "background",
+                color = Color(0XFF454545),
+                fontSize = 34.sp,
+                fontWeight = FontWeight.Bold,
+                modifier = Modifier.align(Alignment.CenterHorizontally)
+            )
             
-            Image(painter = painterResource(id = R.drawable.target), contentDescription = "")
+            
+            
+            
+            Button(onClick = { /*TODO*/ }) {
+                Text(text = "")
+            }
         }
     }
 
@@ -163,10 +200,8 @@ fun saveImage(bitmap: Bitmap, context: Context) {
     val notificationManager =
         context.getSystemService(Context.NOTIFICATION_SERVICE) as NotificationManager
     val notificationBuilder = NotificationCompat.Builder(context, "DOWNLOAD_CHANNEL")
-        .setSmallIcon(R.drawable.baseline_download_24)
-        .setContentTitle("Image Download")
-        .setContentText("Downloading...")
-        .setPriority(NotificationCompat.PRIORITY_HIGH)
+        .setSmallIcon(R.drawable.baseline_download_24).setContentTitle("Image Download")
+        .setContentText("Downloading...").setPriority(NotificationCompat.PRIORITY_HIGH)
         .setOngoing(true)
 
     notificationManager.notify(1, notificationBuilder.build())
@@ -186,21 +221,18 @@ fun saveImage(bitmap: Bitmap, context: Context) {
         resolver.openOutputStream(it)?.use { outputStream ->
             bitmap.compress(Bitmap.CompressFormat.PNG, 100, outputStream)
             Toast.makeText(context, "Image saved to Pictures", Toast.LENGTH_SHORT).show()
-            notificationBuilder.setContentText("Download complete")
-                .setProgress(0, 0, false)
+            notificationBuilder.setContentText("Download complete").setProgress(0, 0, false)
                 .setOngoing(false)
             notificationManager.notify(1, notificationBuilder.build())
         } ?: run {
             Toast.makeText(context, "Error saving image", Toast.LENGTH_SHORT).show()
-            notificationBuilder.setContentText("Download failed")
-                .setProgress(0, 0, false)
+            notificationBuilder.setContentText("Download failed").setProgress(0, 0, false)
                 .setOngoing(false)
             notificationManager.notify(1, notificationBuilder.build())
         }
     } ?: run {
         Toast.makeText(context, "Error saving image", Toast.LENGTH_SHORT).show()
-        notificationBuilder.setContentText("Download failed")
-            .setProgress(0, 0, false)
+        notificationBuilder.setContentText("Download failed").setProgress(0, 0, false)
             .setOngoing(false)
         notificationManager.notify(1, notificationBuilder.build())
     }
