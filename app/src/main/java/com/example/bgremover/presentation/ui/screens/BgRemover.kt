@@ -146,11 +146,13 @@ fun BgRemover() {
     }
 }
 
+
 @SuppressLint("ServiceCast")
 fun saveImage(bitmap: Bitmap, context: Context) {
     createNotificationChannel(context)
 
-    val notificationManager = context.getSystemService(Context.NOTIFICATION_SERVICE) as NotificationManager
+    val notificationManager =
+        context.getSystemService(Context.NOTIFICATION_SERVICE) as NotificationManager
     val notificationBuilder = NotificationCompat.Builder(context, "DOWNLOAD_CHANNEL")
         .setSmallIcon(R.drawable.baseline_download_24)
         .setContentTitle("Image Download")
@@ -194,3 +196,4 @@ fun saveImage(bitmap: Bitmap, context: Context) {
         notificationManager.notify(1, notificationBuilder.build())
     }
 }
+
