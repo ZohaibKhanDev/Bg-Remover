@@ -20,12 +20,15 @@ import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
+import androidx.compose.foundation.layout.width
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.MoreVert
 import androidx.compose.material3.Button
+import androidx.compose.material3.ButtonDefaults
 import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Icon
@@ -180,12 +183,43 @@ fun BgRemover() {
                 fontWeight = FontWeight.Bold,
                 modifier = Modifier.align(Alignment.CenterHorizontally)
             )
-            
-            
-            
-            
-            Button(onClick = { /*TODO*/ }) {
-                Text(text = "")
+
+
+            Spacer(modifier = Modifier.height(12.dp))
+
+            Button(
+                onClick = { /*TODO*/ },
+                colors = ButtonDefaults.buttonColors(containerColor = Color(0XFF0e78e3)),
+                modifier = Modifier
+                    .width(230.dp)
+                    .height(60.dp)
+            ) {
+                Text(
+                    text = "Upload Image",
+                    fontSize = 24.sp,
+                    fontWeight = FontWeight.Bold,
+                    color = Color.White
+                )
+            }
+
+
+
+            Spacer(modifier = Modifier.height(70.dp))
+
+
+            Text(
+                text = "No image? Try one of these::",
+                color = Color(0XFF596671),
+                fontSize = 16.sp,
+                fontWeight = FontWeight.Normal
+            )
+
+            Row(
+                modifier = Modifier.fillMaxWidth(),
+                horizontalArrangement = Arrangement.Center,
+                verticalAlignment = Alignment.CenterVertically
+            ) {
+
             }
         }
     }
