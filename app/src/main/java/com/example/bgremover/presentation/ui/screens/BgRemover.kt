@@ -120,6 +120,7 @@ fun BgRemover() {
             Text("Remove Background")
         }
 
+
         Spacer(modifier = Modifier.height(16.dp))
 
         if (isLoading) {
@@ -145,6 +146,8 @@ fun BgRemover() {
         }
     }
 }
+
+
 
 @SuppressLint("ServiceCast")
 fun saveImage(bitmap: Bitmap, context: Context) {
