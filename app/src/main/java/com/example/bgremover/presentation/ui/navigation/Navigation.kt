@@ -27,12 +27,15 @@ fun Navigation() {
                 imageurl
             )
         }
+
     }
 }
 
 sealed class Screens(
     val route: String
 ) {
+
     object BgRemover : Screens("BgRemover")
     object BgDetail : Screens("BgDetail")
+
 }

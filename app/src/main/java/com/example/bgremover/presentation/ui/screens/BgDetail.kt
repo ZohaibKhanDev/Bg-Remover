@@ -34,3 +34,5 @@ fun BgDetail(navController: NavController, imageUrl: String?) {
         } ?: Text(text = "No image selected.")
     }
 }
+
+
