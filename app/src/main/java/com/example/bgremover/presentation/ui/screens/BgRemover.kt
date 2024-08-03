@@ -62,6 +62,7 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.core.app.NotificationCompat
 import androidx.navigation.NavController
+import coil.compose.AsyncImage
 import coil.compose.rememberImagePainter
 import com.example.bgremover.R
 import com.example.bgremover.createNotificationChannel
@@ -75,11 +76,12 @@ import java.io.File
 @SuppressLint("UnusedMaterial3ScaffoldPaddingParameter")
 @Composable
 fun BgRemover(navController: NavController) {
+    val viewModel: MainViewModel = koinInject()
     var imageUri by remember { mutableStateOf<Uri?>(null) }
     var imageFile by remember { mutableStateOf<File?>(null) }
     var isLoading by remember { mutableStateOf(false) }
     var bgRemovedImageBase64 by remember { mutableStateOf<String?>(null) }
-
+    val bgRemovalState by viewModel.bgRemoval.collectAsState()
     val context = LocalContext.current
 
     val launcher = rememberLauncherForActivityResult(ActivityResultContracts.GetContent()) { uri ->
@@ -95,12 +97,40 @@ fun BgRemover(navController: NavController) {
                 file
             }
         }
-        uri?.let {
-            navController.navigate(Screens.BgDetail.route + "/${Uri.encode(it.toString())}")
+        imageFile?.let { file ->
+            isLoading = true
+            viewModel.removeBackground(file)
         }
     }
 
+    LaunchedEffect(bgRemovalState) {
+        when (bgRemovalState) {
+            is ResultState.Error -> {
+                isLoading = false
+                val error = (bgRemovalState as ResultState.Error).error
+                Toast.makeText(context, "$error", Toast.LENGTH_SHORT).show()
+            }
 
+            ResultState.Loading -> {
+                isLoading = true
+            }
+
+            is ResultState.Success -> {
+                isLoading = false
+                bgRemovedImageBase64 = (bgRemovalState as ResultState.Success<String>).success
+                imageUri?.let {
+                    bgRemovedImageBase64?.let {imagebg->
+                        navController.navigate(
+                            Screens.BgDetail.route + "/${Uri.encode(it.toString())}/${
+                                Uri.encode(imagebg )
+                            }"
+                        )
+                    }
+
+                }
+            }
+        }
+    }
 
     Scaffold(topBar = {
         TopAppBar(title = {
@@ -175,6 +205,7 @@ fun BgRemover(navController: NavController) {
                 modifier = Modifier.align(Alignment.CenterHorizontally)
             )
 
+
             Spacer(modifier = Modifier.height(12.dp))
 
             Button(
@@ -193,7 +224,6 @@ fun BgRemover(navController: NavController) {
             }
 
             Spacer(modifier = Modifier.height(70.dp))
-
 
             Text(
                 text = "No image? Try one of these::",

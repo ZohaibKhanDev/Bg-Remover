@@ -1,14 +1,16 @@
 package com.example.bgremover.presentation.ui.screens
 
 import android.annotation.SuppressLint
-import android.net.Uri
-import android.widget.Toast
+import android.graphics.BitmapFactory
+import android.util.Base64
+import androidx.compose.foundation.BorderStroke
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
+import androidx.compose.foundation.border
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
-import androidx.compose.foundation.layout.Row
+import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
@@ -16,13 +18,11 @@ import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.filled.ArrowBack
 import androidx.compose.material.icons.filled.MoreVert
 import androidx.compose.material.icons.filled.Redo
-import androidx.compose.material.icons.filled.Replay
 import androidx.compose.material.icons.filled.Splitscreen
 import androidx.compose.material.icons.filled.Undo
-import androidx.compose.material.icons.outlined.Stars
+import androidx.compose.material3.Button
 import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Icon
@@ -32,8 +32,6 @@ import androidx.compose.material3.Text
 import androidx.compose.material3.TopAppBar
 import androidx.compose.material3.TopAppBarDefaults
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.LaunchedEffect
-import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
@@ -43,6 +41,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.draw.rotate
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.graphics.asImageBitmap
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.painterResource
@@ -51,16 +50,16 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.navigation.NavController
 import coil.compose.AsyncImage
-import coil.compose.rememberImagePainter
 import com.example.bgremover.R
-import com.example.bgremover.domain.usecase.ResultState
-import com.example.bgremover.presentation.viewmodel.MainViewModel
-import org.koin.compose.koinInject
 
 @OptIn(ExperimentalMaterial3Api::class)
 @SuppressLint("UnusedMaterial3ScaffoldPaddingParameter")
 @Composable
-fun BgDetail(navController: NavController, imageUrl: String?) {
+fun BgDetail(
+    navController: NavController,
+    imageUrl: String?,
+    bgremoveimage: String?
+) {
     val context = LocalContext.current
     var isLoading by remember { mutableStateOf(true) }
 
@@ -88,25 +87,29 @@ fun BgDetail(navController: NavController, imageUrl: String?) {
                         )
                     }
 
-
                     IconButton(onClick = { /* TODO */ }) {
                         Icon(
                             imageVector = Icons.Default.Undo,
-                            contentDescription = "",
-
-                            )
+                            contentDescription = ""
+                        )
                     }
                     IconButton(onClick = { /* TODO */ }) {
                         Icon(
                             imageVector = Icons.Default.Redo,
-                            contentDescription = "",
+                            contentDescription = ""
+                        )
+                    }
+
+                    IconButton(onClick = { /* TODO */ }) {
+                        Icon(
+                            imageVector = Icons.Default.MoreVert,
+                            contentDescription = ""
                         )
                     }
                 }, colors = TopAppBarDefaults.topAppBarColors(containerColor = Color.White)
             )
         }
     ) {
-
         Column(
             modifier = Modifier
                 .fillMaxSize()
@@ -114,43 +117,67 @@ fun BgDetail(navController: NavController, imageUrl: String?) {
             verticalArrangement = Arrangement.Center,
             horizontalAlignment = Alignment.CenterHorizontally
         ) {
-            imageUrl?.let { url ->
-                Box(
-                    modifier = Modifier
-                        .size(300.dp)
-                        .clip(RoundedCornerShape(10.dp))
-                        .background(Color.Gray),
-                    contentAlignment = Alignment.Center
-                ) {
-                    AsyncImage(
-                        model = url,
-                        contentDescription = null,
-                        modifier = Modifier.matchParentSize(),
-                        contentScale = ContentScale.Crop,
-                        onSuccess = { isLoading = false },
-                        onError = { isLoading = false }
-                    )
-                    if (isLoading) {
-                        Box(
-                            modifier = Modifier.matchParentSize(),
-                            contentAlignment = Alignment.Center
-                        ) {
-                            CircularProgressIndicator(color = Color.White)
-                            Icon(imageVector = Icons.Outlined.Stars, contentDescription = "")
+            if (isLoading){
+                imageUrl?.let {
+                    Box(
+                        modifier = Modifier
+                            .width(340.dp)
+                            .border(
+                                BorderStroke(2.dp, color = Color.DarkGray),
+                                shape = RoundedCornerShape(11.dp)
+                            )
+                            .height(450.dp),
+                        contentAlignment = Alignment.Center
+                    ) {
+                        AsyncImage(
+                            model = it,
+                            contentDescription = null,
+                            modifier = Modifier
+                                .fillMaxSize()
+                                .clip(RoundedCornerShape(11.dp)),
+                            contentScale = ContentScale.Crop,
+                            onSuccess = { isLoading = false },
+                            onError = { isLoading = false }
+                        )
+                        if (isLoading) {
+                            Box(
+                                modifier = Modifier
+                                    .matchParentSize()
+                                    .background(Color.DarkGray.copy(alpha = 0.30f)),
+                                contentAlignment = Alignment.Center
+                            ) {
+                                Image(
+                                    painter = painterResource(id = R.drawable.targets),
+                                    contentDescription = "",
+                                    modifier = Modifier
+                                        .size(50.dp)
+                                        .padding(10.dp)
+                                )
+                            }
                         }
                     }
+                } ?: run {
+                    Text(
+                        text = "No image selected",
+                        color = Color.Red,
+                        fontSize = 20.sp,
+                        fontWeight = FontWeight.Bold
+                    )
                 }
-            } ?: run {
-                Text(
-                    text = "No image selected",
-                    color = Color.Red,
-                    fontSize = 20.sp,
-                    fontWeight = FontWeight.Bold
-                )
+            } else {
+                bgremoveimage?.let { base64 ->
+                    val imageBytes = Base64.decode(base64, Base64.DEFAULT)
+                    val bitmap = BitmapFactory.decodeByteArray(imageBytes, 0, imageBytes.size)
+                    Column {
+                        Image(
+                            bitmap = bitmap.asImageBitmap(),
+                            contentDescription = null,
+                            modifier = Modifier.size(200.dp)
+                        )
+                    }
+                }
             }
         }
-
-
     }
 }
 

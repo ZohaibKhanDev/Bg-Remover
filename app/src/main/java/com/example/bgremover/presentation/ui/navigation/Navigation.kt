@@ -18,18 +18,24 @@ fun Navigation() {
             BgRemover(navController)
         }
         composable(
-            route = Screens.BgDetail.route + "/{imageUrl}",
-            arguments = listOf(navArgument("imageUrl") { type = NavType.StringType })
-        ) { backStackEntry ->
-            val imageurl = backStackEntry?.arguments?.getString("imageUrl")
-            BgDetail(
-                navController = navController,
-                imageurl
+            route = Screens.BgDetail.route + "/{imageUrl}/{bgremoveimage}",
+            arguments =
+            listOf(
+                navArgument("imageUrl") {
+                    type = NavType.StringType
+                },
+                navArgument("bgremoveimage") {
+                    type = NavType.StringType
+                }
             )
+        ) { backStackEntry ->
+            val imageurl = backStackEntry.arguments?.getString("imageUrl")
+            val bgremoveimage = backStackEntry.arguments?.getString("bgremoveimage")
+            BgDetail(navController = navController, imageurl, bgremoveimage)
         }
-
     }
 }
+
 
 sealed class Screens(
     val route: String
