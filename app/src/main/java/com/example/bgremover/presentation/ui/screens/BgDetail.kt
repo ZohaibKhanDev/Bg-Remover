@@ -182,7 +182,7 @@ fun BgDetail(
                                     contentDescription = null,
                                     contentScale = ContentScale.Crop,
                                     modifier = Modifier
-                                        .fillMaxSize()
+                                        .size(340.dp, 450.dp)
                                         .clip(RoundedCornerShape(11.dp))
                                 )
                             }
