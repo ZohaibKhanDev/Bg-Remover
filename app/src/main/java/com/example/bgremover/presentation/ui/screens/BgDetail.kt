@@ -87,6 +87,7 @@ fun BgDetail(navController: NavController, imageUrl: String?) {
             )
         }
     ) {
+
         Column(
             modifier = Modifier
                 .fillMaxSize()
@@ -129,6 +130,8 @@ fun BgDetail(navController: NavController, imageUrl: String?) {
                 )
             }
         }
+
+
     }
 }
 
