@@ -3,7 +3,10 @@ package com.example.bgremover.presentation.ui.screens
 import android.annotation.SuppressLint
 import android.graphics.BitmapFactory
 import android.util.Base64
+import androidx.compose.animation.AnimatedVisibility
 import androidx.compose.animation.Crossfade
+import androidx.compose.animation.slideInHorizontally
+import androidx.compose.animation.slideOutHorizontally
 import androidx.compose.foundation.BorderStroke
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
@@ -14,10 +17,12 @@ import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
+import androidx.compose.foundation.layout.wrapContentSize
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.MoreVert
@@ -25,6 +30,8 @@ import androidx.compose.material.icons.filled.Redo
 import androidx.compose.material.icons.filled.Splitscreen
 import androidx.compose.material.icons.filled.Undo
 import androidx.compose.material3.Button
+import androidx.compose.material3.Card
+import androidx.compose.material3.CardDefaults
 import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Icon
@@ -64,13 +71,10 @@ fun BgDetail(
     imageUrl: String?,
     bgremoveimage: String?
 ) {
-    val context = LocalContext.current
-    var isLoading by remember { mutableStateOf(true) }
     var showBgRemovedImage by remember { mutableStateOf(false) }
-    var split by remember { mutableStateOf(false) }
 
     LaunchedEffect(Unit) {
-        delay(3000) // Delay before switching to the next image
+        delay(3000)
         showBgRemovedImage = true
     }
 
@@ -88,7 +92,6 @@ fun BgDetail(
                     )
                 },
                 actions = {
-
                     IconButton(onClick = { /* TODO */ }) {
                         Image(
                             imageVector = Icons.Filled.Splitscreen,
@@ -96,10 +99,9 @@ fun BgDetail(
                             contentScale = ContentScale.Crop,
                             modifier = Modifier
                                 .rotate(90f)
-                                .clickable { split = !split }
+                                .clickable { /* TODO */ }
                         )
                     }
-
                     IconButton(onClick = { /* TODO */ }) {
                         Icon(
                             imageVector = Icons.Default.Undo,
@@ -112,14 +114,14 @@ fun BgDetail(
                             contentDescription = ""
                         )
                     }
-
                     IconButton(onClick = { /* TODO */ }) {
                         Icon(
                             imageVector = Icons.Default.MoreVert,
                             contentDescription = ""
                         )
                     }
-                }, colors = TopAppBarDefaults.topAppBarColors(containerColor = Color.White)
+                },
+                colors = TopAppBarDefaults.topAppBarColors(containerColor = Color.White)
             )
         }
     ) {
@@ -130,100 +132,129 @@ fun BgDetail(
             verticalArrangement = Arrangement.Center,
             horizontalAlignment = Alignment.CenterHorizontally
         ) {
-            Crossfade(targetState = showBgRemovedImage) { isBgRemoved ->
-                if (isBgRemoved) {
-                    bgremoveimage?.let { base64 ->
-                        val imageBytes = Base64.decode(base64, Base64.DEFAULT)
-                        val bitmap = BitmapFactory.decodeByteArray(imageBytes, 0, imageBytes.size)
-                        Column {
-                            Image(
-                                bitmap = bitmap.asImageBitmap(),
-                                contentDescription = null,
-                                modifier = Modifier.size(200.dp)
+            AnimatedVisibility(
+                visible = !showBgRemovedImage,
+                enter = slideInHorizontally(initialOffsetX = { -it }),
+                exit = slideOutHorizontally(targetOffsetX = { -it })
+            ) {
+                imageUrl?.let {
+                    Box(
+                        modifier = Modifier
+                            .width(340.dp)
+                            .border(
+                                BorderStroke(2.dp, color = Color.DarkGray),
+                                shape = RoundedCornerShape(11.dp)
                             )
-                        }
-                    } ?: run {
-                        Text(
-                            text = "No background removed image available",
-                            color = Color.Red,
-                            fontSize = 20.sp,
-                            fontWeight = FontWeight.Bold
+                            .height(450.dp),
+                        contentAlignment = Alignment.Center
+                    ) {
+                        AsyncImage(
+                            model = it,
+                            contentDescription = null,
+                            modifier = Modifier
+                                .fillMaxSize()
+                                .clip(RoundedCornerShape(11.dp)),
+                            contentScale = ContentScale.Crop
                         )
-                    }
-                } else {
-                    imageUrl?.let {
                         Box(
                             modifier = Modifier
-                                .width(340.dp)
-                                .border(
-                                    BorderStroke(2.dp, color = Color.DarkGray),
-                                    shape = RoundedCornerShape(11.dp)
-                                )
-                                .height(450.dp),
+                                .matchParentSize()
+                                .background(Color.DarkGray.copy(alpha = 0.30f)),
                             contentAlignment = Alignment.Center
                         ) {
-                            AsyncImage(
-                                model = it,
-                                contentDescription = null,
+                            Image(
+                                painter = painterResource(id = R.drawable.targets),
+                                contentDescription = "",
                                 modifier = Modifier
-                                    .fillMaxSize()
-                                    .clip(RoundedCornerShape(11.dp)),
-                                contentScale = ContentScale.Crop,
-                                onSuccess = { isLoading = false },
-                                onError = { isLoading = false }
+                                    .size(50.dp)
+                                    .align(Alignment.TopStart)
+                                    .padding(10.dp)
                             )
-                            Box(
+                            Image(
+                                painter = painterResource(id = R.drawable.targets),
+                                contentDescription = "",
                                 modifier = Modifier
-                                    .matchParentSize()
-                                    .background(Color.DarkGray.copy(alpha = 0.30f)),
+                                    .size(50.dp)
+                                    .align(Alignment.Center)
+                                    .padding(10.dp)
+                            )
+                            Image(
+                                painter = painterResource(id = R.drawable.targets),
+                                contentDescription = "",
+                                modifier = Modifier
+                                    .size(50.dp)
+                                    .align(Alignment.BottomEnd)
+                                    .padding(10.dp)
+                            )
+                            Image(
+                                painter = painterResource(id = R.drawable.targets),
+                                contentDescription = "",
+                                modifier = Modifier
+                                    .size(50.dp)
+                                    .align(Alignment.CenterStart)
+                                    .padding(10.dp)
+                            )
+                        }
+                    }
+                } ?: run {
+                    Text(
+                        text = "No image selected",
+                        color = Color.Red,
+                        fontSize = 20.sp,
+                        fontWeight = FontWeight.Bold
+                    )
+                }
+            }
+
+            AnimatedVisibility(
+                visible = showBgRemovedImage,
+                enter = slideInHorizontally(initialOffsetX = { it }),
+                exit = slideOutHorizontally(targetOffsetX = { it })
+            ) {
+                bgremoveimage?.let { base64 ->
+                    val imageBytes = Base64.decode(base64, Base64.DEFAULT)
+                    val bitmap = BitmapFactory.decodeByteArray(imageBytes, 0, imageBytes.size)
+                    Column {
+                        Card(
+                            modifier = Modifier
+                                .fillMaxWidth()
+                                .height(450.dp)
+                                .padding(10.dp),
+                            elevation = CardDefaults.elevatedCardElevation(2.dp),
+                            border = BorderStroke(2.dp, color = Color.Gray.copy(alpha = 0.50f))
+                        ) {
+                            Box(
+                                modifier = Modifier.fillMaxSize(),
                                 contentAlignment = Alignment.Center
                             ) {
                                 Image(
-                                    painter = painterResource(id = R.drawable.targets),
+                                    painter = painterResource(id = R.drawable.transparntbg),
                                     contentDescription = "",
+                                    contentScale = ContentScale.Crop,
                                     modifier = Modifier
-                                        .size(50.dp)
-                                        .align(Alignment.TopStart)
-                                        .padding(10.dp)
+                                        .fillMaxSize()
+                                        .background(color = Color.Transparent.copy(alpha = 0.30f))
                                 )
-
                                 Image(
-                                    painter = painterResource(id = R.drawable.targets),
-                                    contentDescription = "",
+                                    bitmap = bitmap.asImageBitmap(),
+                                    contentDescription = null,
+                                    contentScale = ContentScale.Crop,
                                     modifier = Modifier
-                                        .size(50.dp)
+                                        .fillMaxWidth()
+                                        .height(250.dp)
                                         .align(Alignment.Center)
-                                        .padding(10.dp)
-                                )
-
-
-                                Image(
-                                    painter = painterResource(id = R.drawable.targets),
-                                    contentDescription = "",
-                                    modifier = Modifier
-                                        .size(50.dp)
-                                        .align(Alignment.BottomEnd)
-                                        .padding(10.dp)
-                                )
-
-                                Image(
-                                    painter = painterResource(id = R.drawable.targets),
-                                    contentDescription = "",
-                                    modifier = Modifier
-                                        .size(50.dp)
-                                        .align(Alignment.CenterStart)
-                                        .padding(10.dp)
                                 )
                             }
+
                         }
-                    } ?: run {
-                        Text(
-                            text = "No image selected",
-                            color = Color.Red,
-                            fontSize = 20.sp,
-                            fontWeight = FontWeight.Bold
-                        )
                     }
+                } ?: run {
+                    Text(
+                        text = "No background removed image available",
+                        color = Color.Red,
+                        fontSize = 20.sp,
+                        fontWeight = FontWeight.Bold
+                    )
                 }
             }
         }
