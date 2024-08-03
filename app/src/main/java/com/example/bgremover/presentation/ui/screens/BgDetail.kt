@@ -13,12 +13,14 @@ import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
+import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.ArrowBack
 import androidx.compose.material.icons.filled.MoreVert
 import androidx.compose.material.icons.filled.Redo
 import androidx.compose.material.icons.filled.Replay
+import androidx.compose.material.icons.filled.Splitscreen
 import androidx.compose.material.icons.filled.Undo
 import androidx.compose.material.icons.outlined.Stars
 import androidx.compose.material3.CircularProgressIndicator
@@ -28,6 +30,7 @@ import androidx.compose.material3.IconButton
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
 import androidx.compose.material3.TopAppBar
+import androidx.compose.material3.TopAppBarDefaults
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
@@ -77,12 +80,21 @@ fun BgDetail(navController: NavController, imageUrl: String?) {
                 actions = {
 
                     IconButton(onClick = { /* TODO */ }) {
-
+                        Image(
+                            imageVector = Icons.Filled.Splitscreen,
+                            contentDescription = "",
+                            contentScale = ContentScale.Crop,
+                            modifier = Modifier.rotate(90f)
+                        )
                     }
 
 
                     IconButton(onClick = { /* TODO */ }) {
-                        Icon(imageVector = Icons.Default.Undo, contentDescription = "")
+                        Icon(
+                            imageVector = Icons.Default.Undo,
+                            contentDescription = "",
+
+                            )
                     }
                     IconButton(onClick = { /* TODO */ }) {
                         Icon(
@@ -90,7 +102,7 @@ fun BgDetail(navController: NavController, imageUrl: String?) {
                             contentDescription = "",
                         )
                     }
-                }
+                }, colors = TopAppBarDefaults.topAppBarColors(containerColor = Color.White)
             )
         }
     ) {
