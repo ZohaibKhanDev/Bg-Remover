@@ -17,7 +17,9 @@ import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.ArrowBack
 import androidx.compose.material.icons.filled.MoreVert
+import androidx.compose.material.icons.filled.Redo
 import androidx.compose.material.icons.filled.Replay
+import androidx.compose.material.icons.filled.Undo
 import androidx.compose.material.icons.outlined.Stars
 import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.ExperimentalMaterial3Api
@@ -73,14 +75,19 @@ fun BgDetail(navController: NavController, imageUrl: String?) {
                     )
                 },
                 actions = {
+
                     IconButton(onClick = { /* TODO */ }) {
-                        Icon(imageVector = Icons.Default.Replay, contentDescription = "")
+
+                    }
+
+
+                    IconButton(onClick = { /* TODO */ }) {
+                        Icon(imageVector = Icons.Default.Undo, contentDescription = "")
                     }
                     IconButton(onClick = { /* TODO */ }) {
                         Icon(
-                            imageVector = Icons.Default.Replay,
+                            imageVector = Icons.Default.Redo,
                             contentDescription = "",
-                            modifier = Modifier.rotate(180f)
                         )
                     }
                 }
