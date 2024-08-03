@@ -3,10 +3,12 @@ package com.example.bgremover.presentation.ui.screens
 import android.annotation.SuppressLint
 import android.graphics.BitmapFactory
 import android.util.Base64
+import androidx.compose.animation.Crossfade
 import androidx.compose.foundation.BorderStroke
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.border
+import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
@@ -32,6 +34,7 @@ import androidx.compose.material3.Text
 import androidx.compose.material3.TopAppBar
 import androidx.compose.material3.TopAppBarDefaults
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
@@ -51,6 +54,7 @@ import androidx.compose.ui.unit.sp
 import androidx.navigation.NavController
 import coil.compose.AsyncImage
 import com.example.bgremover.R
+import kotlinx.coroutines.delay
 
 @OptIn(ExperimentalMaterial3Api::class)
 @SuppressLint("UnusedMaterial3ScaffoldPaddingParameter")
@@ -62,6 +66,13 @@ fun BgDetail(
 ) {
     val context = LocalContext.current
     var isLoading by remember { mutableStateOf(true) }
+    var showBgRemovedImage by remember { mutableStateOf(false) }
+    var split by remember { mutableStateOf(false) }
+
+    LaunchedEffect(Unit) {
+        delay(3000) // Delay before switching to the next image
+        showBgRemovedImage = true
+    }
 
     Scaffold(
         topBar = {
@@ -83,7 +94,9 @@ fun BgDetail(
                             imageVector = Icons.Filled.Splitscreen,
                             contentDescription = "",
                             contentScale = ContentScale.Crop,
-                            modifier = Modifier.rotate(90f)
+                            modifier = Modifier
+                                .rotate(90f)
+                                .clickable { split = !split }
                         )
                     }
 
@@ -117,29 +130,48 @@ fun BgDetail(
             verticalArrangement = Arrangement.Center,
             horizontalAlignment = Alignment.CenterHorizontally
         ) {
-            if (isLoading){
-                imageUrl?.let {
-                    Box(
-                        modifier = Modifier
-                            .width(340.dp)
-                            .border(
-                                BorderStroke(2.dp, color = Color.DarkGray),
-                                shape = RoundedCornerShape(11.dp)
+            Crossfade(targetState = showBgRemovedImage) { isBgRemoved ->
+                if (isBgRemoved) {
+                    bgremoveimage?.let { base64 ->
+                        val imageBytes = Base64.decode(base64, Base64.DEFAULT)
+                        val bitmap = BitmapFactory.decodeByteArray(imageBytes, 0, imageBytes.size)
+                        Column {
+                            Image(
+                                bitmap = bitmap.asImageBitmap(),
+                                contentDescription = null,
+                                modifier = Modifier.size(200.dp)
                             )
-                            .height(450.dp),
-                        contentAlignment = Alignment.Center
-                    ) {
-                        AsyncImage(
-                            model = it,
-                            contentDescription = null,
-                            modifier = Modifier
-                                .fillMaxSize()
-                                .clip(RoundedCornerShape(11.dp)),
-                            contentScale = ContentScale.Crop,
-                            onSuccess = { isLoading = false },
-                            onError = { isLoading = false }
+                        }
+                    } ?: run {
+                        Text(
+                            text = "No background removed image available",
+                            color = Color.Red,
+                            fontSize = 20.sp,
+                            fontWeight = FontWeight.Bold
                         )
-                        if (isLoading) {
+                    }
+                } else {
+                    imageUrl?.let {
+                        Box(
+                            modifier = Modifier
+                                .width(340.dp)
+                                .border(
+                                    BorderStroke(2.dp, color = Color.DarkGray),
+                                    shape = RoundedCornerShape(11.dp)
+                                )
+                                .height(450.dp),
+                            contentAlignment = Alignment.Center
+                        ) {
+                            AsyncImage(
+                                model = it,
+                                contentDescription = null,
+                                modifier = Modifier
+                                    .fillMaxSize()
+                                    .clip(RoundedCornerShape(11.dp)),
+                                contentScale = ContentScale.Crop,
+                                onSuccess = { isLoading = false },
+                                onError = { isLoading = false }
+                            )
                             Box(
                                 modifier = Modifier
                                     .matchParentSize()
@@ -151,28 +183,45 @@ fun BgDetail(
                                     contentDescription = "",
                                     modifier = Modifier
                                         .size(50.dp)
+                                        .align(Alignment.TopStart)
+                                        .padding(10.dp)
+                                )
+
+                                Image(
+                                    painter = painterResource(id = R.drawable.targets),
+                                    contentDescription = "",
+                                    modifier = Modifier
+                                        .size(50.dp)
+                                        .align(Alignment.Center)
+                                        .padding(10.dp)
+                                )
+
+
+                                Image(
+                                    painter = painterResource(id = R.drawable.targets),
+                                    contentDescription = "",
+                                    modifier = Modifier
+                                        .size(50.dp)
+                                        .align(Alignment.BottomEnd)
+                                        .padding(10.dp)
+                                )
+
+                                Image(
+                                    painter = painterResource(id = R.drawable.targets),
+                                    contentDescription = "",
+                                    modifier = Modifier
+                                        .size(50.dp)
+                                        .align(Alignment.CenterStart)
                                         .padding(10.dp)
                                 )
                             }
                         }
-                    }
-                } ?: run {
-                    Text(
-                        text = "No image selected",
-                        color = Color.Red,
-                        fontSize = 20.sp,
-                        fontWeight = FontWeight.Bold
-                    )
-                }
-            } else {
-                bgremoveimage?.let { base64 ->
-                    val imageBytes = Base64.decode(base64, Base64.DEFAULT)
-                    val bitmap = BitmapFactory.decodeByteArray(imageBytes, 0, imageBytes.size)
-                    Column {
-                        Image(
-                            bitmap = bitmap.asImageBitmap(),
-                            contentDescription = null,
-                            modifier = Modifier.size(200.dp)
+                    } ?: run {
+                        Text(
+                            text = "No image selected",
+                            color = Color.Red,
+                            fontSize = 20.sp,
+                            fontWeight = FontWeight.Bold
                         )
                     }
                 }
@@ -180,6 +229,8 @@ fun BgDetail(
         }
     }
 }
+
+
 
 
 
