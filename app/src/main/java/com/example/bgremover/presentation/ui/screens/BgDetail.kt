@@ -3,8 +3,6 @@ package com.example.bgremover.presentation.ui.screens
 import android.annotation.SuppressLint
 import android.graphics.BitmapFactory
 import android.util.Base64
-import androidx.compose.animation.AnimatedVisibility
-import androidx.compose.animation.Crossfade
 import androidx.compose.animation.core.LinearOutSlowInEasing
 import androidx.compose.animation.core.animateFloatAsState
 import androidx.compose.animation.core.tween
@@ -22,25 +20,19 @@ import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
-import androidx.compose.foundation.layout.fillMaxHeight
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
-import androidx.compose.foundation.layout.wrapContentHeight
-import androidx.compose.foundation.layout.wrapContentSize
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.Add
 import androidx.compose.material.icons.filled.MoreVert
 import androidx.compose.material.icons.filled.Redo
 import androidx.compose.material.icons.filled.Splitscreen
 import androidx.compose.material.icons.filled.Undo
-import androidx.compose.material3.Button
-import androidx.compose.material3.Card
-import androidx.compose.material3.CardDefaults
-import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
@@ -62,7 +54,6 @@ import androidx.compose.ui.draw.scale
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.asImageBitmap
 import androidx.compose.ui.layout.ContentScale
-import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
@@ -142,12 +133,26 @@ fun BgDetail(
             Row(
                 modifier = Modifier
                     .fillMaxWidth()
-                    .padding(top = 70.dp, bottom = 40.dp),
+                    .padding(top = 12.dp, bottom = 40.dp),
                 horizontalArrangement = Arrangement.spacedBy(5.dp),
                 verticalAlignment = Alignment.CenterVertically
             ) {
-
+                Box(
+                    modifier = Modifier
+                        .clip(RoundedCornerShape(6.dp))
+                        .width(70.dp)
+                        .background(color = Color.Blue.copy(alpha = 0.20f))
+                        .height(45.dp), contentAlignment = Alignment.Center
+                ) {
+                    Icon(
+                        imageVector = Icons.Default.Add,
+                        contentDescription = "",
+                        modifier = Modifier.size(25.dp)
+                    )
+                }
             }
+
+
 
             imageUrl?.let {
                 Box(
@@ -174,6 +179,7 @@ fun BgDetail(
                             contentScale = ContentScale.Crop
                         )
                     }
+
 
                     androidx.compose.animation.AnimatedVisibility(
                         visible = showBgRemovedImage,
@@ -226,6 +232,7 @@ fun BgDetail(
                 )
             }
 
+
             Spacer(modifier = Modifier.height(12.dp))
 
 
@@ -234,8 +241,9 @@ fun BgDetail(
                 horizontalArrangement = Arrangement.spacedBy(6.dp),
                 verticalAlignment = Alignment.CenterVertically
             ) {
-                
+
             }
+
         }
     }
 }
