@@ -133,21 +133,20 @@ fun BgDetail(
             Row(
                 modifier = Modifier
                     .fillMaxWidth()
-                    .padding(top = 12.dp, bottom = 40.dp),
+                    .padding(top = 12.dp, bottom = 40.dp, start = 6.dp),
                 horizontalArrangement = Arrangement.spacedBy(5.dp),
                 verticalAlignment = Alignment.CenterVertically
             ) {
                 Box(
                     modifier = Modifier
                         .clip(RoundedCornerShape(6.dp))
-                        .width(70.dp)
-                        .background(color = Color.Blue.copy(alpha = 0.20f))
-                        .height(45.dp), contentAlignment = Alignment.Center
+                        .width(60.dp)
+                        .background(color = Color(0XFFb5cef7).copy(alpha = 0.55f))
+                        .height(55.dp), contentAlignment = Alignment.Center
                 ) {
                     Icon(
                         imageVector = Icons.Default.Add,
-                        contentDescription = "",
-                        modifier = Modifier.size(25.dp)
+                        contentDescription = "", tint = Color(0XFF0766e3)
                     )
                 }
             }
