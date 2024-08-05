@@ -156,6 +156,7 @@ fun BgDetail(
                     modifier = Modifier
                         .clip(RoundedCornerShape(6.dp))
                         .width(58.dp)
+                        .border(BorderStroke(1.dp, color = Color(0XFF0766e3)))
                         .background(color = Color(0XFFb5cef7).copy(alpha = 0.55f))
                         .height(58.dp), contentAlignment = Alignment.Center
                 ) {
@@ -171,7 +172,7 @@ fun BgDetail(
                     Image(
                         painter = painterResource(id = R.drawable.deleteicon),
                         contentDescription = "",
-                        contentScale = ContentScale.Crop
+                        contentScale = ContentScale.Crop, modifier = Modifier.size(50.dp)
                     )
                 }
             }
