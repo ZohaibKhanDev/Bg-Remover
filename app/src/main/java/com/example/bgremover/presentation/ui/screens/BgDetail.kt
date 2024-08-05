@@ -20,6 +20,7 @@ import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxHeight
 import androidx.compose.foundation.layout.fillMaxSize
@@ -75,9 +76,7 @@ import kotlinx.coroutines.delay
 @SuppressLint("UnusedMaterial3ScaffoldPaddingParameter")
 @Composable
 fun BgDetail(
-    navController: NavController,
-    imageUrl: String?,
-    bgremoveimage: String?
+    navController: NavController, imageUrl: String?, bgremoveimage: String?
 ) {
     var showBgRemovedImage by remember { mutableStateOf(false) }
     var showImageAnimation by remember { mutableStateOf(true) }
@@ -90,78 +89,75 @@ fun BgDetail(
     }
 
     val animatedScale = animateFloatAsState(
-        targetValue = if (showImageAnimation) 1f else 0f,
-        animationSpec = tween(
-            durationMillis = 1500,
-            easing = LinearOutSlowInEasing
+        targetValue = if (showImageAnimation) 1f else 0f, animationSpec = tween(
+            durationMillis = 1500, easing = LinearOutSlowInEasing
         ), label = ""
     )
 
-    Scaffold(
-        topBar = {
-            TopAppBar(
-                title = {},
-                navigationIcon = {
-                    Image(
-                        painter = painterResource(id = R.drawable.bgremover),
-                        contentDescription = "",
-                        modifier = Modifier
-                            .padding(top = 10.dp)
-                            .size(60.dp),
-                    )
-                },
-                actions = {
-                    IconButton(onClick = { /* TODO */ }) {
-                        Image(
-                            imageVector = Icons.Filled.Splitscreen,
-                            contentDescription = "",
-                            contentScale = ContentScale.Crop,
-                            modifier = Modifier
-                                .rotate(90f)
-                                .clickable { /* TODO */ }
-                        )
-                    }
-                    IconButton(onClick = { /* TODO */ }) {
-                        Icon(
-                            imageVector = Icons.Default.Undo,
-                            contentDescription = ""
-                        )
-                    }
-                    IconButton(onClick = { /* TODO */ }) {
-                        Icon(
-                            imageVector = Icons.Default.Redo,
-                            contentDescription = ""
-                        )
-                    }
-                    IconButton(onClick = { /* TODO */ }) {
-                        Icon(
-                            imageVector = Icons.Default.MoreVert,
-                            contentDescription = ""
-                        )
-                    }
-                },
-                colors = TopAppBarDefaults.topAppBarColors(containerColor = Color.White)
+    Scaffold(topBar = {
+        TopAppBar(title = {}, navigationIcon = {
+            Image(
+                painter = painterResource(id = R.drawable.bgremover),
+                contentDescription = "",
+                modifier = Modifier
+                    .padding(top = 10.dp)
+                    .size(60.dp),
             )
-        }
-    ) {
+        }, actions = {
+            IconButton(onClick = { /* TODO */ }) {
+                Image(imageVector = Icons.Filled.Splitscreen,
+                    contentDescription = "",
+                    contentScale = ContentScale.Crop,
+                    modifier = Modifier
+                        .rotate(90f)
+                        .clickable { /* TODO */ })
+            }
+            IconButton(onClick = { /* TODO */ }) {
+                Icon(
+                    imageVector = Icons.Default.Undo, contentDescription = ""
+                )
+            }
+            IconButton(onClick = { /* TODO */ }) {
+                Icon(
+                    imageVector = Icons.Default.Redo, contentDescription = ""
+                )
+            }
+            IconButton(onClick = { /* TODO */ }) {
+                Icon(
+                    imageVector = Icons.Default.MoreVert, contentDescription = ""
+                )
+            }
+        }, colors = TopAppBarDefaults.topAppBarColors(containerColor = Color.White)
+        )
+    }) {
         Column(
             modifier = Modifier
                 .fillMaxSize()
                 .background(Color.White)
                 .padding(top = it.calculateTopPadding()),
-            verticalArrangement = Arrangement.Center,
+            verticalArrangement = Arrangement.spacedBy(15.dp),
             horizontalAlignment = Alignment.CenterHorizontally
         ) {
+
+            Row(
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .padding(top = 70.dp, bottom = 40.dp),
+                horizontalArrangement = Arrangement.spacedBy(5.dp),
+                verticalAlignment = Alignment.CenterVertically
+            ) {
+
+            }
+
             imageUrl?.let {
                 Box(
                     modifier = Modifier
                         .width(400.dp)
                         .border(
-                            BorderStroke(2.dp, color = Color.DarkGray),
+                            BorderStroke(2.dp, color = Color.LightGray.copy(alpha = 0.50f)),
                             shape = RoundedCornerShape(11.dp)
                         )
-                        .height(550.dp),
-                    contentAlignment = Alignment.Center
+                        .height(550.dp), contentAlignment = Alignment.Center
                 ) {
                     androidx.compose.animation.AnimatedVisibility(
                         visible = showImageAnimation,
@@ -186,7 +182,8 @@ fun BgDetail(
                     ) {
                         bgremoveimage?.let { base64 ->
                             val imageBytes = Base64.decode(base64, Base64.DEFAULT)
-                            val bitmap = BitmapFactory.decodeByteArray(imageBytes, 0, imageBytes.size)
+                            val bitmap =
+                                BitmapFactory.decodeByteArray(imageBytes, 0, imageBytes.size)
                             Box(
                                 modifier = Modifier
                                     .size(400.dp, 550.dp)
@@ -227,6 +224,17 @@ fun BgDetail(
                     fontSize = 20.sp,
                     fontWeight = FontWeight.Bold
                 )
+            }
+
+            Spacer(modifier = Modifier.height(12.dp))
+
+
+            Row(
+                modifier = Modifier.fillMaxWidth(),
+                horizontalArrangement = Arrangement.spacedBy(6.dp),
+                verticalAlignment = Alignment.CenterVertically
+            ) {
+                
             }
         }
     }
