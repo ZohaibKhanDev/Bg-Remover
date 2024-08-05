@@ -5,6 +5,11 @@ import android.graphics.BitmapFactory
 import android.util.Base64
 import androidx.compose.animation.AnimatedVisibility
 import androidx.compose.animation.Crossfade
+import androidx.compose.animation.core.LinearOutSlowInEasing
+import androidx.compose.animation.core.animateFloatAsState
+import androidx.compose.animation.core.tween
+import androidx.compose.animation.fadeIn
+import androidx.compose.animation.fadeOut
 import androidx.compose.animation.slideInHorizontally
 import androidx.compose.animation.slideOutHorizontally
 import androidx.compose.foundation.BorderStroke
@@ -52,6 +57,7 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.draw.rotate
+import androidx.compose.ui.draw.scale
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.asImageBitmap
 import androidx.compose.ui.layout.ContentScale
@@ -74,12 +80,22 @@ fun BgDetail(
     bgremoveimage: String?
 ) {
     var showBgRemovedImage by remember { mutableStateOf(false) }
+    var showImageAnimation by remember { mutableStateOf(true) }
+    var animationState by remember { mutableStateOf(0f) }
 
     LaunchedEffect(Unit) {
         delay(3000)
         showBgRemovedImage = true
+        showImageAnimation = false
     }
 
+    val animatedScale = animateFloatAsState(
+        targetValue = if (showImageAnimation) 1f else 0f,
+        animationSpec = tween(
+            durationMillis = 1500,
+            easing = LinearOutSlowInEasing
+        ), label = ""
+    )
 
     Scaffold(
         topBar = {
@@ -129,7 +145,6 @@ fun BgDetail(
         }
     ) {
         Column(
-
             modifier = Modifier
                 .fillMaxSize()
                 .background(Color.White)
@@ -140,23 +155,29 @@ fun BgDetail(
             imageUrl?.let {
                 Box(
                     modifier = Modifier
-                        .width(340.dp)
+                        .width(400.dp)
                         .border(
                             BorderStroke(2.dp, color = Color.DarkGray),
                             shape = RoundedCornerShape(11.dp)
                         )
-                        .height(450.dp),
+                        .height(550.dp),
                     contentAlignment = Alignment.Center
                 ) {
-                    AsyncImage(
-                        model = it,
-                        contentDescription = null,
-                        modifier = Modifier
-                            .size(340.dp, 450.dp)
-                            .clip(RoundedCornerShape(11.dp)),
-                        contentScale = ContentScale.Crop
-                    )
-
+                    androidx.compose.animation.AnimatedVisibility(
+                        visible = showImageAnimation,
+                        enter = fadeIn(animationSpec = tween(durationMillis = 1500)),
+                        exit = fadeOut(animationSpec = tween(durationMillis = 1500))
+                    ) {
+                        AsyncImage(
+                            model = it,
+                            contentDescription = null,
+                            modifier = Modifier
+                                .size(400.dp, 550.dp)
+                                .clip(RoundedCornerShape(11.dp))
+                                .scale(animatedScale.value),
+                            contentScale = ContentScale.Crop
+                        )
+                    }
 
                     androidx.compose.animation.AnimatedVisibility(
                         visible = showBgRemovedImage,
@@ -168,7 +189,7 @@ fun BgDetail(
                             val bitmap = BitmapFactory.decodeByteArray(imageBytes, 0, imageBytes.size)
                             Box(
                                 modifier = Modifier
-                                    .size(340.dp, 450.dp)
+                                    .size(400.dp, 550.dp)
                                     .clip(RoundedCornerShape(11.dp)),
                                 contentAlignment = Alignment.Center
                             ) {
@@ -185,31 +206,27 @@ fun BgDetail(
                                     contentDescription = null,
                                     contentScale = ContentScale.Crop,
                                     modifier = Modifier
-                                        .size(340.dp, 450.dp)
+                                        .size(400.dp, 550.dp)
                                         .clip(RoundedCornerShape(11.dp))
                                 )
                             }
                         } ?: run {
-
                             Text(
                                 text = "No background removed image available",
                                 color = Color.Red,
                                 fontSize = 20.sp,
                                 fontWeight = FontWeight.Bold
                             )
-
                         }
                     }
                 }
             } ?: run {
-
                 Text(
                     text = "Image Not Detected",
                     color = Color.Red,
                     fontSize = 20.sp,
                     fontWeight = FontWeight.Bold
                 )
-
             }
         }
     }
