@@ -12,7 +12,7 @@ import io.ktor.client.plugins.logging.Logging
 import io.ktor.client.request.forms.MultiPartFormDataContent
 import io.ktor.client.request.forms.formData
 import io.ktor.client.request.headers
-import io.ktor.client.request.post
+import io.ktor.client.request.post              
 import io.ktor.client.request.setBody
 import io.ktor.client.statement.HttpResponse
 import io.ktor.client.statement.bodyAsText
@@ -22,7 +22,7 @@ import io.ktor.http.Headers
 import io.ktor.http.HttpHeaders
 import io.ktor.http.isSuccess
 import io.ktor.serialization.kotlinx.json.json
-import io.ktor.util.InternalAPI
+import io.ktor.util.InternalAPI        
 import kotlinx.serialization.ExperimentalSerializationApi
 import kotlinx.serialization.json.Json
 import kotlinx.serialization.json.JsonObject
@@ -45,6 +45,7 @@ object BgRemoverApiClient {
                 }
             )
         }
+        
 
         install(Logging) {
             level = LogLevel.ALL
@@ -56,6 +57,7 @@ object BgRemoverApiClient {
             }
         }
 
+        
         install(HttpTimeout) {
             connectTimeoutMillis = TIMEOUT
             socketTimeoutMillis = TIMEOUT
@@ -63,6 +65,7 @@ object BgRemoverApiClient {
         }
     }
 
+    
     @OptIn(InternalAPI::class)
     suspend fun removeBackground(imageFile: File): String {
         val formData = formData {
