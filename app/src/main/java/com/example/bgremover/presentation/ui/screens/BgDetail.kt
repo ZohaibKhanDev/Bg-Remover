@@ -33,6 +33,8 @@ import androidx.compose.material.icons.filled.MoreVert
 import androidx.compose.material.icons.filled.Redo
 import androidx.compose.material.icons.filled.Splitscreen
 import androidx.compose.material.icons.filled.Undo
+import androidx.compose.material.icons.outlined.Add
+import androidx.compose.material.icons.outlined.DeleteOutline
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
@@ -133,20 +135,43 @@ fun BgDetail(
             Row(
                 modifier = Modifier
                     .fillMaxWidth()
-                    .padding(top = 12.dp, bottom = 40.dp, start = 6.dp),
-                horizontalArrangement = Arrangement.spacedBy(5.dp),
+                    .padding(top = 12.dp, bottom = 40.dp, start = 11.dp),
+                horizontalArrangement = Arrangement.spacedBy(11.dp),
                 verticalAlignment = Alignment.CenterVertically
             ) {
                 Box(
                     modifier = Modifier
                         .clip(RoundedCornerShape(6.dp))
-                        .width(60.dp)
+                        .width(58.dp)
                         .background(color = Color(0XFFb5cef7).copy(alpha = 0.55f))
-                        .height(55.dp), contentAlignment = Alignment.Center
+                        .height(58.dp), contentAlignment = Alignment.Center
                 ) {
                     Icon(
-                        imageVector = Icons.Default.Add,
+                        imageVector = Icons.Outlined.Add,
                         contentDescription = "", tint = Color(0XFF0766e3)
+                    )
+                }
+
+                Box(
+                    modifier = Modifier
+                        .clip(RoundedCornerShape(6.dp))
+                        .width(58.dp)
+                        .background(color = Color(0XFFb5cef7).copy(alpha = 0.55f))
+                        .height(58.dp), contentAlignment = Alignment.Center
+                ) {
+                    imageUrl?.let {
+                        AsyncImage(
+                            model = it,
+                            contentDescription = "",
+                            modifier = Modifier.fillMaxSize(),
+                            contentScale = ContentScale.Crop
+                        )
+                    }
+
+                    Image(
+                        painter = painterResource(id = R.drawable.deleteicon),
+                        contentDescription = "",
+                        contentScale = ContentScale.Crop
                     )
                 }
             }
