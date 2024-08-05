@@ -5,9 +5,9 @@ import androidx.lifecycle.viewModelScope
 import com.example.bgremover.domain.repository.Repository
 import com.example.bgremover.domain.usecase.ResultState
 import kotlinx.coroutines.flow.MutableStateFlow
-import kotlinx.coroutines.flow.StateFlow
+import kotlinx.coroutines.flow.StateFlow               
 import kotlinx.coroutines.flow.asStateFlow
-import kotlinx.coroutines.launch
+import kotlinx.coroutines.launch                     
 import java.io.File
 
 class MainViewModel(private val repository: Repository) : ViewModel() {
@@ -16,14 +16,16 @@ class MainViewModel(private val repository: Repository) : ViewModel() {
 
     fun removeBackground(imageFile: File) {
         viewModelScope.launch {
-            _bgRemoval.value = ResultState.Loading
+            _bgRemoval.value = ResultState.Loading                    
             try {
                 val response = repository.removeBackground(imageFile)
                 _bgRemoval.value = ResultState.Success(response)
-            } catch (e: Exception) {
+            } catch (e: Exception) {            
                 _bgRemoval.value = ResultState.Error(e)
             }
+            
         }
+        
     }
 }
 
