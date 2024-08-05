@@ -80,6 +80,7 @@ fun BgDetail(
         showBgRemovedImage = true
     }
 
+
     Scaffold(
         topBar = {
             TopAppBar(
@@ -128,6 +129,7 @@ fun BgDetail(
         }
     ) {
         Column(
+
             modifier = Modifier
                 .fillMaxSize()
                 .background(Color.White)
@@ -154,6 +156,7 @@ fun BgDetail(
                             .clip(RoundedCornerShape(11.dp)),
                         contentScale = ContentScale.Crop
                     )
+
 
                     androidx.compose.animation.AnimatedVisibility(
                         visible = showBgRemovedImage,
@@ -187,22 +190,26 @@ fun BgDetail(
                                 )
                             }
                         } ?: run {
+
                             Text(
                                 text = "No background removed image available",
                                 color = Color.Red,
                                 fontSize = 20.sp,
                                 fontWeight = FontWeight.Bold
                             )
+
                         }
                     }
                 }
             } ?: run {
+
                 Text(
-                    text = "No image selected",
+                    text = "Image Not Detected",
                     color = Color.Red,
                     fontSize = 20.sp,
                     fontWeight = FontWeight.Bold
                 )
+
             }
         }
     }
