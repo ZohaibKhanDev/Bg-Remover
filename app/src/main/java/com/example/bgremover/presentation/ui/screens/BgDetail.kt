@@ -92,6 +92,7 @@ fun BgDetail(
         showImageAnimation = false
     }
 
+
     val animatedScale = animateFloatAsState(
         targetValue = if (showImageAnimation) 1f else 0f, animationSpec = tween(
             durationMillis = 1500, easing = LinearOutSlowInEasing
@@ -298,68 +299,11 @@ fun BgDetail(
 
             Spacer(modifier = Modifier.height(12.dp))
 
-            Row(
-                modifier = Modifier.fillMaxWidth(),
-                horizontalArrangement = Arrangement.spacedBy(6.dp),
-                verticalAlignment = Alignment.CenterVertically
-            ) {
-                IconWithLabel(
-                    icon = Icons.Default.Download,
-                    label = "Download",
-                    iconColor = Color(0xFF0377fc),
-                    labelColor = Color(0xFF0377fc)
-                )
 
-                IconWithLabel(
-                    icon = Icons.Outlined.Download,
-                    label = "Download HD",
-                    iconColor = Color(0xFFb5cef7),
-                    labelColor = Color(0xFFb5cef7)
-                )
-
-                IconWithLabel(
-                    icon = Icons.Outlined.Add,
-                    label = "Background",
-                    iconColor = Color(0xFFb5cef7),
-                    labelColor = Color(0xFFb5cef7)
-                )
-
-                IconWithLabel(
-                    icon =Icons.Outlined.Brush,
-                    label = "Erase/Restore",
-                    iconColor = Color(0xFFb5cef7),
-                    labelColor = Color(0xFFb5cef7)
-                )
-
-
-            }
         }
     }
 }
 
-@Composable
-fun IconWithLabel(
-    icon: ImageVector, label: String, iconColor: Color, labelColor: Color
-) {
-    Column(
-        horizontalAlignment = Alignment.CenterHorizontally,
-        verticalArrangement = Arrangement.Center,
-        modifier = Modifier.padding(horizontal = 8.dp)
-    ) {
-        Icon(
-            imageVector = icon,
-            contentDescription = label,
-            tint = iconColor,
-            modifier = Modifier.size(40.dp)
-        )
-        Text(
-            text = label,
-            color = labelColor,
-            fontSize = 12.sp,
-            textAlign = TextAlign.Center
-        )
-    }
-}
 
 
 

@@ -45,7 +45,6 @@ object BgRemoverApiClient {
                 }
             )
         }
-        
 
         install(Logging) {
             level = LogLevel.ALL
@@ -75,6 +74,7 @@ object BgRemoverApiClient {
             })
             append("size", "auto")
         }
+
 
         val response: HttpResponse = client.post("https://api.remove.bg/v1.0/removebg") {
             headers {
