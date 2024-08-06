@@ -36,11 +36,13 @@ import androidx.compose.material.icons.filled.Splitscreen
 import androidx.compose.material.icons.filled.Undo
 import androidx.compose.material.icons.outlined.Add
 import androidx.compose.material.icons.outlined.DeleteOutline
+import androidx.compose.material3.AlertDialog
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
+import androidx.compose.material3.TextButton
 import androidx.compose.material3.TopAppBar
 import androidx.compose.material3.TopAppBarDefaults
 import androidx.compose.runtime.Composable
@@ -64,6 +66,7 @@ import androidx.compose.ui.unit.sp
 import androidx.navigation.NavController
 import coil.compose.AsyncImage
 import com.example.bgremover.R
+import com.example.bgremover.presentation.ui.navigation.Screens
 import kotlinx.coroutines.delay
 
 @OptIn(ExperimentalMaterial3Api::class)
@@ -75,6 +78,7 @@ fun BgDetail(
     var showBgRemovedImage by remember { mutableStateOf(false) }
     var showImageAnimation by remember { mutableStateOf(true) }
     var animationState by remember { mutableStateOf(0f) }
+    var showDialog by remember { mutableStateOf(false) }
 
     LaunchedEffect(Unit) {
         delay(3000)
@@ -87,6 +91,29 @@ fun BgDetail(
             durationMillis = 1500, easing = LinearOutSlowInEasing
         ), label = ""
     )
+
+    if (showDialog) {
+        AlertDialog(
+            onDismissRequest = { showDialog = false },
+            title = { Text("Delete Image") },
+            text = { Text("Are you sure you want to delete this image?") },
+            confirmButton = {
+                TextButton(
+                    onClick = {
+                        showDialog = false
+                        navController.navigate("bgremover")
+                    }
+                ) {
+                    Text("Yes")
+                }
+            },
+            dismissButton = {
+                TextButton(onClick = { showDialog = false }) {
+                    Text("No")
+                }
+            }
+        )
+    }
 
     Scaffold(topBar = {
         TopAppBar(title = {}, navigationIcon = {
@@ -178,6 +205,9 @@ fun BgDetail(
                         contentScale = ContentScale.Crop,
                         modifier = Modifier
                             .size(50.dp)
+                            .clickable {
+                                showDialog = true
+                            }
                             .offset(y = 5.dp)
                     )
                 }
@@ -273,6 +303,7 @@ fun BgDetail(
         }
     }
 }
+
 
 
 
