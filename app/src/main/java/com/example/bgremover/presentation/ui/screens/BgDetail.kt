@@ -23,6 +23,7 @@ import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
+import androidx.compose.foundation.layout.offset
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
@@ -141,7 +142,7 @@ fun BgDetail(
             ) {
                 Box(
                     modifier = Modifier
-                        .clip(RoundedCornerShape(6.dp))
+                        .clip(RoundedCornerShape(11.dp))
                         .width(58.dp)
                         .background(color = Color(0XFFb5cef7).copy(alpha = 0.55f))
                         .height(58.dp), contentAlignment = Alignment.Center
@@ -154,9 +155,11 @@ fun BgDetail(
 
                 Box(
                     modifier = Modifier
-                        .clip(RoundedCornerShape(6.dp))
                         .width(58.dp)
-                        .border(BorderStroke(1.dp, color = Color(0XFF0766e3)))
+                        .border(
+                            BorderStroke(3.dp, color = Color(0XFF0377fc)),
+                            shape = RoundedCornerShape(6.dp)
+                        )
                         .background(color = Color(0XFFb5cef7).copy(alpha = 0.55f))
                         .height(58.dp), contentAlignment = Alignment.Center
                 ) {
@@ -172,12 +175,13 @@ fun BgDetail(
                     Image(
                         painter = painterResource(id = R.drawable.deleteicon),
                         contentDescription = "",
-                        contentScale = ContentScale.Crop, modifier = Modifier.size(50.dp)
+                        contentScale = ContentScale.Crop,
+                        modifier = Modifier
+                            .size(50.dp)
+                            .offset(y = 5.dp)
                     )
                 }
             }
-
-
 
             imageUrl?.let {
                 Box(
@@ -204,7 +208,6 @@ fun BgDetail(
                             contentScale = ContentScale.Crop
                         )
                     }
-
 
                     androidx.compose.animation.AnimatedVisibility(
                         visible = showBgRemovedImage,
@@ -257,9 +260,7 @@ fun BgDetail(
                 )
             }
 
-
             Spacer(modifier = Modifier.height(12.dp))
-
 
             Row(
                 modifier = Modifier.fillMaxWidth(),
@@ -272,6 +273,7 @@ fun BgDetail(
         }
     }
 }
+
 
 
 
