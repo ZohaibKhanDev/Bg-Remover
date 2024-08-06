@@ -42,6 +42,7 @@ import androidx.compose.material.icons.filled.Splitscreen
 import androidx.compose.material.icons.filled.Undo
 import androidx.compose.material.icons.outlined.Add
 import androidx.compose.material.icons.outlined.Brush
+import androidx.compose.material.icons.outlined.FileDownload
 import androidx.compose.material.icons.outlined.JoinLeft
 import androidx.compose.material3.AlertDialog
 import androidx.compose.material3.ExperimentalMaterial3Api
@@ -333,8 +334,8 @@ data class ActionItemData(
 )
 
 val actionItems = listOf(
-    ActionItemData(Icons.Default.Download, "Download", false, true, false),
-    ActionItemData(Icons.Default.Download, "Download HD", false, false, true),
+    ActionItemData(Icons.Outlined.FileDownload, "Download", false, true, false),
+    ActionItemData(Icons.Outlined.FileDownload, "Download HD", false, false, true),
     ActionItemData(Icons.Outlined.Add, "Background", false, false, false),
     ActionItemData(Icons.Outlined.Brush, "Erase/Restore", false, false, false),
     ActionItemData(Icons.Outlined.JoinLeft, "Effects", isNew = true, false, false)
@@ -355,7 +356,7 @@ fun ActionItem(
 
         Box(
             modifier = Modifier
-                .size(40.dp)
+                .size(45.dp)
                 .background(
                     color = if (blue) Color(0XFF0077ff) else if (lightBlue) Color(0XFF92b2d6) else Color.White,
                     shape = CircleShape
@@ -368,7 +369,8 @@ fun ActionItem(
                 contentDescription = text,
                 modifier = Modifier
                     .size(24.dp)
-                    .align(Alignment.Center)
+                    .align(Alignment.Center),
+                tint = if (blue) Color.White else if (lightBlue) Color(0XFF3589e8) else Color.Black
             )
             if (isNew) {
                 Box(
@@ -386,9 +388,8 @@ fun ActionItem(
         Text(
             text = text,
             style = TextStyle(
-                color = Color.Black,
                 fontSize = 12.sp,
-                fontWeight = FontWeight.Normal
+                fontWeight = FontWeight.Medium
             )
         )
     }
