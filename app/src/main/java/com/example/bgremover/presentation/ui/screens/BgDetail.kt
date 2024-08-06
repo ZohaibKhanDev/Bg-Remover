@@ -314,7 +314,9 @@ fun BgDetail(
                     ActionItem(
                         icon = item.icon,
                         text = item.text,
-                        isNew = item.isNew
+                        isNew = item.isNew,
+                        blue = item.blue,
+                        lightBlue = item.lightBlue
                     )
                 }
             }
@@ -325,27 +327,42 @@ fun BgDetail(
 data class ActionItemData(
     val icon: ImageVector,
     val text: String,
-    val isNew: Boolean = false
+    val isNew: Boolean = false,
+    val blue: Boolean = false,
+    val lightBlue: Boolean = false,
 )
 
 val actionItems = listOf(
-    ActionItemData(Icons.Default.Download, "Download"),
-    ActionItemData(Icons.Default.Download, "Download HD"),
-    ActionItemData(Icons.Outlined.Add, "Background"),
-    ActionItemData(Icons.Outlined.Brush, "Erase/Restore"),
-    ActionItemData(Icons.Outlined.JoinLeft, "Effects", isNew = true)
+    ActionItemData(Icons.Default.Download, "Download", false, true, false),
+    ActionItemData(Icons.Default.Download, "Download HD", false, false, true),
+    ActionItemData(Icons.Outlined.Add, "Background", false, false, false),
+    ActionItemData(Icons.Outlined.Brush, "Erase/Restore", false, false, false),
+    ActionItemData(Icons.Outlined.JoinLeft, "Effects", isNew = true, false, false)
 )
 
 @Composable
-fun ActionItem(icon: ImageVector, text: String, isNew: Boolean = false) {
+fun ActionItem(
+    icon: ImageVector,
+    text: String,
+    isNew: Boolean = false,
+    blue: Boolean,
+    lightBlue: Boolean
+) {
     Column(
         horizontalAlignment = Alignment.CenterHorizontally,
         modifier = Modifier.padding(vertical = 8.dp)
     ) {
+
         Box(
+            modifier = Modifier
+                .size(40.dp)
+                .background(
+                    color = if (blue) Color(0XFF0077ff) else if (lightBlue) Color(0XFF92b2d6) else Color.White,
+                    shape = CircleShape
+                ),
             contentAlignment = Alignment.TopEnd,
-            modifier = Modifier.size(40.dp)
-        ) {
+
+            ) {
             Icon(
                 imageVector = icon,
                 contentDescription = text,
