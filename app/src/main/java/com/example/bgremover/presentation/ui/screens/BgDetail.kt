@@ -4,7 +4,7 @@ import android.annotation.SuppressLint
 import android.graphics.BitmapFactory
 import android.util.Base64
 import androidx.compose.animation.core.LinearOutSlowInEasing
-import androidx.compose.animation.core.animateFloatAsState
+import androidx.compose.animation.core.animateFloatAsState           
 import androidx.compose.animation.core.tween
 import androidx.compose.animation.fadeIn
 import androidx.compose.animation.fadeOut
@@ -80,12 +80,14 @@ fun BgDetail(
         showBgRemovedImage = true
         showImageAnimation = false
     }
+    
 
     val animatedScale = animateFloatAsState(
         targetValue = if (showImageAnimation) 1f else 0f, animationSpec = tween(
             durationMillis = 1500, easing = LinearOutSlowInEasing
         ), label = ""
     )
+    
 
     Scaffold(topBar = {
         TopAppBar(title = {}, navigationIcon = {
@@ -122,7 +124,9 @@ fun BgDetail(
             }
         }, colors = TopAppBarDefaults.topAppBarColors(containerColor = Color.White)
         )
-    }) {
+         
+    }) {    
+        
         Column(
             modifier = Modifier
                 .fillMaxSize()
@@ -139,6 +143,7 @@ fun BgDetail(
                 horizontalArrangement = Arrangement.spacedBy(11.dp),
                 verticalAlignment = Alignment.CenterVertically
             ) {
+                
                 Box(
                     modifier = Modifier
                         .clip(RoundedCornerShape(6.dp))
@@ -151,6 +156,7 @@ fun BgDetail(
                         contentDescription = "", tint = Color(0XFF0766e3)
                     )
                 }
+                
 
                 Box(
                     modifier = Modifier
@@ -160,6 +166,7 @@ fun BgDetail(
                         .background(color = Color(0XFFb5cef7).copy(alpha = 0.55f))
                         .height(58.dp), contentAlignment = Alignment.Center
                 ) {
+                    
                     imageUrl?.let {
                         AsyncImage(
                             model = it,
@@ -167,6 +174,7 @@ fun BgDetail(
                             modifier = Modifier.fillMaxSize(),
                             contentScale = ContentScale.Crop
                         )
+                                                        
                     }
 
                     Image(
@@ -176,7 +184,6 @@ fun BgDetail(
                     )
                 }
             }
-
 
 
             imageUrl?.let {
@@ -194,6 +201,7 @@ fun BgDetail(
                         enter = fadeIn(animationSpec = tween(durationMillis = 1500)),
                         exit = fadeOut(animationSpec = tween(durationMillis = 1500))
                     ) {
+                        
                         AsyncImage(
                             model = it,
                             contentDescription = null,
@@ -203,6 +211,7 @@ fun BgDetail(
                                 .scale(animatedScale.value),
                             contentScale = ContentScale.Crop
                         )
+                        
                     }
 
 
@@ -211,6 +220,7 @@ fun BgDetail(
                         enter = slideInHorizontally(initialOffsetX = { it }),
                         exit = slideOutHorizontally(targetOffsetX = { -it })
                     ) {
+                        
                         bgremoveimage?.let { base64 ->
                             val imageBytes = Base64.decode(base64, Base64.DEFAULT)
                             val bitmap =
@@ -238,6 +248,7 @@ fun BgDetail(
                                         .clip(RoundedCornerShape(11.dp))
                                 )
                             }
+                            
                         } ?: run {
                             Text(
                                 text = "No background removed image available",
@@ -249,17 +260,17 @@ fun BgDetail(
                     }
                 }
             } ?: run {
+                
                 Text(
                     text = "Image Not Detected",
                     color = Color.Red,
                     fontSize = 20.sp,
                     fontWeight = FontWeight.Bold
                 )
+                
             }
 
-
             Spacer(modifier = Modifier.height(12.dp))
-
 
             Row(
                 modifier = Modifier.fillMaxWidth(),
@@ -268,11 +279,9 @@ fun BgDetail(
             ) {
 
             }
-
         }
     }
 }
-
 
 
 
