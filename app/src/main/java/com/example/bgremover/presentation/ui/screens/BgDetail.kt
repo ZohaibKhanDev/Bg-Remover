@@ -30,12 +30,15 @@ import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Add
+import androidx.compose.material.icons.filled.Download
 import androidx.compose.material.icons.filled.MoreVert
 import androidx.compose.material.icons.filled.Redo
 import androidx.compose.material.icons.filled.Splitscreen
 import androidx.compose.material.icons.filled.Undo
 import androidx.compose.material.icons.outlined.Add
+import androidx.compose.material.icons.outlined.Brush
 import androidx.compose.material.icons.outlined.DeleteOutline
+import androidx.compose.material.icons.outlined.Download
 import androidx.compose.material3.AlertDialog
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Icon
@@ -58,9 +61,12 @@ import androidx.compose.ui.draw.rotate
 import androidx.compose.ui.draw.scale
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.asImageBitmap
+import androidx.compose.ui.graphics.painter.Painter
+import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.font.FontWeight
+import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.navigation.NavController
@@ -297,12 +303,64 @@ fun BgDetail(
                 horizontalArrangement = Arrangement.spacedBy(6.dp),
                 verticalAlignment = Alignment.CenterVertically
             ) {
+                IconWithLabel(
+                    icon = Icons.Default.Download,
+                    label = "Download",
+                    iconColor = Color(0xFF0377fc),
+                    labelColor = Color(0xFF0377fc)
+                )
+
+                IconWithLabel(
+                    icon = Icons.Outlined.Download,
+                    label = "Download HD",
+                    iconColor = Color(0xFFb5cef7),
+                    labelColor = Color(0xFFb5cef7)
+                )
+
+                IconWithLabel(
+                    icon = Icons.Outlined.Add,
+                    label = "Background",
+                    iconColor = Color(0xFFb5cef7),
+                    labelColor = Color(0xFFb5cef7)
+                )
+
+                IconWithLabel(
+                    icon =Icons.Outlined.Brush,
+                    label = "Erase/Restore",
+                    iconColor = Color(0xFFb5cef7),
+                    labelColor = Color(0xFFb5cef7)
+                )
+
 
             }
-
         }
     }
 }
+
+@Composable
+fun IconWithLabel(
+    icon: ImageVector, label: String, iconColor: Color, labelColor: Color
+) {
+    Column(
+        horizontalAlignment = Alignment.CenterHorizontally,
+        verticalArrangement = Arrangement.Center,
+        modifier = Modifier.padding(horizontal = 8.dp)
+    ) {
+        Icon(
+            imageVector = icon,
+            contentDescription = label,
+            tint = iconColor,
+            modifier = Modifier.size(40.dp)
+        )
+        Text(
+            text = label,
+            color = labelColor,
+            fontSize = 12.sp,
+            textAlign = TextAlign.Center
+        )
+    }
+}
+
 
 
 
