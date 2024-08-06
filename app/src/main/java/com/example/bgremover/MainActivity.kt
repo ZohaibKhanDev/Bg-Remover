@@ -38,6 +38,7 @@ import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import androidx.core.splashscreen.SplashScreen.Companion.installSplashScreen
 import com.example.bgremover.di.appModule
 import com.example.bgremover.presentation.ui.navigation.Navigation
 import com.example.bgremover.presentation.ui.screens.BgRemover
@@ -57,6 +58,7 @@ class MainActivity : ComponentActivity() {
             androidLogger()
             modules(appModule)
         }
+        installSplashScreen()
         setContent {
             BgRemoverTheme {
                 Navigation()

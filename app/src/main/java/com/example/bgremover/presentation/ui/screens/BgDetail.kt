@@ -27,18 +27,22 @@ import androidx.compose.foundation.layout.offset
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
+import androidx.compose.foundation.lazy.LazyRow
+import androidx.compose.foundation.lazy.items
+import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Add
+import androidx.compose.material.icons.filled.Brush
 import androidx.compose.material.icons.filled.Download
+import androidx.compose.material.icons.filled.JoinLeft
 import androidx.compose.material.icons.filled.MoreVert
 import androidx.compose.material.icons.filled.Redo
 import androidx.compose.material.icons.filled.Splitscreen
 import androidx.compose.material.icons.filled.Undo
 import androidx.compose.material.icons.outlined.Add
 import androidx.compose.material.icons.outlined.Brush
-import androidx.compose.material.icons.outlined.DeleteOutline
-import androidx.compose.material.icons.outlined.Download
+import androidx.compose.material.icons.outlined.JoinLeft
 import androidx.compose.material3.AlertDialog
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Icon
@@ -61,18 +65,16 @@ import androidx.compose.ui.draw.rotate
 import androidx.compose.ui.draw.scale
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.asImageBitmap
-import androidx.compose.ui.graphics.painter.Painter
 import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.res.painterResource
+import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.text.font.FontWeight
-import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.navigation.NavController
 import coil.compose.AsyncImage
 import com.example.bgremover.R
-import com.example.bgremover.presentation.ui.navigation.Screens
 import kotlinx.coroutines.delay
 
 @OptIn(ExperimentalMaterial3Api::class)
@@ -83,7 +85,6 @@ fun BgDetail(
 ) {
     var showBgRemovedImage by remember { mutableStateOf(false) }
     var showImageAnimation by remember { mutableStateOf(true) }
-    var animationState by remember { mutableStateOf(0f) }
     var showDialog by remember { mutableStateOf(false) }
 
     LaunchedEffect(Unit) {
@@ -91,7 +92,6 @@ fun BgDetail(
         showBgRemovedImage = true
         showImageAnimation = false
     }
-
 
     val animatedScale = animateFloatAsState(
         targetValue = if (showImageAnimation) 1f else 0f, animationSpec = tween(
@@ -297,14 +297,85 @@ fun BgDetail(
                 )
             }
 
-            Spacer(modifier = Modifier.height(12.dp))
+            Spacer(modifier = Modifier.height(30.dp))
 
-
+            LazyRow(
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .padding(horizontal = 16.dp)
+                    .background(
+                        color = Color(0xFFF9F9F9),
+                        shape = RoundedCornerShape(8.dp)
+                    ),
+                horizontalArrangement = Arrangement.SpaceBetween,
+                verticalAlignment = Alignment.CenterVertically
+            ) {
+                items(actionItems) { item ->
+                    ActionItem(
+                        icon = item.icon,
+                        text = item.text,
+                        isNew = item.isNew
+                    )
+                }
+            }
         }
     }
 }
 
+data class ActionItemData(
+    val icon: ImageVector,
+    val text: String,
+    val isNew: Boolean = false
+)
 
+val actionItems = listOf(
+    ActionItemData(Icons.Default.Download, "Download"),
+    ActionItemData(Icons.Default.Download, "Download HD"),
+    ActionItemData(Icons.Outlined.Add, "Background"),
+    ActionItemData(Icons.Outlined.Brush, "Erase/Restore"),
+    ActionItemData(Icons.Outlined.JoinLeft, "Effects", isNew = true)
+)
+
+@Composable
+fun ActionItem(icon: ImageVector, text: String, isNew: Boolean = false) {
+    Column(
+        horizontalAlignment = Alignment.CenterHorizontally,
+        modifier = Modifier.padding(vertical = 8.dp)
+    ) {
+        Box(
+            contentAlignment = Alignment.TopEnd,
+            modifier = Modifier.size(40.dp)
+        ) {
+            Icon(
+                imageVector = icon,
+                contentDescription = text,
+                modifier = Modifier
+                    .size(24.dp)
+                    .align(Alignment.Center)
+            )
+            if (isNew) {
+                Box(
+                    modifier = Modifier
+                        .size(16.dp)
+                        .background(Color.Yellow, shape = CircleShape)
+                        .align(Alignment.TopEnd),
+                    contentAlignment = Alignment.Center
+                ) {
+                    Text("New", color = Color.Black, fontSize = 8.sp)
+                }
+            }
+        }
+        Spacer(modifier = Modifier.height(4.dp))
+        Text(
+            text = text,
+            style = TextStyle(
+                color = Color.Black,
+                fontSize = 12.sp,
+                fontWeight = FontWeight.Normal
+            )
+        )
+    }
+}
 
 
 

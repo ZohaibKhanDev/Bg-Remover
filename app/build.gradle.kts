@@ -84,14 +84,16 @@ dependencies {
     val room_version = "2.6.1"
 
     implementation("androidx.room:room-runtime:$room_version")
-    kapt ("androidx.room:room-compiler:$room_version")
+    kapt("androidx.room:room-compiler:$room_version")
     implementation("androidx.room:room-ktx:$room_version")
-    implementation ("androidx.core:core-splashscreen:1.0.0")
+    implementation("androidx.core:core-splashscreen:1.0.0")
     implementation(project.dependencies.platform("io.insert-koin:koin-bom:3.5.4"))
     implementation("io.insert-koin:koin-core")
     implementation("io.insert-koin:koin-android")
     implementation("io.insert-koin:koin-compose")
     implementation("io.insert-koin:koin-annotations:1.3.1")
-    implementation ("com.github.GhayasAhmad:auto-background-remover:1.0.3")
+    implementation("com.github.GhayasAhmad:auto-background-remover:1.0.3")
+    implementation("androidx.media3:media3-transformer:1.1.1")
+
 
 }
