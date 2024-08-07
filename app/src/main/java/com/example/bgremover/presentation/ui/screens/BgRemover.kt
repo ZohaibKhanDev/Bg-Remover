@@ -319,20 +319,22 @@ fun BgRemover(navController: NavController) {
 
 
 @SuppressLint("ServiceCast")
-fun saveImage(bitmap: Bitmap?, context: Context) {
+fun saveImage(bitmap: Bitmap?, context: Context, isHd: Boolean) {
     createNotificationChannel(context)
 
     val notificationManager =
         context.getSystemService(Context.NOTIFICATION_SERVICE) as NotificationManager
     val notificationBuilder = NotificationCompat.Builder(context, "DOWNLOAD_CHANNEL")
-        .setSmallIcon(R.drawable.baseline_download_24).setContentTitle("Image Download")
-        .setContentText("Downloading...").setPriority(NotificationCompat.PRIORITY_HIGH)
+        .setSmallIcon(R.drawable.baseline_download_24)
+        .setContentTitle("Image Download")
+        .setContentText("Downloading...")
+        .setPriority(NotificationCompat.PRIORITY_HIGH)
         .setOngoing(true)
 
     notificationManager.notify(1, notificationBuilder.build())
 
     val contentValues = ContentValues().apply {
-        put(MediaStore.MediaColumns.DISPLAY_NAME, "bg_removed_image.png")
+        put(MediaStore.MediaColumns.DISPLAY_NAME, if (isHd) "bg_removed_image_hd.png" else "bg_removed_image.png")
         put(MediaStore.MediaColumns.MIME_TYPE, "image/png")
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.Q) {
             put(MediaStore.MediaColumns.RELATIVE_PATH, Environment.DIRECTORY_PICTURES)
@@ -344,23 +346,26 @@ fun saveImage(bitmap: Bitmap?, context: Context) {
 
     uri?.let {
         resolver.openOutputStream(it)?.use { outputStream ->
-            bitmap?.compress(Bitmap.CompressFormat.PNG, 100, outputStream)
+            val scaledBitmap = if (isHd) {
+                bitmap?.let { Bitmap.createScaledBitmap(it, it.width * 2, it.height * 2, true) }
+            } else {
+                bitmap
+            }
+            scaledBitmap?.compress(Bitmap.CompressFormat.PNG, 100, outputStream)
             Toast.makeText(context, "Image saved to Pictures", Toast.LENGTH_SHORT).show()
-            notificationBuilder.setContentText("Download complete").setProgress(0, 0, false)
-                .setOngoing(false)
+            notificationBuilder.setContentText("Download complete").setProgress(0, 0, false).setOngoing(false)
             notificationManager.notify(1, notificationBuilder.build())
         } ?: run {
             Toast.makeText(context, "Error saving image", Toast.LENGTH_SHORT).show()
-            notificationBuilder.setContentText("Download failed").setProgress(0, 0, false)
-                .setOngoing(false)
+            notificationBuilder.setContentText("Download failed").setProgress(0, 0, false).setOngoing(false)
             notificationManager.notify(1, notificationBuilder.build())
         }
     } ?: run {
         Toast.makeText(context, "Error saving image", Toast.LENGTH_SHORT).show()
-        notificationBuilder.setContentText("Download failed").setProgress(0, 0, false)
-            .setOngoing(false)
+        notificationBuilder.setContentText("Download failed").setProgress(0, 0, false).setOngoing(false)
         notificationManager.notify(1, notificationBuilder.build())
     }
 }
+
 
 

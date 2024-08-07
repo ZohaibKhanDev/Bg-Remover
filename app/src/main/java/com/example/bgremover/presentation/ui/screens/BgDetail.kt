@@ -350,7 +350,8 @@ fun ActionItem(
     isNew: Boolean = false,
     blue: Boolean,
     lightBlue: Boolean,
-    bgremoveimage: Bitmap?
+    bgremoveimage: Bitmap?,
+    isHd: Boolean = false
 ) {
     val context = LocalContext.current
     Column(
@@ -365,8 +366,11 @@ fun ActionItem(
             modifier = Modifier
                 .size(45.dp)
                 .clickable {
-                    if (blue || lightBlue) {
-                        saveImage(bgremoveimage, context = context)
+                   if (blue){
+                       saveImage(bgremoveimage,context,false)
+                   }
+                    if (lightBlue){
+                        saveImage(bgremoveimage,context,true)
                     }
                 }
                 .background(
@@ -403,5 +407,6 @@ fun ActionItem(
         )
     }
 }
+
 
 
