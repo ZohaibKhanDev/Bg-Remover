@@ -65,6 +65,30 @@ class MainActivity : ComponentActivity() {
             }
         }
     }
+
+    override fun onStart() {
+        super.onStart()
+    }
+
+    override fun onStop() {
+        super.onStop()
+    }
+
+    override fun onRestart() {
+        super.onRestart()
+    }
+
+    override fun onResume() {
+        super.onResume()
+    }
+
+    override fun onPostResume() {
+        super.onPostResume()
+    }
+
+    override fun onDestroy() {
+        super.onDestroy()
+    }
 }
 
 

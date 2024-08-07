@@ -1,6 +1,7 @@
 package com.example.bgremover.presentation.ui.screens
 
 import android.annotation.SuppressLint
+import android.graphics.Bitmap
 import android.graphics.BitmapFactory
 import android.util.Base64
 import androidx.compose.animation.core.LinearOutSlowInEasing
@@ -15,6 +16,7 @@ import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.border
 import androidx.compose.foundation.clickable
+import androidx.compose.foundation.gestures.detectTapGestures
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
@@ -32,10 +34,6 @@ import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.filled.Add
-import androidx.compose.material.icons.filled.Brush
-import androidx.compose.material.icons.filled.Download
-import androidx.compose.material.icons.filled.JoinLeft
 import androidx.compose.material.icons.filled.MoreVert
 import androidx.compose.material.icons.filled.Redo
 import androidx.compose.material.icons.filled.Splitscreen
@@ -67,9 +65,10 @@ import androidx.compose.ui.draw.scale
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.asImageBitmap
 import androidx.compose.ui.graphics.vector.ImageVector
+import androidx.compose.ui.input.pointer.pointerInput
 import androidx.compose.ui.layout.ContentScale
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.painterResource
-import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
@@ -254,8 +253,7 @@ fun BgDetail(
                     ) {
                         bgremoveimage?.let { base64 ->
                             val imageBytes = Base64.decode(base64, Base64.DEFAULT)
-                            val bitmap =
-                                BitmapFactory.decodeByteArray(imageBytes, 0, imageBytes.size)
+                            val bitmap = BitmapFactory.decodeByteArray(imageBytes, 0, imageBytes.size)
                             Box(
                                 modifier = Modifier
                                     .size(400.dp, 550.dp)
@@ -317,7 +315,11 @@ fun BgDetail(
                         text = item.text,
                         isNew = item.isNew,
                         blue = item.blue,
-                        lightBlue = item.lightBlue
+                        lightBlue = item.lightBlue,
+                        bgremoveimage = bgremoveimage?.let {
+                            val imageBytes = Base64.decode(it, Base64.DEFAULT)
+                            BitmapFactory.decodeByteArray(imageBytes, 0, imageBytes.size)
+                        }
                     )
                 }
             }
@@ -347,61 +349,59 @@ fun ActionItem(
     text: String,
     isNew: Boolean = false,
     blue: Boolean,
-    lightBlue: Boolean
+    lightBlue: Boolean,
+    bgremoveimage: Bitmap?
 ) {
+    val context = LocalContext.current
     Column(
         horizontalAlignment = Alignment.CenterHorizontally,
-        modifier = Modifier.padding(vertical = 8.dp)
+        modifier = Modifier
+            .padding(vertical = 8.dp)
+            .pointerInput(Unit) {
+                detectTapGestures(onLongPress = { /* Trigger tooltip */ })
+            }
     ) {
-
         Box(
             modifier = Modifier
                 .size(45.dp)
+                .clickable {
+                    if (blue || lightBlue) {
+                        saveImage(bgremoveimage, context = context)
+                    }
+                }
                 .background(
-                    color = if (blue) Color(0XFF0077ff) else if (lightBlue) Color(0XFF92b2d6) else Color.White,
+                    color = if (blue) Color(0XFF0077ff) else if (lightBlue) Color(0XFFc1dff5) else Color.White,
                     shape = CircleShape
                 ),
-            contentAlignment = Alignment.TopEnd,
-
-            ) {
+            contentAlignment = Alignment.TopEnd
+        ) {
             Icon(
                 imageVector = icon,
                 contentDescription = text,
                 modifier = Modifier
                     .size(24.dp)
                     .align(Alignment.Center),
-                tint = if (blue) Color.White else if (lightBlue) Color(0XFF3589e8) else Color.Black
+                tint = if (blue) Color.White else if (lightBlue) Color.Blue else Color.Black
             )
 
             if (isNew) {
-                Box(
+                Text(
+                    text = "new",
+                    color = Color.White,
+                    fontSize = 8.sp,
+                    fontWeight = FontWeight.Bold,
                     modifier = Modifier
-                        .size(16.dp)
-                        .background(Color.Yellow, shape = CircleShape)
-                        .align(Alignment.TopEnd),
-                    contentAlignment = Alignment.Center
-                ) {
-                    Text("NEW", color = Color.Black, fontSize = 8.sp)
-                }
+                        .background(Color(0XFFfe3747), shape = RoundedCornerShape(8.dp))
+                        .padding(horizontal = 4.dp, vertical = 1.dp)
+                )
             }
         }
-
-        Spacer(modifier = Modifier.height(4.dp))
         Text(
             text = text,
-            style = TextStyle(
-                fontSize = 12.sp,
-                fontWeight = FontWeight.Medium
-            )
+            fontSize = 10.sp,
+            color = if (blue) Color(0XFF0077ff) else if (lightBlue) Color(0XFF0077ff) else Color.Black
         )
-
     }
 }
-
-
-
-
-
-
 
 
