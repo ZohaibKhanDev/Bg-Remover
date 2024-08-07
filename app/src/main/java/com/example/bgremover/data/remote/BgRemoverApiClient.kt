@@ -31,6 +31,7 @@ import kotlinx.serialization.json.jsonPrimitive
 import org.koin.core.annotation.Single
 import java.io.File
 
+
 @Single
 object BgRemoverApiClient {
     @OptIn(ExperimentalSerializationApi::class)
@@ -55,7 +56,6 @@ object BgRemoverApiClient {
 
             }
         }
-
         
         install(HttpTimeout) {
             connectTimeoutMillis = TIMEOUT
@@ -64,7 +64,6 @@ object BgRemoverApiClient {
         }
     }
 
-    
     @OptIn(InternalAPI::class)
     suspend fun removeBackground(imageFile: File): String {
         val formData = formData {
@@ -74,15 +73,12 @@ object BgRemoverApiClient {
             })
             append("size", "auto")
         }
-
-
         val response: HttpResponse = client.post("https://api.remove.bg/v1.0/removebg") {
             headers {
                 append("X-API-Key", "rH8SbrohMJWJ7cXERmdqdzTf")
             }
             setBody(MultiPartFormDataContent(formData))
         }
-
         if (response.status.isSuccess()) {
             val responseBody = response.body<JsonObject>()
             return responseBody["data"]?.jsonObject?.get("result_b64")?.jsonPrimitive?.content
