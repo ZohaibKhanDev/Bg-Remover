@@ -372,6 +372,7 @@ fun ActionItem(
                     .align(Alignment.Center),
                 tint = if (blue) Color.White else if (lightBlue) Color(0XFF3589e8) else Color.Black
             )
+
             if (isNew) {
                 Box(
                     modifier = Modifier
@@ -380,10 +381,11 @@ fun ActionItem(
                         .align(Alignment.TopEnd),
                     contentAlignment = Alignment.Center
                 ) {
-                    Text("New", color = Color.Black, fontSize = 8.sp)
+                    Text("NEW", color = Color.Black, fontSize = 8.sp)
                 }
             }
         }
+
         Spacer(modifier = Modifier.height(4.dp))
         Text(
             text = text,
@@ -392,6 +394,7 @@ fun ActionItem(
                 fontWeight = FontWeight.Medium
             )
         )
+
     }
 }
 
