@@ -75,7 +75,7 @@ object BgRemoverApiClient {
         }
         val response: HttpResponse = client.post("https://api.remove.bg/v1.0/removebg") {
             headers {
-                append("X-API-Key", "rH8SbrohMJWJ7cXERmdqdzTf")
+                append("X-API-Key", "5SNgPnHgBrRp71ijMFNYuLso")
             }
             setBody(MultiPartFormDataContent(formData))
         }

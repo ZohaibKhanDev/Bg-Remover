@@ -1,9 +1,14 @@
 package com.example.bgremover.presentation.ui.screens
 
 import android.annotation.SuppressLint
+import android.content.ActivityNotFoundException
+import android.content.Context
+import android.content.Intent
 import android.graphics.Bitmap
 import android.graphics.BitmapFactory
+import android.net.Uri
 import android.util.Base64
+import android.util.Log
 import androidx.compose.animation.core.LinearOutSlowInEasing
 import androidx.compose.animation.core.animateFloatAsState
 import androidx.compose.animation.core.tween
@@ -72,10 +77,14 @@ import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import androidx.core.content.ContextCompat.startActivity
+import androidx.core.content.FileProvider
 import androidx.navigation.NavController
 import coil.compose.AsyncImage
 import com.example.bgremover.R
 import kotlinx.coroutines.delay
+import java.io.File
+import java.io.FileOutputStream
 
 @OptIn(ExperimentalMaterial3Api::class)
 @SuppressLint("UnusedMaterial3ScaffoldPaddingParameter")
@@ -302,12 +311,6 @@ fun BgDetail(
 
             Spacer(modifier = Modifier.height(30.dp))
 
-            if (bottomColor){
-                
-                Text(text = "Hello Word!")
-
-            }else{
-
                 LazyRow(
                     modifier = Modifier
                         .fillMaxWidth()
@@ -329,15 +332,89 @@ fun BgDetail(
                             bgremoveimage = bgremoveimage?.let {
                                 val imageBytes = Base64.decode(it, Base64.DEFAULT)
                                 BitmapFactory.decodeByteArray(imageBytes, 0, imageBytes.size)
-                            },item.color,bottomColor
+                            }, item.color, bottomColor
                         )
                     }
+                    item {
+                        Column(
+                            horizontalAlignment = Alignment.CenterHorizontally,
+                            modifier = Modifier
+                                .padding(vertical = 8.dp)
+                                .pointerInput(Unit) {
+                                    detectTapGestures(onLongPress = { /* Trigger tooltip */ })
+                                }
+                        ) {
+                            val context = LocalContext.current
+                            Box(
+                                modifier = Modifier
+                                    .size(45.dp)
+                                    .clickable {
+                                       Intent(Intent.ACTION_MAIN).also {
+                                            it.`package` = "com.canva.editor"
+                                            try {
+                                                context.startActivity(it)
+                                            } catch (e: ActivityNotFoundException) {
+                                                e.printStackTrace()
+                                                val playStoreIntent = Intent(Intent.ACTION_VIEW, Uri.parse("https://play.google.com/store/apps/details?id=com.canva.editor"))
+                                                context.startActivity(playStoreIntent)
+                                            }
+                                        }
+
+                                    },
+                                contentAlignment = Alignment.TopEnd
+                            ) {
+                                Image(
+                                    painter = painterResource(id = R.drawable.canva),
+                                    contentDescription = "Canva",
+                                    modifier = Modifier
+                                        .size(24.dp)
+                                        .align(Alignment.Center),
+                                )
+                            }
+                            Text(
+                                text = "Canva",
+                                fontSize = 10.sp,
+                            )
+                        }
+
+                    }
                 }
-            }
-           
+
+
         }
     }
 }
+
+fun saveBitmapToUri(context: Context, bitmap: Bitmap): Uri {
+    val file = File(context.cacheDir, "shared_image.png")
+    FileOutputStream(file).use {
+        bitmap.compress(Bitmap.CompressFormat.PNG, 100, it)
+    }
+    return FileProvider.getUriForFile(context, "com.example.bgremover.fileprovider", file) // Replace with correct package
+}
+
+
+
+fun handleCanvaClick(context: Context, bgremoveimage: String?) {
+    bgremoveimage?.let { base64 ->
+        val imageBytes = Base64.decode(base64, Base64.DEFAULT)
+        val bitmap = BitmapFactory.decodeByteArray(imageBytes, 0, imageBytes.size)
+
+        val imageUri = saveBitmapToUri(context, bitmap)
+
+        val shareIntent = Intent().apply {
+            action = Intent.ACTION_SEND
+            putExtra(Intent.EXTRA_STREAM, imageUri)
+            type = "image/png"
+            flags = Intent.FLAG_GRANT_READ_URI_PERMISSION
+        }
+
+        context.startActivity(Intent.createChooser(shareIntent, "Share Image"))
+    } ?: run {
+        Log.e("CanvaClick", "No background removed image available")
+    }
+}
+
 
 data class ActionItemData(
     val icon: ImageVector,
@@ -349,11 +426,11 @@ data class ActionItemData(
 )
 
 val actionItems = listOf(
-    ActionItemData(Icons.Outlined.FileDownload, "Download", false, true, false,false),
-    ActionItemData(Icons.Outlined.FileDownload, "Download HD", false, false, true,false),
-    ActionItemData(Icons.Outlined.Add, "Background", false, false, false,true),
-    ActionItemData(Icons.Outlined.Brush, "Erase/Restore", false, false, false,false),
-    ActionItemData(Icons.Outlined.JoinLeft, "Effects", isNew = true, false, false,false)
+    ActionItemData(Icons.Outlined.FileDownload, "Download", false, true, false, false),
+    ActionItemData(Icons.Outlined.FileDownload, "Download HD", false, false, true, false),
+    ActionItemData(Icons.Outlined.Add, "Background", false, false, false, true),
+    ActionItemData(Icons.Outlined.Brush, "Erase/Restore", false, false, false, false),
+    ActionItemData(Icons.Outlined.JoinLeft, "Effects", isNew = true, false, false, false)
 )
 
 @Composable
