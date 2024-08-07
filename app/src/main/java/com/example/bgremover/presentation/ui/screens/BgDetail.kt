@@ -314,28 +314,174 @@ fun BgDetail(
                 LazyRow(
                     modifier = Modifier
                         .fillMaxWidth()
-                        .padding(horizontal = 16.dp)
-                        .background(
-                            color = Color(0xFFF9F9F9),
-                            shape = RoundedCornerShape(8.dp)
-                        ),
+                        .padding(horizontal = 16.dp),
                     horizontalArrangement = Arrangement.SpaceBetween,
                     verticalAlignment = Alignment.CenterVertically
                 ) {
-                    items(actionItems) { item ->
-                        ActionItem(
-                            icon = item.icon,
-                            text = item.text,
-                            isNew = item.isNew,
-                            blue = item.blue,
-                            lightBlue = item.lightBlue,
-                            bgremoveimage = bgremoveimage?.let {
-                                val imageBytes = Base64.decode(it, Base64.DEFAULT)
-                                BitmapFactory.decodeByteArray(imageBytes, 0, imageBytes.size)
-                            }, item.color, bottomColor
-                        )
-                    }
+
                     item {
+                        Column(
+                            horizontalAlignment = Alignment.CenterHorizontally,
+                            modifier = Modifier
+                                .padding(vertical = 8.dp)
+                                .pointerInput(Unit) {
+                                    detectTapGestures(onLongPress = { /* Trigger tooltip */ })
+                                }
+                        ) {
+                            Box(
+                                modifier = Modifier
+                                    .size(45.dp)
+                                    .clickable {
+
+                                    },
+                                contentAlignment = Alignment.TopEnd
+                            ) {
+                                Icon(
+                                    imageVector = Icons.Outlined.FileDownload,
+                                    contentDescription = "Download",
+                                    modifier = Modifier
+                                        .size(24.dp)
+                                        .align(Alignment.Center),
+                                )
+                            }
+                            Text(
+                                text = "Download",
+                                fontSize = 10.sp,
+                            )
+                        }
+
+
+                        Column(
+                            horizontalAlignment = Alignment.CenterHorizontally,
+                            modifier = Modifier
+                                .padding(vertical = 8.dp)
+                                .pointerInput(Unit) {
+                                    detectTapGestures(onLongPress = { /* Trigger tooltip */ })
+                                }
+                        ) {
+                            val context = LocalContext.current
+                            Box(
+                                modifier = Modifier
+                                    .size(45.dp)
+                                    .clickable {
+                                    },
+                                contentAlignment = Alignment.TopEnd
+                            ) {
+                                Icon(
+                                    imageVector = Icons.Outlined.FileDownload,
+                                    contentDescription = "DownloadHd",
+                                    modifier = Modifier
+                                        .size(24.dp)
+                                        .align(Alignment.Center),
+                                )
+                            }
+                            Text(
+                                text = "DownloadHd",
+                                fontSize = 10.sp,
+                            )
+                        }
+
+
+                        Column(
+                            horizontalAlignment = Alignment.CenterHorizontally,
+                            modifier = Modifier
+                                .padding(vertical = 8.dp)
+                                .pointerInput(Unit) {
+                                    detectTapGestures(onLongPress = { /* Trigger tooltip */ })
+                                }
+                        ) {
+                            val context = LocalContext.current
+                            Box(
+                                modifier = Modifier
+                                    .size(45.dp)
+                                    .clickable {
+
+                                    },
+                                contentAlignment = Alignment.TopEnd
+                            ) {
+                                Icon(
+                                    imageVector = Icons.Outlined.Add,
+                                    contentDescription = "Add",
+                                    modifier = Modifier
+                                        .size(24.dp)
+                                        .align(Alignment.Center),
+                                )
+                            }
+                            Text(
+                                text = "Add",
+                                fontSize = 10.sp,
+                            )
+                        }
+
+
+
+                        Column(
+                            horizontalAlignment = Alignment.CenterHorizontally,
+                            modifier = Modifier
+                                .padding(vertical = 8.dp)
+                                .pointerInput(Unit) {
+                                    detectTapGestures(onLongPress = { /* Trigger tooltip */ })
+                                }
+                        ) {
+                            val context = LocalContext.current
+                            Box(
+                                modifier = Modifier
+                                    .size(45.dp)
+                                    .clickable {
+
+                                    },
+                                contentAlignment = Alignment.TopEnd
+                            ) {
+                                Icon(
+                                    imageVector = Icons.Outlined.Brush,
+                                    contentDescription = "Erase/Restore",
+                                    modifier = Modifier
+                                        .size(24.dp)
+                                        .align(Alignment.Center),
+                                )
+                            }
+                            Text(
+                                text = "Erase/Restore",
+                                fontSize = 10.sp,
+                            )
+                        }
+
+
+
+                        Column(
+                            horizontalAlignment = Alignment.CenterHorizontally,
+                            modifier = Modifier
+                                .padding(vertical = 8.dp)
+                                .pointerInput(Unit) {
+                                    detectTapGestures(onLongPress = { /* Trigger tooltip */ })
+                                }
+                        ) {
+                            val context = LocalContext.current
+                            Box(
+                                modifier = Modifier
+                                    .size(45.dp)
+                                    .clickable {
+
+                                    },
+                                contentAlignment = Alignment.TopEnd
+                            ) {
+                                Icon(
+                                    imageVector = Icons.Outlined.JoinLeft,
+                                    contentDescription = "Effects",
+                                    modifier = Modifier
+                                        .size(24.dp)
+                                        .align(Alignment.Center),
+                                )
+                            }
+                            Text(
+                                text = "Effects",
+                                fontSize = 10.sp,
+                            )
+                        }
+
+
+
+
                         Column(
                             horizontalAlignment = Alignment.CenterHorizontally,
                             modifier = Modifier
