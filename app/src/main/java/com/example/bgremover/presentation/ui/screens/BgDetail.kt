@@ -305,7 +305,9 @@ fun BgDetail(
             if (bottomColor){
                 
                 Text(text = "Hello Word!")
+
             }else{
+
                 LazyRow(
                     modifier = Modifier
                         .fillMaxWidth()
