@@ -144,13 +144,8 @@ fun BgDetail(
                     .size(60.dp),
             )
         }, actions = {
-            IconButton(onClick = { /* TODO */ }) {
-                Image(imageVector = Icons.Filled.Splitscreen,
-                    contentDescription = "",
-                    contentScale = ContentScale.Crop,
-                    modifier = Modifier
-                        .rotate(90f)
-                        .clickable { /* TODO */ })
+            IconButton(onClick = { showBgRemovedImage = !showBgRemovedImage }) {
+                Icon(imageVector = Icons.Filled.Splitscreen, contentDescription = "")
             }
             IconButton(onClick = { /* TODO */ }) {
                 Icon(
@@ -310,6 +305,7 @@ fun BgDetail(
             }
 
             Spacer(modifier = Modifier.height(30.dp))
+
 
             LazyRow(
                 modifier = Modifier
@@ -533,3 +529,4 @@ fun BgDetail(
         }
     }
 }
+
