@@ -94,12 +94,11 @@ class MainActivity : ComponentActivity() {
 
 fun createNotificationChannel(context: Context) {
     if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
-        val channel = NotificationChannel(
-            "DOWNLOAD_CHANNEL",
-            "Image Download",
-            NotificationManager.IMPORTANCE_HIGH
-        ).apply {
-            description = "Channel for image download notifications"
+        val name = "Download Channel"
+        val descriptionText = "Channel for download notifications"
+        val importance = NotificationManager.IMPORTANCE_HIGH
+        val channel = NotificationChannel("DOWNLOAD_CHANNEL", name, importance).apply {
+            description = descriptionText
         }
         val notificationManager: NotificationManager =
             context.getSystemService(Context.NOTIFICATION_SERVICE) as NotificationManager

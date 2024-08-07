@@ -86,6 +86,9 @@ fun BgDetail(
     var showBgRemovedImage by remember { mutableStateOf(false) }
     var showImageAnimation by remember { mutableStateOf(true) }
     var showDialog by remember { mutableStateOf(false) }
+    var bottomColor by remember {
+        mutableStateOf(false)
+    }
 
     LaunchedEffect(Unit) {
         delay(3000)
@@ -253,7 +256,8 @@ fun BgDetail(
                     ) {
                         bgremoveimage?.let { base64 ->
                             val imageBytes = Base64.decode(base64, Base64.DEFAULT)
-                            val bitmap = BitmapFactory.decodeByteArray(imageBytes, 0, imageBytes.size)
+                            val bitmap =
+                                BitmapFactory.decodeByteArray(imageBytes, 0, imageBytes.size)
                             Box(
                                 modifier = Modifier
                                     .size(400.dp, 550.dp)
@@ -298,31 +302,37 @@ fun BgDetail(
 
             Spacer(modifier = Modifier.height(30.dp))
 
-            LazyRow(
-                modifier = Modifier
-                    .fillMaxWidth()
-                    .padding(horizontal = 16.dp)
-                    .background(
-                        color = Color(0xFFF9F9F9),
-                        shape = RoundedCornerShape(8.dp)
-                    ),
-                horizontalArrangement = Arrangement.SpaceBetween,
-                verticalAlignment = Alignment.CenterVertically
-            ) {
-                items(actionItems) { item ->
-                    ActionItem(
-                        icon = item.icon,
-                        text = item.text,
-                        isNew = item.isNew,
-                        blue = item.blue,
-                        lightBlue = item.lightBlue,
-                        bgremoveimage = bgremoveimage?.let {
-                            val imageBytes = Base64.decode(it, Base64.DEFAULT)
-                            BitmapFactory.decodeByteArray(imageBytes, 0, imageBytes.size)
-                        }
-                    )
+            if (bottomColor){
+                
+                Text(text = "Hello Word!")
+            }else{
+                LazyRow(
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .padding(horizontal = 16.dp)
+                        .background(
+                            color = Color(0xFFF9F9F9),
+                            shape = RoundedCornerShape(8.dp)
+                        ),
+                    horizontalArrangement = Arrangement.SpaceBetween,
+                    verticalAlignment = Alignment.CenterVertically
+                ) {
+                    items(actionItems) { item ->
+                        ActionItem(
+                            icon = item.icon,
+                            text = item.text,
+                            isNew = item.isNew,
+                            blue = item.blue,
+                            lightBlue = item.lightBlue,
+                            bgremoveimage = bgremoveimage?.let {
+                                val imageBytes = Base64.decode(it, Base64.DEFAULT)
+                                BitmapFactory.decodeByteArray(imageBytes, 0, imageBytes.size)
+                            },item.color,bottomColor
+                        )
+                    }
                 }
             }
+           
         }
     }
 }
@@ -333,14 +343,15 @@ data class ActionItemData(
     val isNew: Boolean = false,
     val blue: Boolean = false,
     val lightBlue: Boolean = false,
+    val color: Boolean = false,
 )
 
 val actionItems = listOf(
-    ActionItemData(Icons.Outlined.FileDownload, "Download", false, true, false),
-    ActionItemData(Icons.Outlined.FileDownload, "Download HD", false, false, true),
-    ActionItemData(Icons.Outlined.Add, "Background", false, false, false),
-    ActionItemData(Icons.Outlined.Brush, "Erase/Restore", false, false, false),
-    ActionItemData(Icons.Outlined.JoinLeft, "Effects", isNew = true, false, false)
+    ActionItemData(Icons.Outlined.FileDownload, "Download", false, true, false,false),
+    ActionItemData(Icons.Outlined.FileDownload, "Download HD", false, false, true,false),
+    ActionItemData(Icons.Outlined.Add, "Background", false, false, false,true),
+    ActionItemData(Icons.Outlined.Brush, "Erase/Restore", false, false, false,false),
+    ActionItemData(Icons.Outlined.JoinLeft, "Effects", isNew = true, false, false,false)
 )
 
 @Composable
@@ -351,8 +362,10 @@ fun ActionItem(
     blue: Boolean,
     lightBlue: Boolean,
     bgremoveimage: Bitmap?,
-    isHd: Boolean = false
+    color: Boolean,
+    bottomColor: Boolean
 ) {
+    var BottomColor = bottomColor
     val context = LocalContext.current
     Column(
         horizontalAlignment = Alignment.CenterHorizontally,
@@ -366,11 +379,15 @@ fun ActionItem(
             modifier = Modifier
                 .size(45.dp)
                 .clickable {
-                   if (blue){
-                       saveImage(bgremoveimage,context,false)
-                   }
-                    if (lightBlue){
-                        saveImage(bgremoveimage,context,true)
+                    if (blue) {
+                        saveImage(bgremoveimage, context, false)
+                    }
+                    if (lightBlue) {
+                        saveImage(bgremoveimage, context, true)
+                    }
+
+                    if (color) {
+                        BottomColor = !BottomColor
                     }
                 }
                 .background(
@@ -407,6 +424,3 @@ fun ActionItem(
         )
     }
 }
-
-
-

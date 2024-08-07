@@ -7,11 +7,11 @@ import android.content.Context
 import android.graphics.Bitmap
 import android.net.Uri
 import android.os.Build
-import android.os.Environment     
+import android.os.Environment
 import android.provider.MediaStore
 import android.widget.Toast
 import androidx.activity.compose.rememberLauncherForActivityResult
-import androidx.activity.result.contract.ActivityResultContracts 
+import androidx.activity.result.contract.ActivityResultContracts
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
@@ -123,7 +123,7 @@ fun BgRemover(navController: NavController) {
             }
         }
     }
-    
+
 
     Scaffold(topBar = {
         TopAppBar(title = {
@@ -157,7 +157,7 @@ fun BgRemover(navController: NavController) {
             )
         })
     }) {
-        
+
         Column(
             modifier = Modifier
                 .fillMaxSize()
@@ -366,6 +366,3 @@ fun saveImage(bitmap: Bitmap?, context: Context, isHd: Boolean) {
         notificationManager.notify(1, notificationBuilder.build())
     }
 }
-
-
-
