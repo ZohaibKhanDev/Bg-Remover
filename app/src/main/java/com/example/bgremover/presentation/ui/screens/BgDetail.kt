@@ -315,10 +315,9 @@ fun BgDetail(
                 modifier = Modifier
                     .fillMaxWidth()
                     .padding(horizontal = 16.dp),
-                horizontalArrangement = Arrangement.SpaceBetween,
+                horizontalArrangement = Arrangement.spacedBy(16.dp), // Add space between items
                 verticalAlignment = Alignment.CenterVertically
             ) {
-
                 item {
                     Column(
                         horizontalAlignment = Alignment.CenterHorizontally,
@@ -348,11 +347,12 @@ fun BgDetail(
                         }
                         Text(
                             text = "Download",
-                            fontSize = 10.sp, color = Color(0XFF0077ff)
+                            fontSize = 12.sp, color = Color(0XFF0077ff)
                         )
                     }
+                }
 
-
+                item {
                     Column(
                         horizontalAlignment = Alignment.CenterHorizontally,
                         modifier = Modifier
@@ -381,11 +381,12 @@ fun BgDetail(
                         }
                         Text(
                             text = "DownloadHd",
-                            fontSize = 10.sp, color = Color(0XFF0077ff)
+                            fontSize = 12.sp, color = Color(0XFF0077ff)
                         )
                     }
+                }
 
-
+                item {
                     Column(
                         horizontalAlignment = Alignment.CenterHorizontally,
                         modifier = Modifier
@@ -413,12 +414,12 @@ fun BgDetail(
                         }
                         Text(
                             text = "Add",
-                            fontSize = 10.sp,
+                            fontSize = 12.sp,
                         )
                     }
+                }
 
-
-
+                item {
                     Column(
                         horizontalAlignment = Alignment.CenterHorizontally,
                         modifier = Modifier
@@ -446,12 +447,12 @@ fun BgDetail(
                         }
                         Text(
                             text = "Erase/Restore",
-                            fontSize = 10.sp,
+                            fontSize = 12.sp,
                         )
                     }
+                }
 
-
-
+                item {
                     Column(
                         horizontalAlignment = Alignment.CenterHorizontally,
                         modifier = Modifier
@@ -479,13 +480,12 @@ fun BgDetail(
                         }
                         Text(
                             text = "Effects",
-                            fontSize = 10.sp,
+                            fontSize = 12.sp,
                         )
                     }
+                }
 
-
-
-
+                item {
                     Column(
                         horizontalAlignment = Alignment.CenterHorizontally,
                         modifier = Modifier
@@ -512,7 +512,6 @@ fun BgDetail(
                                             context.startActivity(playStoreIntent)
                                         }
                                     }
-
                                 },
                             contentAlignment = Alignment.TopEnd
                         ) {
@@ -526,17 +525,19 @@ fun BgDetail(
                         }
                         Text(
                             text = "Canva",
-                            fontSize = 10.sp,
+                            fontSize = 12.sp,
                         )
                     }
-
                 }
             }
-
-
         }
     }
 }
+
+
+
+
+
 
 fun saveBitmapToUri(context: Context, bitmap: Bitmap): Uri {
     val file = File(context.cacheDir, "shared_image.png")
