@@ -311,220 +311,227 @@ fun BgDetail(
 
             Spacer(modifier = Modifier.height(30.dp))
 
-                LazyRow(
-                    modifier = Modifier
-                        .fillMaxWidth()
-                        .padding(horizontal = 16.dp),
-                    horizontalArrangement = Arrangement.SpaceBetween,
-                    verticalAlignment = Alignment.CenterVertically
-                ) {
+            LazyRow(
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .padding(horizontal = 16.dp),
+                horizontalArrangement = Arrangement.SpaceBetween,
+                verticalAlignment = Alignment.CenterVertically
+            ) {
 
-                    item {
-                        Column(
-                            horizontalAlignment = Alignment.CenterHorizontally,
-                            modifier = Modifier
-                                .padding(vertical = 8.dp)
-                                .pointerInput(Unit) {
-                                    detectTapGestures(onLongPress = { /* Trigger tooltip */ })
-                                }
-                        ) {
-                            Box(
-                                modifier = Modifier
-                                    .size(45.dp)
-                                    .clickable {
-
-                                    },
-                                contentAlignment = Alignment.TopEnd
-                            ) {
-                                Icon(
-                                    imageVector = Icons.Outlined.FileDownload,
-                                    contentDescription = "Download",
-                                    modifier = Modifier
-                                        .size(24.dp)
-                                        .align(Alignment.Center),
-                                )
+                item {
+                    Column(
+                        horizontalAlignment = Alignment.CenterHorizontally,
+                        modifier = Modifier
+                            .padding(vertical = 8.dp)
+                            .pointerInput(Unit) {
+                                detectTapGestures(onLongPress = { /* Trigger tooltip */ })
                             }
-                            Text(
-                                text = "Download",
-                                fontSize = 10.sp,
+                    ) {
+                        Box(
+                            modifier = Modifier
+                                .clip(CircleShape)
+                                .size(45.dp)
+                                .background(Color(0XFF0077ff))
+                                .clickable {
+
+                                },
+                            contentAlignment = Alignment.TopEnd
+                        ) {
+                            Icon(
+                                imageVector = Icons.Outlined.FileDownload,
+                                contentDescription = "Download",
+                                modifier = Modifier
+                                    .size(24.dp)
+                                    .align(Alignment.Center), tint = Color.White
                             )
                         }
-
-
-                        Column(
-                            horizontalAlignment = Alignment.CenterHorizontally,
-                            modifier = Modifier
-                                .padding(vertical = 8.dp)
-                                .pointerInput(Unit) {
-                                    detectTapGestures(onLongPress = { /* Trigger tooltip */ })
-                                }
-                        ) {
-                            val context = LocalContext.current
-                            Box(
-                                modifier = Modifier
-                                    .size(45.dp)
-                                    .clickable {
-                                    },
-                                contentAlignment = Alignment.TopEnd
-                            ) {
-                                Icon(
-                                    imageVector = Icons.Outlined.FileDownload,
-                                    contentDescription = "DownloadHd",
-                                    modifier = Modifier
-                                        .size(24.dp)
-                                        .align(Alignment.Center),
-                                )
-                            }
-                            Text(
-                                text = "DownloadHd",
-                                fontSize = 10.sp,
-                            )
-                        }
-
-
-                        Column(
-                            horizontalAlignment = Alignment.CenterHorizontally,
-                            modifier = Modifier
-                                .padding(vertical = 8.dp)
-                                .pointerInput(Unit) {
-                                    detectTapGestures(onLongPress = { /* Trigger tooltip */ })
-                                }
-                        ) {
-                            val context = LocalContext.current
-                            Box(
-                                modifier = Modifier
-                                    .size(45.dp)
-                                    .clickable {
-
-                                    },
-                                contentAlignment = Alignment.TopEnd
-                            ) {
-                                Icon(
-                                    imageVector = Icons.Outlined.Add,
-                                    contentDescription = "Add",
-                                    modifier = Modifier
-                                        .size(24.dp)
-                                        .align(Alignment.Center),
-                                )
-                            }
-                            Text(
-                                text = "Add",
-                                fontSize = 10.sp,
-                            )
-                        }
-
-
-
-                        Column(
-                            horizontalAlignment = Alignment.CenterHorizontally,
-                            modifier = Modifier
-                                .padding(vertical = 8.dp)
-                                .pointerInput(Unit) {
-                                    detectTapGestures(onLongPress = { /* Trigger tooltip */ })
-                                }
-                        ) {
-                            val context = LocalContext.current
-                            Box(
-                                modifier = Modifier
-                                    .size(45.dp)
-                                    .clickable {
-
-                                    },
-                                contentAlignment = Alignment.TopEnd
-                            ) {
-                                Icon(
-                                    imageVector = Icons.Outlined.Brush,
-                                    contentDescription = "Erase/Restore",
-                                    modifier = Modifier
-                                        .size(24.dp)
-                                        .align(Alignment.Center),
-                                )
-                            }
-                            Text(
-                                text = "Erase/Restore",
-                                fontSize = 10.sp,
-                            )
-                        }
-
-
-
-                        Column(
-                            horizontalAlignment = Alignment.CenterHorizontally,
-                            modifier = Modifier
-                                .padding(vertical = 8.dp)
-                                .pointerInput(Unit) {
-                                    detectTapGestures(onLongPress = { /* Trigger tooltip */ })
-                                }
-                        ) {
-                            val context = LocalContext.current
-                            Box(
-                                modifier = Modifier
-                                    .size(45.dp)
-                                    .clickable {
-
-                                    },
-                                contentAlignment = Alignment.TopEnd
-                            ) {
-                                Icon(
-                                    imageVector = Icons.Outlined.JoinLeft,
-                                    contentDescription = "Effects",
-                                    modifier = Modifier
-                                        .size(24.dp)
-                                        .align(Alignment.Center),
-                                )
-                            }
-                            Text(
-                                text = "Effects",
-                                fontSize = 10.sp,
-                            )
-                        }
-
-
-
-
-                        Column(
-                            horizontalAlignment = Alignment.CenterHorizontally,
-                            modifier = Modifier
-                                .padding(vertical = 8.dp)
-                                .pointerInput(Unit) {
-                                    detectTapGestures(onLongPress = { /* Trigger tooltip */ })
-                                }
-                        ) {
-                            val context = LocalContext.current
-                            Box(
-                                modifier = Modifier
-                                    .size(45.dp)
-                                    .clickable {
-                                       Intent(Intent.ACTION_MAIN).also {
-                                            it.`package` = "com.canva.editor"
-                                            try {
-                                                context.startActivity(it)
-                                            } catch (e: ActivityNotFoundException) {
-                                                e.printStackTrace()
-                                                val playStoreIntent = Intent(Intent.ACTION_VIEW, Uri.parse("https://play.google.com/store/apps/details?id=com.canva.editor"))
-                                                context.startActivity(playStoreIntent)
-                                            }
-                                        }
-
-                                    },
-                                contentAlignment = Alignment.TopEnd
-                            ) {
-                                Image(
-                                    painter = painterResource(id = R.drawable.canva),
-                                    contentDescription = "Canva",
-                                    modifier = Modifier
-                                        .size(24.dp)
-                                        .align(Alignment.Center),
-                                )
-                            }
-                            Text(
-                                text = "Canva",
-                                fontSize = 10.sp,
-                            )
-                        }
-
+                        Text(
+                            text = "Download",
+                            fontSize = 10.sp, color = Color(0XFF0077ff)
+                        )
                     }
+
+
+                    Column(
+                        horizontalAlignment = Alignment.CenterHorizontally,
+                        modifier = Modifier
+                            .padding(vertical = 8.dp)
+                            .pointerInput(Unit) {
+                                detectTapGestures(onLongPress = { /* Trigger tooltip */ })
+                            }
+                    ) {
+                        val context = LocalContext.current
+                        Box(
+                            modifier = Modifier
+                                .clip(CircleShape)
+                                .size(45.dp)
+                                .background(Color(0XFFc1dff5))
+                                .clickable {
+                                },
+                            contentAlignment = Alignment.TopEnd
+                        ) {
+                            Icon(
+                                imageVector = Icons.Outlined.FileDownload,
+                                contentDescription = "DownloadHd",
+                                modifier = Modifier
+                                    .size(24.dp)
+                                    .align(Alignment.Center), tint = Color.Blue
+                            )
+                        }
+                        Text(
+                            text = "DownloadHd",
+                            fontSize = 10.sp, color = Color(0XFF0077ff)
+                        )
+                    }
+
+
+                    Column(
+                        horizontalAlignment = Alignment.CenterHorizontally,
+                        modifier = Modifier
+                            .padding(vertical = 8.dp)
+                            .pointerInput(Unit) {
+                                detectTapGestures(onLongPress = { /* Trigger tooltip */ })
+                            }
+                    ) {
+                        val context = LocalContext.current
+                        Box(
+                            modifier = Modifier
+                                .size(45.dp)
+                                .clickable {
+
+                                },
+                            contentAlignment = Alignment.TopEnd
+                        ) {
+                            Icon(
+                                imageVector = Icons.Outlined.Add,
+                                contentDescription = "Add",
+                                modifier = Modifier
+                                    .size(24.dp)
+                                    .align(Alignment.Center),
+                            )
+                        }
+                        Text(
+                            text = "Add",
+                            fontSize = 10.sp,
+                        )
+                    }
+
+
+
+                    Column(
+                        horizontalAlignment = Alignment.CenterHorizontally,
+                        modifier = Modifier
+                            .padding(vertical = 8.dp)
+                            .pointerInput(Unit) {
+                                detectTapGestures(onLongPress = { /* Trigger tooltip */ })
+                            }
+                    ) {
+                        val context = LocalContext.current
+                        Box(
+                            modifier = Modifier
+                                .size(45.dp)
+                                .clickable {
+
+                                },
+                            contentAlignment = Alignment.TopEnd
+                        ) {
+                            Icon(
+                                imageVector = Icons.Outlined.Brush,
+                                contentDescription = "Erase/Restore",
+                                modifier = Modifier
+                                    .size(24.dp)
+                                    .align(Alignment.Center),
+                            )
+                        }
+                        Text(
+                            text = "Erase/Restore",
+                            fontSize = 10.sp,
+                        )
+                    }
+
+
+
+                    Column(
+                        horizontalAlignment = Alignment.CenterHorizontally,
+                        modifier = Modifier
+                            .padding(vertical = 8.dp)
+                            .pointerInput(Unit) {
+                                detectTapGestures(onLongPress = { /* Trigger tooltip */ })
+                            }
+                    ) {
+                        val context = LocalContext.current
+                        Box(
+                            modifier = Modifier
+                                .size(45.dp)
+                                .clickable {
+
+                                },
+                            contentAlignment = Alignment.TopEnd
+                        ) {
+                            Icon(
+                                imageVector = Icons.Outlined.JoinLeft,
+                                contentDescription = "Effects",
+                                modifier = Modifier
+                                    .size(24.dp)
+                                    .align(Alignment.Center),
+                            )
+                        }
+                        Text(
+                            text = "Effects",
+                            fontSize = 10.sp,
+                        )
+                    }
+
+
+
+
+                    Column(
+                        horizontalAlignment = Alignment.CenterHorizontally,
+                        modifier = Modifier
+                            .padding(vertical = 8.dp)
+                            .pointerInput(Unit) {
+                                detectTapGestures(onLongPress = { /* Trigger tooltip */ })
+                            }
+                    ) {
+                        val context = LocalContext.current
+                        Box(
+                            modifier = Modifier
+                                .size(45.dp)
+                                .clickable {
+                                    Intent(Intent.ACTION_MAIN).also {
+                                        it.`package` = "com.canva.editor"
+                                        try {
+                                            context.startActivity(it)
+                                        } catch (e: ActivityNotFoundException) {
+                                            e.printStackTrace()
+                                            val playStoreIntent = Intent(
+                                                Intent.ACTION_VIEW,
+                                                Uri.parse("https://play.google.com/store/apps/details?id=com.canva.editor")
+                                            )
+                                            context.startActivity(playStoreIntent)
+                                        }
+                                    }
+
+                                },
+                            contentAlignment = Alignment.TopEnd
+                        ) {
+                            Image(
+                                painter = painterResource(id = R.drawable.canva),
+                                contentDescription = "Canva",
+                                modifier = Modifier
+                                    .size(24.dp)
+                                    .align(Alignment.Center),
+                            )
+                        }
+                        Text(
+                            text = "Canva",
+                            fontSize = 10.sp,
+                        )
+                    }
+
                 }
+            }
 
 
         }
@@ -536,9 +543,12 @@ fun saveBitmapToUri(context: Context, bitmap: Bitmap): Uri {
     FileOutputStream(file).use {
         bitmap.compress(Bitmap.CompressFormat.PNG, 100, it)
     }
-    return FileProvider.getUriForFile(context, "com.example.bgremover.fileprovider", file) // Replace with correct package
+    return FileProvider.getUriForFile(
+        context,
+        "com.example.bgremover.fileprovider",
+        file
+    ) // Replace with correct package
 }
-
 
 
 fun handleCanvaClick(context: Context, bgremoveimage: String?) {
