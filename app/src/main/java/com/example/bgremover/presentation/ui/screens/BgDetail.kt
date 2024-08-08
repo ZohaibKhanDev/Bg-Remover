@@ -242,7 +242,6 @@ fun BgDetail(
                         enter = fadeIn(animationSpec = tween(durationMillis = 1500)),
                         exit = fadeOut(animationSpec = tween(durationMillis = 1500))
                     ) {
-
                         AsyncImage(
                             model = it,
                             contentDescription = null,
@@ -253,8 +252,6 @@ fun BgDetail(
                             contentScale = ContentScale.Crop
                         )
                     }
-
-
 
                     androidx.compose.animation.AnimatedVisibility(
                         visible = showBgRemovedImage,
@@ -532,4 +529,5 @@ fun BgDetail(
         }
     }
 }
+
 
