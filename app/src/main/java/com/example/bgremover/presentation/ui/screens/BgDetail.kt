@@ -589,8 +589,8 @@ fun BgDetail(
                                 text = "Add", fontSize = 12.sp,
                             )
                         }
-
                     }
+
 
                     item {
                         Column(horizontalAlignment = Alignment.CenterHorizontally,
