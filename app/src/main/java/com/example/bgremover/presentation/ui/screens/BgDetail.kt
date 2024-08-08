@@ -571,7 +571,6 @@ fun BgDetail(
                                 modifier = Modifier
                                     .clip(CircleShape)
                                     .size(45.dp)
-                                    .background(Color(0XFFc1dff5))
                                     .clickable {
                                        addBg=true
                                     },
@@ -587,7 +586,7 @@ fun BgDetail(
                                 )
                             }
                             Text(
-                                text = "Add", fontSize = 12.sp, color = Color(0XFF0077ff)
+                                text = "Add", fontSize = 12.sp,
                             )
                         }
 
