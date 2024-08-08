@@ -5,6 +5,8 @@ import android.app.NotificationManager
 import android.content.ContentValues
 import android.content.Context
 import android.graphics.Bitmap
+import android.graphics.Canvas
+import android.graphics.Paint
 import android.net.Uri
 import android.os.Build
 import android.os.Environment
@@ -51,6 +53,7 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.graphics.toArgb
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.painterResource
@@ -324,13 +327,30 @@ fun BgRemover(navController: NavController) {
 }
 
 
+fun compositeBackground(bitmap: Bitmap, backgroundColor: Color?): Bitmap {
+    val resultBitmap = Bitmap.createBitmap(bitmap.width, bitmap.height, Bitmap.Config.ARGB_8888)
+    val canvas = Canvas(resultBitmap)
+
+    backgroundColor?.let {
+        val paint = Paint().apply {
+            color = it.toArgb()
+            style = Paint.Style.FILL
+        }
+        canvas.drawRect(0f, 0f, resultBitmap.width.toFloat(), resultBitmap.height.toFloat(), paint)
+    }
+
+    canvas.drawBitmap(bitmap, 0f, 0f, null)
+
+    return resultBitmap
+}
+
+
 
 @SuppressLint("ServiceCast")
-fun saveImage(bitmap: Bitmap?, context: Context, isHd: Boolean) {
+fun saveImage(bitmap: Bitmap?, context: Context, isHd: Boolean, backgroundColor: Color?) {
     createNotificationChannel(context)
 
-    val notificationManager =
-        context.getSystemService(Context.NOTIFICATION_SERVICE) as NotificationManager
+    val notificationManager = context.getSystemService(Context.NOTIFICATION_SERVICE) as NotificationManager
     val notificationBuilder = NotificationCompat.Builder(context, "DOWNLOAD_CHANNEL")
         .setSmallIcon(R.drawable.baseline_download_24)
         .setContentTitle("Image Download")
@@ -358,7 +378,10 @@ fun saveImage(bitmap: Bitmap?, context: Context, isHd: Boolean) {
             } else {
                 bitmap
             }
-            scaledBitmap?.compress(Bitmap.CompressFormat.PNG, 100, outputStream)
+
+            val finalBitmap = compositeBackground(scaledBitmap ?: return, backgroundColor)
+
+            finalBitmap.compress(Bitmap.CompressFormat.PNG, 100, outputStream)
             Toast.makeText(context, "Image saved to Pictures", Toast.LENGTH_SHORT).show()
             notificationBuilder.setContentText("Download complete").setProgress(0, 0, false).setOngoing(false)
             notificationManager.notify(1, notificationBuilder.build())
@@ -373,5 +396,9 @@ fun saveImage(bitmap: Bitmap?, context: Context, isHd: Boolean) {
         notificationManager.notify(1, notificationBuilder.build())
     }
 }
+
+
+
+
 
 

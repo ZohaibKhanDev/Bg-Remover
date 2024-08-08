@@ -47,6 +47,7 @@ import androidx.compose.ui.unit.sp
 import androidx.navigation.NavController
 import coil.compose.AsyncImage
 import com.example.bgremover.R
+import com.example.bgremover.presentation.ui.navigation.Screens
 import kotlinx.coroutines.delay
 
 @OptIn(ExperimentalMaterial3Api::class)
@@ -62,6 +63,7 @@ fun BgDetail(
     var showImageAnimation by remember { mutableStateOf(true) }
     var showDialog by remember { mutableStateOf(false) }
     var selectedColor by remember { mutableStateOf(Color.Transparent) }
+    var selectedPhoto by remember { mutableStateOf<Int?>(null) }
 
     LaunchedEffect(Unit) {
         delay(3000)
@@ -129,7 +131,8 @@ fun BgDetail(
         Column(
             modifier = Modifier
                 .verticalScroll(vertical)
-                .fillMaxSize().height(1000.dp)
+                .fillMaxSize()
+                .height(1150.dp)
                 .background(Color.White)
                 .padding(top = it.calculateTopPadding()),
             verticalArrangement = Arrangement.spacedBy(15.dp),
@@ -202,8 +205,7 @@ fun BgDetail(
                         .background(
                             if (selectedColor != Color.Transparent) selectedColor
                             else Color.Transparent
-                        ),
-                    contentAlignment = Alignment.Center
+                        ), contentAlignment = Alignment.Center
                 ) {
                     androidx.compose.animation.AnimatedVisibility(
                         visible = showImageAnimation,
@@ -230,17 +232,37 @@ fun BgDetail(
                             val imageBytes = Base64.decode(base64, Base64.DEFAULT)
                             val bitmap =
                                 BitmapFactory.decodeByteArray(imageBytes, 0, imageBytes.size)
+
                             Box(
                                 modifier = Modifier
                                     .size(400.dp, 550.dp)
                                     .clip(RoundedCornerShape(11.dp)),
                                 contentAlignment = Alignment.Center
                             ) {
-                                Box(
-                                    modifier = Modifier
-                                        .fillMaxSize()
-                                        .background(selectedColor.copy(alpha = 0.30f))
-                                )
+                                if (selectedPhoto != null) {
+                                    AsyncImage(
+                                        model = selectedPhoto,
+                                        contentDescription = "",
+                                        modifier = Modifier.fillMaxSize(),
+                                        contentScale = ContentScale.Crop
+                                    )
+                                } else {
+                                    Image(
+                                        painter = painterResource(id = R.drawable.transparntbg),
+                                        contentDescription = "",
+                                        modifier = Modifier.fillMaxSize(),
+                                        contentScale = ContentScale.Crop
+                                    )
+
+                                    if (selectedColor != Color.Transparent) {
+                                        Box(
+                                            modifier = Modifier
+                                                .fillMaxSize()
+                                                .background(selectedColor)
+                                        )
+                                    }
+                                }
+
                                 Image(
                                     bitmap = bitmap.asImageBitmap(),
                                     contentDescription = null,
@@ -249,7 +271,6 @@ fun BgDetail(
                                         .size(400.dp, 550.dp)
                                         .clip(RoundedCornerShape(11.dp))
                                 )
-
                             }
                         } ?: run {
                             Text(
@@ -277,7 +298,6 @@ fun BgDetail(
             }
 
             if (addBg) {
-                // LazyColumn to support vertical scrolling
                 LazyColumn(
                     modifier = Modifier
                         .fillMaxSize()
@@ -286,8 +306,7 @@ fun BgDetail(
                 ) {
                     item {
                         Card(
-                            modifier = Modifier
-                                .fillMaxWidth(),
+                            modifier = Modifier.fillMaxWidth(),
                             shape = RoundedCornerShape(4.dp),
                             colors = CardDefaults.cardColors(containerColor = Color.White)
                         ) {
@@ -303,16 +322,20 @@ fun BgDetail(
                                     horizontalArrangement = Arrangement.SpaceBetween,
                                     verticalAlignment = Alignment.CenterVertically
                                 ) {
-                                    Text(
-                                        text = "Reset",
-                                        fontSize = 15.sp,
-                                        fontWeight = FontWeight.Medium
-                                    )
-                                    Text(
-                                        text = "Done",
+                                    Text(text = "Reset",
                                         fontSize = 15.sp,
                                         fontWeight = FontWeight.Medium,
-                                        color = Color.Blue.copy(alpha = 0.60f)
+                                        modifier = Modifier.clickable {
+                                            showColor= null == true
+                                            showphoto= null == true
+                                        })
+                                    Text(text = "Done",
+                                        fontSize = 15.sp,
+                                        fontWeight = FontWeight.Medium,
+                                        color = Color.Blue.copy(alpha = 0.60f),
+                                        modifier = Modifier.clickable {
+                                            addBg = false
+                                        }
                                     )
                                 }
 
@@ -373,37 +396,79 @@ fun BgDetail(
                                                 Color(0xFFFFE4C4)
                                             )
                                         ) { color ->
-                                            Box(
-                                                modifier = Modifier
-                                                    .clip(RoundedCornerShape(6.dp))
-                                                    .width(55.dp)
-                                                    .height(65.dp)
-                                                    .background(color)
-                                                    .clickable {
-                                                        selectedColor = color
-                                                    }
-                                            )
+                                            Box(modifier = Modifier
+                                                .clip(RoundedCornerShape(6.dp))
+                                                .width(55.dp)
+                                                .height(40.dp)
+                                                .background(color)
+                                                .clickable {
+                                                    selectedColor = color
+                                                })
                                         }
                                     }
                                 }
 
-                                Text(
-                                    text = if (showphoto) "There is Nothing Photos" else "There is Nothing Photos"
-                                )
+                                if (showphoto) {
+                                    LazyHorizontalGrid(
+                                        rows = GridCells.Fixed(2),
+                                        modifier = Modifier
+                                            .fillMaxWidth()
+                                            .height(200.dp)
+                                            .padding(top = 7.dp),
+                                        horizontalArrangement = Arrangement.spacedBy(20.dp),
+                                        verticalArrangement = Arrangement.spacedBy(10.dp),
+                                    ) {
+                                        items(
+                                            listOf(
+                                                R.drawable.car,
+                                                R.drawable.cat,
+                                                R.drawable.women,
+                                                R.drawable.phone,
 
+                                                )
+                                        ) { photoResId ->
+                                            Box(modifier = Modifier
+                                                .clip(RoundedCornerShape(6.dp))
+                                                .width(55.dp)
+                                                .height(40.dp)
+                                                .background(Color.Gray)
+                                                .clickable {
+                                                    selectedPhoto = photoResId
+                                                })
+                                        }
+                                    }
+                                }
+
+
+
+                                Spacer(modifier = Modifier.height(7.dp))
                                 Row(
                                     modifier = Modifier.fillMaxWidth(),
                                     horizontalArrangement = Arrangement.Center,
                                     verticalAlignment = Alignment.CenterVertically
                                 ) {
-                                    Button(onClick = { showphoto = true }) {
-                                        Text(text = "Photo")
+                                    Button(
+                                        onClick = {
+                                            showphoto = true
+                                            showColor = false
+                                        }, colors = ButtonDefaults.buttonColors(
+                                            Color.LightGray.copy(alpha = 0.40f)
+                                        )
+                                    ) {
+                                        Text(text = "Photo", color = Color.Black)
                                     }
 
                                     Spacer(modifier = Modifier.width(10.dp))
 
-                                    Button(onClick = { showColor = true }) {
-                                        Text(text = "Color")
+                                    Button(
+                                        onClick = {
+                                            showphoto = false
+                                            showColor = true
+                                        }, colors = ButtonDefaults.buttonColors(
+                                            Color.LightGray.copy(alpha = 0.40f)
+                                        )
+                                    ) {
+                                        Text(text = "Color", color = Color.Black)
                                     }
                                 }
                             }
@@ -419,6 +484,7 @@ fun BgDetail(
                     verticalAlignment = Alignment.CenterVertically
                 ) {
                     item {
+                        val context= LocalContext.current
                         Column(horizontalAlignment = Alignment.CenterHorizontally,
                             modifier = Modifier
                                 .padding(vertical = 8.dp)
@@ -431,7 +497,12 @@ fun BgDetail(
                                     .size(45.dp)
                                     .background(Color(0XFF0077ff))
                                     .clickable {
-
+                                        bgremoveimage?.let { base64 ->
+                                            val imageBytes = Base64.decode(base64, Base64.DEFAULT)
+                                            val bitmap =
+                                                BitmapFactory.decodeByteArray(imageBytes, 0, imageBytes.size)
+                                            saveImage(bitmap, context =context ,false,selectedColor)
+                                        }
                                     }, contentAlignment = Alignment.TopEnd
                             ) {
                                 Icon(
@@ -450,6 +521,8 @@ fun BgDetail(
                     }
 
                     item {
+                        val context= LocalContext.current
+
                         Column(horizontalAlignment = Alignment.CenterHorizontally,
                             modifier = Modifier
                                 .padding(vertical = 8.dp)
@@ -461,7 +534,13 @@ fun BgDetail(
                                     .clip(CircleShape)
                                     .size(45.dp)
                                     .background(Color(0XFFc1dff5))
-                                    .clickable {},
+                                    .clickable {
+                                        bgremoveimage?.let { base64 ->
+                                            val imageBytes = Base64.decode(base64, Base64.DEFAULT)
+                                            val bitmap = BitmapFactory.decodeByteArray(imageBytes, 0, imageBytes.size)
+                                            saveImage(bitmap, context = context, true, selectedColor)
+                                        }
+                                    },
                                 contentAlignment = Alignment.TopEnd
                             ) {
                                 Icon(
@@ -488,10 +567,13 @@ fun BgDetail(
                                 }) {
                             Box(
                                 modifier = Modifier
+                                    .clip(CircleShape)
                                     .size(45.dp)
+                                    .background(Color(0XFFc1dff5))
                                     .clickable {
-                                        addBg = !addBg
-                                    }, contentAlignment = Alignment.TopEnd
+                                       addBg=true
+                                    },
+                                contentAlignment = Alignment.TopEnd
                             ) {
                                 Icon(
                                     imageVector = Icons.Outlined.Add,
@@ -499,13 +581,14 @@ fun BgDetail(
                                     modifier = Modifier
                                         .size(24.dp)
                                         .align(Alignment.Center),
+                                    tint = Color.Blue
                                 )
                             }
                             Text(
-                                text = "Add",
-                                fontSize = 12.sp,
+                                text = "Add", fontSize = 12.sp, color = Color(0XFF0077ff)
                             )
                         }
+
                     }
 
                     item {
