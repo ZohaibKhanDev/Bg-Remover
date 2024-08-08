@@ -582,7 +582,6 @@ fun BgDetail(
                                     modifier = Modifier
                                         .size(24.dp)
                                         .align(Alignment.Center),
-                                    tint = Color.Blue
                                 )
                             }
                             Text(
