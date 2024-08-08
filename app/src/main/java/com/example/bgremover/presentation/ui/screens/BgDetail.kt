@@ -51,7 +51,7 @@ import com.example.bgremover.presentation.ui.navigation.Screens
 import kotlinx.coroutines.delay
 
 @OptIn(ExperimentalMaterial3Api::class)
-@SuppressLint("UnusedMaterial3ScaffoldPaddingParameter")
+@SuppressLint("UnusedMaterial3ScaffoldPaddingParameter", "InvalidColorHexValue")
 @Composable
 fun BgDetail(
     navController: NavController, imageUrl: String?, bgremoveimage: String?
@@ -392,8 +392,10 @@ fun BgDetail(
                                                 Color(0xFFFF69B4),
                                                 Color(0xFFCD5C5C),
                                                 Color(0xFF4B0082),
-                                                Color(0xFFFFF0F5),
-                                                Color(0xFFFFE4C4)
+                                                Color(0xFFF8756F0F5),
+                                                Color(0xFFFF098F5),
+                                                Color(0xFFFF6745F5),
+                                                Color(0XFF835720533)
                                             )
                                         ) { color ->
                                             Box(modifier = Modifier
@@ -439,9 +441,9 @@ fun BgDetail(
                                     }
                                 }
 
-
-
                                 Spacer(modifier = Modifier.height(7.dp))
+
+
                                 Row(
                                     modifier = Modifier.fillMaxWidth(),
                                     horizontalArrangement = Arrangement.Center,
