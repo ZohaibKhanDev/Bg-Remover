@@ -12,6 +12,7 @@ import androidx.compose.foundation.*
 import androidx.compose.foundation.border
 import androidx.compose.foundation.gestures.detectTapGestures
 import androidx.compose.foundation.layout.*
+import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.LazyRow
 import androidx.compose.foundation.lazy.grid.GridCells
 import androidx.compose.foundation.lazy.grid.LazyHorizontalGrid
@@ -124,9 +125,11 @@ fun BgDetail(
         }, colors = TopAppBarDefaults.topAppBarColors(containerColor = Color.White)
         )
     }) {
+        val vertical = rememberScrollState()
         Column(
             modifier = Modifier
-                .fillMaxSize()
+                .verticalScroll(vertical)
+                .fillMaxSize().height(1000.dp)
                 .background(Color.White)
                 .padding(top = it.calculateTopPadding()),
             verticalArrangement = Arrangement.spacedBy(15.dp),
@@ -268,335 +271,348 @@ fun BgDetail(
             }
 
             if (addBg) {
-                Spacer(modifier = Modifier.height(18.dp)) // Add space before the card
-                // Ensure to no space once not showing the card
-                Card(
+
+            } else {
+                Spacer(modifier = Modifier.height(18.dp))
+            }
+
+            if (addBg) {
+                // LazyColumn to support vertical scrolling
+                LazyColumn(
                     modifier = Modifier
-                        .fillMaxWidth(),
-                    shape = RoundedCornerShape(4.dp),
-                    colors = CardDefaults.cardColors(containerColor = Color.White)
+                        .fillMaxSize()
+                        .padding(16.dp),
+                    verticalArrangement = Arrangement.spacedBy(16.dp)
                 ) {
-                    Column(
-                        modifier = Modifier.fillMaxSize(),
-                        verticalArrangement = Arrangement.Center,
-                        horizontalAlignment = Alignment.CenterHorizontally
-                    ) {
-                        Row(
+                    item {
+                        Card(
                             modifier = Modifier
-                                .fillMaxWidth()
-                                .padding(start = 11.dp, end = 11.dp),
-                            horizontalArrangement = Arrangement.SpaceBetween,
-                            verticalAlignment = Alignment.CenterVertically
+                                .fillMaxWidth(),
+                            shape = RoundedCornerShape(4.dp),
+                            colors = CardDefaults.cardColors(containerColor = Color.White)
                         ) {
-                            Text(text = "Reset", fontSize = 15.sp, fontWeight = FontWeight.Medium)
-                            Text(
-                                text = "Done",
-                                fontSize = 15.sp,
-                                fontWeight = FontWeight.Medium,
-                                color = Color.Blue.copy(alpha = 0.60f)
-                            )
-                        }
-                        if (showColor) {
-                            LazyHorizontalGrid(
-                                rows = GridCells.Fixed(2),
-                                modifier = Modifier
-                                    .fillMaxWidth()
-                                    .padding(top = 7.dp),
-                                horizontalArrangement = Arrangement.spacedBy(20.dp),
-                                verticalArrangement = Arrangement.spacedBy(10.dp),
+                            Column(
+                                modifier = Modifier.fillMaxSize(),
+                                verticalArrangement = Arrangement.Center,
+                                horizontalAlignment = Alignment.CenterHorizontally
                             ) {
-                                items(
-                                    listOf(
-                                        Color(0xFFFFFFFF),
-                                        Color(0xFF000000),
-                                        Color(0xFFFF0000),
-                                        Color(0xFF00FF00),
-                                        Color(0xFF0000FF),
-                                        Color(0xFFFFFF00),
-                                        Color(0xFFFFA500),
-                                        Color(0xFF800080),
-                                        Color(0xFF00FFFF),
-                                        Color(0xFFFFC0CB),
-                                        Color(0xFFA52A2A),
-                                        Color(0xFF808080),
-                                        Color(0xFFFF6347),
-                                        Color(0xFF4682B4),
-                                        Color(0xFFD2691E),
-                                        Color(0xFF7FFF00),
-                                        Color(0xFFDC143C),
-                                        Color(0xFFBDB76B),
-                                        Color(0xFF556B2F),
-                                        Color(0xFFFF8C00),
-                                        Color(0xFF9932CC),
-                                        Color(0xFFE9967A),
-                                        Color(0xFF8FBC8F),
-                                        Color(0xFF483D8B),
-                                        Color(0xFF2F4F4F),
-                                        Color(0xFF00CED1),
-                                        Color(0xFF9400D3),
-                                        Color(0xFFFF1493),
-                                        Color(0xFF00BFFF),
-                                        Color(0xFF696969),
-                                        Color(0xFF1E90FF),
-                                        Color(0xFFB22222),
-                                        Color(0xFFFFFAF0),
-                                        Color(0xFF228B22),
-                                        Color(0xFFFFD700),
-                                        Color(0xFFDAA520),
-                                        Color(0xFFADFF2F),
-                                        Color(0xFFF0FFF0),
-                                        Color(0xFFFF69B4),
-                                        Color(0xFFCD5C5C),
-                                        Color(0xFF4B0082),
-                                        Color(0xFFFFF0F5),
-                                        Color(0xFFFFE4C4)
+                                Row(
+                                    modifier = Modifier
+                                        .fillMaxWidth()
+                                        .padding(start = 11.dp, end = 11.dp),
+                                    horizontalArrangement = Arrangement.SpaceBetween,
+                                    verticalAlignment = Alignment.CenterVertically
+                                ) {
+                                    Text(
+                                        text = "Reset",
+                                        fontSize = 15.sp,
+                                        fontWeight = FontWeight.Medium
                                     )
-                                ) { color ->
-
-                                    Box(
-                                        modifier = Modifier
-                                            .clip(RoundedCornerShape(6.dp))
-                                            .width(55.dp)
-                                            .height(65.dp)
-                                            .background(color)
-                                            .clickable {
-                                                selectedColor = color
-                                            }
+                                    Text(
+                                        text = "Done",
+                                        fontSize = 15.sp,
+                                        fontWeight = FontWeight.Medium,
+                                        color = Color.Blue.copy(alpha = 0.60f)
                                     )
-
                                 }
-                            }
-                        }
 
-                        if (showphoto) {
-                            Text(text = "There is Nothing Photos")
-                        } else {
-                            Text(text = "There is Nothing Photos")
-                        }
+                                if (showColor) {
+                                    LazyHorizontalGrid(
+                                        rows = GridCells.Fixed(2),
+                                        modifier = Modifier
+                                            .fillMaxWidth()
+                                            .height(200.dp)
+                                            .padding(top = 7.dp),
+                                        horizontalArrangement = Arrangement.spacedBy(20.dp),
+                                        verticalArrangement = Arrangement.spacedBy(10.dp),
+                                    ) {
+                                        items(
+                                            listOf(
+                                                Color(0xFFFFFFFF),
+                                                Color(0xFF000000),
+                                                Color(0xFFFF0000),
+                                                Color(0xFF00FF00),
+                                                Color(0xFF0000FF),
+                                                Color(0xFFFFFF00),
+                                                Color(0xFFFFA500),
+                                                Color(0xFF800080),
+                                                Color(0xFF00FFFF),
+                                                Color(0xFFFFC0CB),
+                                                Color(0xFFA52A2A),
+                                                Color(0xFF808080),
+                                                Color(0xFFFF6347),
+                                                Color(0xFF4682B4),
+                                                Color(0xFFD2691E),
+                                                Color(0xFF7FFF00),
+                                                Color(0xFFDC143C),
+                                                Color(0xFFBDB76B),
+                                                Color(0xFF556B2F),
+                                                Color(0xFFFF8C00),
+                                                Color(0xFF9932CC),
+                                                Color(0xFFE9967A),
+                                                Color(0xFF8FBC8F),
+                                                Color(0xFF483D8B),
+                                                Color(0xFF2F4F4F),
+                                                Color(0xFF00CED1),
+                                                Color(0xFF9400D3),
+                                                Color(0xFFFF1493),
+                                                Color(0xFF00BFFF),
+                                                Color(0xFF696969),
+                                                Color(0xFF1E90FF),
+                                                Color(0xFFB22222),
+                                                Color(0xFFFFFAF0),
+                                                Color(0xFF228B22),
+                                                Color(0xFFFFD700),
+                                                Color(0xFFDAA520),
+                                                Color(0xFFADFF2F),
+                                                Color(0xFFF0FFF0),
+                                                Color(0xFFFF69B4),
+                                                Color(0xFFCD5C5C),
+                                                Color(0xFF4B0082),
+                                                Color(0xFFFFF0F5),
+                                                Color(0xFFFFE4C4)
+                                            )
+                                        ) { color ->
+                                            Box(
+                                                modifier = Modifier
+                                                    .clip(RoundedCornerShape(6.dp))
+                                                    .width(55.dp)
+                                                    .height(65.dp)
+                                                    .background(color)
+                                                    .clickable {
+                                                        selectedColor = color
+                                                    }
+                                            )
+                                        }
+                                    }
+                                }
 
-                        Row(
-                            modifier = Modifier.fillMaxWidth(),
-                            horizontalArrangement = Arrangement.Center,
-                            verticalAlignment = Alignment.CenterVertically
-                        ) {
-                            Button(onClick = { showphoto = true }) {
-                                Text(text = "Photo")
-                            }
+                                Text(
+                                    text = if (showphoto) "There is Nothing Photos" else "There is Nothing Photos"
+                                )
 
-                            Spacer(modifier = Modifier.width(10.dp))
+                                Row(
+                                    modifier = Modifier.fillMaxWidth(),
+                                    horizontalArrangement = Arrangement.Center,
+                                    verticalAlignment = Alignment.CenterVertically
+                                ) {
+                                    Button(onClick = { showphoto = true }) {
+                                        Text(text = "Photo")
+                                    }
 
-                            Button(onClick = { showColor = true }) {
-                                Text(text = "Color")
+                                    Spacer(modifier = Modifier.width(10.dp))
+
+                                    Button(onClick = { showColor = true }) {
+                                        Text(text = "Color")
+                                    }
+                                }
                             }
                         }
                     }
                 }
             } else {
-                Spacer(modifier = Modifier.height(18.dp)) // No need to handle showing of card while addBg
-            }
-
-            LazyRow(
-                modifier = Modifier
-                    .fillMaxWidth()
-                    .padding(horizontal = 16.dp),
-                horizontalArrangement = Arrangement.spacedBy(16.dp),
-                verticalAlignment = Alignment.CenterVertically
-            ) {
-                item {
-                    Column(horizontalAlignment = Alignment.CenterHorizontally,
-                        modifier = Modifier
-                            .padding(vertical = 8.dp)
-                            .pointerInput(Unit) {
-                                detectTapGestures(onLongPress = { /* Trigger tooltip */ })
-                            }) {
-                        Box(
+                LazyRow(
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .padding(horizontal = 16.dp),
+                    horizontalArrangement = Arrangement.spacedBy(16.dp),
+                    verticalAlignment = Alignment.CenterVertically
+                ) {
+                    item {
+                        Column(horizontalAlignment = Alignment.CenterHorizontally,
                             modifier = Modifier
-                                .clip(CircleShape)
-                                .size(45.dp)
-                                .background(Color(0XFF0077ff))
-                                .clickable {
-
-                                }, contentAlignment = Alignment.TopEnd
-                        ) {
-                            Icon(
-                                imageVector = Icons.Outlined.FileDownload,
-                                contentDescription = "Download",
+                                .padding(vertical = 8.dp)
+                                .pointerInput(Unit) {
+                                    detectTapGestures(onLongPress = { /* Trigger tooltip */ })
+                                }) {
+                            Box(
                                 modifier = Modifier
-                                    .size(24.dp)
-                                    .align(Alignment.Center),
-                                tint = Color.White
+                                    .clip(CircleShape)
+                                    .size(45.dp)
+                                    .background(Color(0XFF0077ff))
+                                    .clickable {
+
+                                    }, contentAlignment = Alignment.TopEnd
+                            ) {
+                                Icon(
+                                    imageVector = Icons.Outlined.FileDownload,
+                                    contentDescription = "Download",
+                                    modifier = Modifier
+                                        .size(24.dp)
+                                        .align(Alignment.Center),
+                                    tint = Color.White
+                                )
+                            }
+                            Text(
+                                text = "Download", fontSize = 12.sp, color = Color(0XFF0077ff)
                             )
                         }
-                        Text(
-                            text = "Download", fontSize = 12.sp, color = Color(0XFF0077ff)
-                        )
                     }
-                }
 
-                item {
-                    Column(horizontalAlignment = Alignment.CenterHorizontally,
-                        modifier = Modifier
-                            .padding(vertical = 8.dp)
-                            .pointerInput(Unit) {
-                                detectTapGestures(onLongPress = { /* Trigger tooltip */ })
-                            }) {
-                        Box(
+                    item {
+                        Column(horizontalAlignment = Alignment.CenterHorizontally,
                             modifier = Modifier
-                                .clip(CircleShape)
-                                .size(45.dp)
-                                .background(Color(0XFFc1dff5))
-                                .clickable {},
-                            contentAlignment = Alignment.TopEnd
-                        ) {
-                            Icon(
-                                imageVector = Icons.Outlined.FileDownload,
-                                contentDescription = "DownloadHd",
+                                .padding(vertical = 8.dp)
+                                .pointerInput(Unit) {
+                                    detectTapGestures(onLongPress = { /* Trigger tooltip */ })
+                                }) {
+                            Box(
                                 modifier = Modifier
-                                    .size(24.dp)
-                                    .align(Alignment.Center),
-                                tint = Color.Blue
+                                    .clip(CircleShape)
+                                    .size(45.dp)
+                                    .background(Color(0XFFc1dff5))
+                                    .clickable {},
+                                contentAlignment = Alignment.TopEnd
+                            ) {
+                                Icon(
+                                    imageVector = Icons.Outlined.FileDownload,
+                                    contentDescription = "DownloadHd",
+                                    modifier = Modifier
+                                        .size(24.dp)
+                                        .align(Alignment.Center),
+                                    tint = Color.Blue
+                                )
+                            }
+                            Text(
+                                text = "DownloadHd", fontSize = 12.sp, color = Color(0XFF0077ff)
                             )
                         }
-                        Text(
-                            text = "DownloadHd", fontSize = 12.sp, color = Color(0XFF0077ff)
-                        )
                     }
-                }
 
-                item {
-                    Column(horizontalAlignment = Alignment.CenterHorizontally,
-                        modifier = Modifier
-                            .padding(vertical = 8.dp)
-                            .pointerInput(Unit) {
-                                detectTapGestures(onLongPress = { /* Trigger tooltip */ })
-                            }) {
-                        Box(
+                    item {
+                        Column(horizontalAlignment = Alignment.CenterHorizontally,
                             modifier = Modifier
-                                .size(45.dp)
-                                .clickable {
-                                    addBg = !addBg
-                                }, contentAlignment = Alignment.TopEnd
-                        ) {
-                            Icon(
-                                imageVector = Icons.Outlined.Add,
-                                contentDescription = "Add",
+                                .padding(vertical = 8.dp)
+                                .pointerInput(Unit) {
+                                    detectTapGestures(onLongPress = { /* Trigger tooltip */ })
+                                }) {
+                            Box(
                                 modifier = Modifier
-                                    .size(24.dp)
-                                    .align(Alignment.Center),
+                                    .size(45.dp)
+                                    .clickable {
+                                        addBg = !addBg
+                                    }, contentAlignment = Alignment.TopEnd
+                            ) {
+                                Icon(
+                                    imageVector = Icons.Outlined.Add,
+                                    contentDescription = "Add",
+                                    modifier = Modifier
+                                        .size(24.dp)
+                                        .align(Alignment.Center),
+                                )
+                            }
+                            Text(
+                                text = "Add",
+                                fontSize = 12.sp,
                             )
                         }
-                        Text(
-                            text = "Add",
-                            fontSize = 12.sp,
-                        )
                     }
-                }
 
-                item {
-                    Column(horizontalAlignment = Alignment.CenterHorizontally,
-                        modifier = Modifier
-                            .padding(vertical = 8.dp)
-                            .pointerInput(Unit) {
-                                detectTapGestures(onLongPress = { /* Trigger tooltip */ })
-                            }) {
-                        Box(
+                    item {
+                        Column(horizontalAlignment = Alignment.CenterHorizontally,
                             modifier = Modifier
-                                .size(45.dp)
-                                .clickable {
-
-                                }, contentAlignment = Alignment.TopEnd
-                        ) {
-                            Icon(
-                                imageVector = Icons.Outlined.Brush,
-                                contentDescription = "Erase/Restore",
+                                .padding(vertical = 8.dp)
+                                .pointerInput(Unit) {
+                                    detectTapGestures(onLongPress = { /* Trigger tooltip */ })
+                                }) {
+                            Box(
                                 modifier = Modifier
-                                    .size(24.dp)
-                                    .align(Alignment.Center),
+                                    .size(45.dp)
+                                    .clickable {
+
+                                    }, contentAlignment = Alignment.TopEnd
+                            ) {
+                                Icon(
+                                    imageVector = Icons.Outlined.Brush,
+                                    contentDescription = "Erase/Restore",
+                                    modifier = Modifier
+                                        .size(24.dp)
+                                        .align(Alignment.Center),
+                                )
+                            }
+                            Text(
+                                text = "Erase/Restore",
+                                fontSize = 12.sp,
                             )
                         }
-                        Text(
-                            text = "Erase/Restore",
-                            fontSize = 12.sp,
-                        )
                     }
-                }
 
-                item {
-                    Column(horizontalAlignment = Alignment.CenterHorizontally,
-                        modifier = Modifier
-                            .padding(vertical = 8.dp)
-                            .pointerInput(Unit) {
-                                detectTapGestures(onLongPress = { /* Trigger tooltip */ })
-                            }) {
-
-                        Box(
+                    item {
+                        Column(horizontalAlignment = Alignment.CenterHorizontally,
                             modifier = Modifier
-                                .size(45.dp)
-                                .clickable {
+                                .padding(vertical = 8.dp)
+                                .pointerInput(Unit) {
+                                    detectTapGestures(onLongPress = { /* Trigger tooltip */ })
+                                }) {
 
-                                }, contentAlignment = Alignment.TopEnd
-                        ) {
-                            Icon(
-                                imageVector = Icons.Outlined.JoinLeft,
-                                contentDescription = "Effects",
+                            Box(
                                 modifier = Modifier
-                                    .size(24.dp)
-                                    .align(Alignment.Center),
+                                    .size(45.dp)
+                                    .clickable {
+
+                                    }, contentAlignment = Alignment.TopEnd
+                            ) {
+                                Icon(
+                                    imageVector = Icons.Outlined.JoinLeft,
+                                    contentDescription = "Effects",
+                                    modifier = Modifier
+                                        .size(24.dp)
+                                        .align(Alignment.Center),
+                                )
+                            }
+                            Text(
+                                text = "Effects",
+                                fontSize = 12.sp,
                             )
                         }
-                        Text(
-                            text = "Effects",
-                            fontSize = 12.sp,
-                        )
                     }
-                }
 
-                item {
-                    val context = LocalContext.current
-                    Column(horizontalAlignment = Alignment.CenterHorizontally,
-                        modifier = Modifier
-                            .padding(vertical = 8.dp)
-                            .pointerInput(Unit) {
-                                detectTapGestures(onLongPress = { /* Trigger tooltip */ })
-                            }) {
-                        Box(
+                    item {
+                        val context = LocalContext.current
+                        Column(horizontalAlignment = Alignment.CenterHorizontally,
                             modifier = Modifier
-                                .size(45.dp)
-                                .clickable {
-                                    Intent(Intent.ACTION_MAIN).also {
-                                        it.`package` = "com.canva.editor"
-                                        try {
-                                            context.startActivity(it)
-                                        } catch (e: ActivityNotFoundException) {
-                                            e.printStackTrace()
-                                            val playStoreIntent = Intent(
-                                                Intent.ACTION_VIEW,
-                                                Uri.parse("https://play.google.com/store/apps/details?id=com.canva.editor")
-                                            )
-                                            context.startActivity(playStoreIntent)
+                                .padding(vertical = 8.dp)
+                                .pointerInput(Unit) {
+                                    detectTapGestures(onLongPress = { /* Trigger tooltip */ })
+                                }) {
+                            Box(
+                                modifier = Modifier
+                                    .size(45.dp)
+                                    .clickable {
+                                        Intent(Intent.ACTION_MAIN).also {
+                                            it.`package` = "com.canva.editor"
+                                            try {
+                                                context.startActivity(it)
+                                            } catch (e: ActivityNotFoundException) {
+                                                e.printStackTrace()
+                                                val playStoreIntent = Intent(
+                                                    Intent.ACTION_VIEW,
+                                                    Uri.parse("https://play.google.com/store/apps/details?id=com.canva.editor")
+                                                )
+                                                context.startActivity(playStoreIntent)
+                                            }
                                         }
-                                    }
-                                }, contentAlignment = Alignment.TopEnd
-                        ) {
-                            Image(
-                                painter = painterResource(id = R.drawable.canva),
-                                contentDescription = "Canva",
-                                modifier = Modifier
-                                    .size(24.dp)
-                                    .align(Alignment.Center),
+                                    }, contentAlignment = Alignment.TopEnd
+                            ) {
+                                Image(
+                                    painter = painterResource(id = R.drawable.canva),
+                                    contentDescription = "Canva",
+                                    modifier = Modifier
+                                        .size(24.dp)
+                                        .align(Alignment.Center),
+                                )
+                            }
+                            Text(
+                                text = "Canva",
+                                fontSize = 12.sp,
                             )
                         }
-                        Text(
-                            text = "Canva",
-                            fontSize = 12.sp,
-                        )
                     }
                 }
             }
         }
     }
 }
-
 
 
 
