@@ -399,7 +399,6 @@ fun saveImage(bitmap: Bitmap?, context: Context, isHd: Boolean, backgroundColor:
                 bitmap
             }
 
-            // Convert backgroundImageId to Bitmap
             val backgroundImageBitmap = backgroundImageId?.let { getBitmapFromDrawable(context, it) }
 
             val finalBitmap = compositeBackground(scaledBitmap, backgroundColor, backgroundImageBitmap)

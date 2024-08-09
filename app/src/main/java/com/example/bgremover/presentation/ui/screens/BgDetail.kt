@@ -6,6 +6,8 @@ import android.content.Intent
 import android.graphics.BitmapFactory
 import android.net.Uri
 import android.util.Base64
+import androidx.activity.compose.rememberLauncherForActivityResult
+import androidx.activity.result.contract.ActivityResultContracts
 import androidx.compose.animation.core.LinearOutSlowInEasing
 import androidx.compose.animation.core.animateFloatAsState
 import androidx.compose.animation.core.tween
@@ -41,6 +43,7 @@ import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.Add
 import androidx.compose.material.icons.filled.MoreVert
 import androidx.compose.material.icons.filled.Redo
 import androidx.compose.material.icons.filled.Splitscreen
@@ -100,6 +103,14 @@ fun BgDetail(
     var showDialog by remember { mutableStateOf(false) }
     var selectedColor by remember { mutableStateOf(Color.Transparent) }
     var selectedPhoto by remember { mutableStateOf<Int?>(null) }
+    var selectedGallery by remember { mutableStateOf<Uri?>(null) }
+    var isPressing by remember { mutableStateOf(false) }
+
+    val launcher= rememberLauncherForActivityResult(contract = ActivityResultContracts.GetContent(), onResult = {
+        selectedGallery=it
+    })
+
+
 
 
     LaunchedEffect(Unit) {
@@ -143,7 +154,7 @@ fun BgDetail(
                     .size(60.dp),
             )
         }, actions = {
-            IconButton(onClick = { showBgRemovedImage = !showBgRemovedImage }) {
+            IconButton(onClick = {  }) {
                 Icon(imageVector = Icons.Filled.Splitscreen, contentDescription = "")
             }
             IconButton(onClick = { /* TODO */ }) {
@@ -466,6 +477,24 @@ fun BgDetail(
                                         horizontalArrangement = Arrangement.spacedBy(20.dp),
                                         verticalArrangement = Arrangement.spacedBy(10.dp),
                                     ) {
+
+                                        items(1) {
+                                            Box(
+                                                modifier = Modifier
+                                                    .clip(RoundedCornerShape(6.dp))
+                                                    .width(60.dp)
+                                                    .height(50.dp)
+                                                    .clickable {
+                                                        launcher.launch("image/*")
+                                                    }
+                                            ) {
+                                                Icon(
+                                                    imageVector = Icons.Default.Add,
+                                                    contentDescription = null,
+                                                )
+                                            }
+
+                                        }
                                         items(
                                             listOf(
                                                 R.drawable.car,
@@ -676,7 +705,7 @@ fun BgDetail(
                                 }) {
                             Box(
                                 modifier = Modifier
-                                    .size(45.dp)
+                                    .size(45.dp).clip(CircleShape)
                                     .clickable {
 
                                     }, contentAlignment = Alignment.TopEnd
@@ -684,7 +713,7 @@ fun BgDetail(
                                 Icon(
                                     imageVector = Icons.Outlined.Brush,
                                     contentDescription = "Erase/Restore",
-                                    modifier = Modifier
+                                    modifier = Modifier.clip(CircleShape)
                                         .size(24.dp)
                                         .align(Alignment.Center),
                                 )

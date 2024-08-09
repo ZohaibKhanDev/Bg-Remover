@@ -1,5 +1,9 @@
 package com.example.bgremover.presentation.viewmodel
 
+import android.graphics.Bitmap
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.setValue
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.example.bgremover.domain.repository.Repository
@@ -27,6 +31,7 @@ class MainViewModel(private val repository: Repository) : ViewModel() {
         }
         
     }
+
 }
 
 
