@@ -6,20 +6,40 @@ import android.content.Intent
 import android.graphics.BitmapFactory
 import android.net.Uri
 import android.util.Base64
-import androidx.compose.animation.*
-import androidx.compose.animation.core.*
-import androidx.compose.foundation.*
+import androidx.compose.animation.core.LinearOutSlowInEasing
+import androidx.compose.animation.core.animateFloatAsState
+import androidx.compose.animation.core.tween
+import androidx.compose.animation.fadeIn
+import androidx.compose.animation.fadeOut
+import androidx.compose.animation.slideInHorizontally
+import androidx.compose.animation.slideOutHorizontally
+import androidx.compose.foundation.BorderStroke
+import androidx.compose.foundation.Image
+import androidx.compose.foundation.background
 import androidx.compose.foundation.border
+import androidx.compose.foundation.clickable
 import androidx.compose.foundation.gestures.detectTapGestures
-import androidx.compose.foundation.layout.*
+import androidx.compose.foundation.layout.Arrangement
+import androidx.compose.foundation.layout.Box
+import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.Row
+import androidx.compose.foundation.layout.Spacer
+import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.height
+import androidx.compose.foundation.layout.offset
+import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.size
+import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.LazyRow
 import androidx.compose.foundation.lazy.grid.GridCells
 import androidx.compose.foundation.lazy.grid.LazyHorizontalGrid
 import androidx.compose.foundation.lazy.grid.items
-import androidx.compose.foundation.lazy.items
+import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
+import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.MoreVert
 import androidx.compose.material.icons.filled.Redo
@@ -29,16 +49,33 @@ import androidx.compose.material.icons.outlined.Add
 import androidx.compose.material.icons.outlined.Brush
 import androidx.compose.material.icons.outlined.FileDownload
 import androidx.compose.material.icons.outlined.JoinLeft
-import androidx.compose.material3.*
-import androidx.compose.runtime.*
-import androidx.compose.ui.*
+import androidx.compose.material3.AlertDialog
+import androidx.compose.material3.Button
+import androidx.compose.material3.ButtonDefaults
+import androidx.compose.material3.Card
+import androidx.compose.material3.CardDefaults
+import androidx.compose.material3.ExperimentalMaterial3Api
+import androidx.compose.material3.Icon
+import androidx.compose.material3.IconButton
+import androidx.compose.material3.Scaffold
+import androidx.compose.material3.Text
+import androidx.compose.material3.TextButton
+import androidx.compose.material3.TopAppBar
+import androidx.compose.material3.TopAppBarDefaults
+import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
+import androidx.compose.runtime.setValue
+import androidx.compose.ui.Alignment
+import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.draw.scale
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.asImageBitmap
 import androidx.compose.ui.input.pointer.pointerInput
 import androidx.compose.ui.layout.ContentScale
-import androidx.compose.ui.modifier.modifierLocalConsumer
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.font.FontWeight
@@ -47,7 +84,6 @@ import androidx.compose.ui.unit.sp
 import androidx.navigation.NavController
 import coil.compose.AsyncImage
 import com.example.bgremover.R
-import com.example.bgremover.presentation.ui.navigation.Screens
 import kotlinx.coroutines.delay
 
 @OptIn(ExperimentalMaterial3Api::class)
@@ -57,7 +93,7 @@ fun BgDetail(
     navController: NavController, imageUrl: String?, bgremoveimage: String?
 ) {
     var showBgRemovedImage by remember { mutableStateOf(false) }
-    var showphoto by remember { mutableStateOf(false) }
+    var showPhoto by remember { mutableStateOf(true) }
     var showColor by remember { mutableStateOf(false) }
     var addBg by remember { mutableStateOf(false) }
     var showImageAnimation by remember { mutableStateOf(true) }
@@ -322,14 +358,18 @@ fun BgDetail(
                                     horizontalArrangement = Arrangement.SpaceBetween,
                                     verticalAlignment = Alignment.CenterVertically
                                 ) {
-                                    Text(text = "Reset",
+                                    Text(
+                                        text = "Reset",
                                         fontSize = 15.sp,
                                         fontWeight = FontWeight.Medium,
                                         modifier = Modifier.clickable {
-                                            showColor= null == true
-                                            showphoto= null == true
-                                        })
-                                    Text(text = "Done",
+                                            showColor = false
+                                            showPhoto = true
+                                            selectedPhoto = null
+                                        }
+                                    )
+                                    Text(
+                                        text = "Done",
                                         fontSize = 15.sp,
                                         fontWeight = FontWeight.Medium,
                                         color = Color.Blue.copy(alpha = 0.60f),
@@ -339,12 +379,15 @@ fun BgDetail(
                                     )
                                 }
 
+                                Spacer(modifier = Modifier.height(11.dp))
+
+
                                 if (showColor) {
                                     LazyHorizontalGrid(
                                         rows = GridCells.Fixed(2),
                                         modifier = Modifier
                                             .fillMaxWidth()
-                                            .height(200.dp)
+                                            .height(130.dp)
                                             .padding(top = 7.dp),
                                         horizontalArrangement = Arrangement.spacedBy(20.dp),
                                         verticalArrangement = Arrangement.spacedBy(10.dp),
@@ -399,7 +442,7 @@ fun BgDetail(
                                             )
                                         ) { color ->
                                             Box(modifier = Modifier
-                                                .clip(RoundedCornerShape(6.dp))
+                                                .clip(RoundedCornerShape(11.dp))
                                                 .width(55.dp)
                                                 .height(40.dp)
                                                 .background(color)
@@ -408,14 +451,12 @@ fun BgDetail(
                                                 })
                                         }
                                     }
-                                }
-
-                                if (showphoto) {
+                                } else if (showPhoto) {
                                     LazyHorizontalGrid(
                                         rows = GridCells.Fixed(2),
                                         modifier = Modifier
                                             .fillMaxWidth()
-                                            .height(200.dp)
+                                            .height(130.dp)
                                             .padding(top = 7.dp),
                                         horizontalArrangement = Arrangement.spacedBy(20.dp),
                                         verticalArrangement = Arrangement.spacedBy(10.dp),
@@ -426,11 +467,10 @@ fun BgDetail(
                                                 R.drawable.cat,
                                                 R.drawable.women,
                                                 R.drawable.phone,
-
-                                                )
+                                            )
                                         ) { photoResId ->
                                             Box(modifier = Modifier
-                                                .clip(RoundedCornerShape(6.dp))
+                                                .clip(RoundedCornerShape(11.dp))
                                                 .width(55.dp)
                                                 .height(40.dp)
                                                 .background(Color.Gray)
@@ -443,7 +483,6 @@ fun BgDetail(
 
                                 Spacer(modifier = Modifier.height(7.dp))
 
-
                                 Row(
                                     modifier = Modifier.fillMaxWidth(),
                                     horizontalArrangement = Arrangement.Center,
@@ -451,9 +490,10 @@ fun BgDetail(
                                 ) {
                                     Button(
                                         onClick = {
-                                            showphoto = true
+                                            showPhoto = true
                                             showColor = false
-                                        }, colors = ButtonDefaults.buttonColors(
+                                        },
+                                        colors = ButtonDefaults.buttonColors(
                                             Color.LightGray.copy(alpha = 0.40f)
                                         )
                                     ) {
@@ -464,9 +504,10 @@ fun BgDetail(
 
                                     Button(
                                         onClick = {
-                                            showphoto = false
+                                            showPhoto = false
                                             showColor = true
-                                        }, colors = ButtonDefaults.buttonColors(
+                                        },
+                                        colors = ButtonDefaults.buttonColors(
                                             Color.LightGray.copy(alpha = 0.40f)
                                         )
                                     ) {
@@ -486,7 +527,7 @@ fun BgDetail(
                     verticalAlignment = Alignment.CenterVertically
                 ) {
                     item {
-                        val context= LocalContext.current
+                        val context = LocalContext.current
                         Column(horizontalAlignment = Alignment.CenterHorizontally,
                             modifier = Modifier
                                 .padding(vertical = 8.dp)
@@ -502,8 +543,17 @@ fun BgDetail(
                                         bgremoveimage?.let { base64 ->
                                             val imageBytes = Base64.decode(base64, Base64.DEFAULT)
                                             val bitmap =
-                                                BitmapFactory.decodeByteArray(imageBytes, 0, imageBytes.size)
-                                            saveImage(bitmap, context =context ,false,selectedColor)
+                                                BitmapFactory.decodeByteArray(
+                                                    imageBytes,
+                                                    0,
+                                                    imageBytes.size
+                                                )
+                                            saveImage(
+                                                bitmap,
+                                                context = context,
+                                                false,
+                                                selectedColor
+                                            )
                                         }
                                     }, contentAlignment = Alignment.TopEnd
                             ) {
@@ -523,7 +573,7 @@ fun BgDetail(
                     }
 
                     item {
-                        val context= LocalContext.current
+                        val context = LocalContext.current
 
                         Column(horizontalAlignment = Alignment.CenterHorizontally,
                             modifier = Modifier
@@ -539,8 +589,17 @@ fun BgDetail(
                                     .clickable {
                                         bgremoveimage?.let { base64 ->
                                             val imageBytes = Base64.decode(base64, Base64.DEFAULT)
-                                            val bitmap = BitmapFactory.decodeByteArray(imageBytes, 0, imageBytes.size)
-                                            saveImage(bitmap, context = context, true, selectedColor)
+                                            val bitmap = BitmapFactory.decodeByteArray(
+                                                imageBytes,
+                                                0,
+                                                imageBytes.size
+                                            )
+                                            saveImage(
+                                                bitmap,
+                                                context = context,
+                                                true,
+                                                selectedColor
+                                            )
                                         }
                                     },
                                 contentAlignment = Alignment.TopEnd
@@ -572,7 +631,7 @@ fun BgDetail(
                                     .clip(CircleShape)
                                     .size(45.dp)
                                     .clickable {
-                                       addBg=true
+                                        addBg = true
                                     },
                                 contentAlignment = Alignment.TopEnd
                             ) {
