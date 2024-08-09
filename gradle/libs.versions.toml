@@ -11,6 +11,7 @@ activityCompose = "1.9.1"
 composeBom = "2024.04.01"
 ktor = "2.3.9"  
 
+
 [libraries]
 androidx-core-ktx = { group = "androidx.core", name = "core-ktx", version.ref = "coreKtx" }
 junit = { group = "junit", name = "junit", version.ref = "junit" }
