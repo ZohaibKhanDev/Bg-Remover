@@ -65,6 +65,7 @@ import androidx.compose.ui.text.withStyle
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.core.app.NotificationCompat
+import androidx.core.content.ContextCompat
 import androidx.navigation.NavController
 import com.example.bgremover.R
 import com.example.bgremover.createNotificationChannel
@@ -327,27 +328,46 @@ fun BgRemover(navController: NavController) {
 }
 
 
-fun compositeBackground(bitmap: Bitmap, backgroundColor: Color?): Bitmap {
-    val resultBitmap = Bitmap.createBitmap(bitmap.width, bitmap.height, Bitmap.Config.ARGB_8888)
+fun compositeBackground(bitmap: Bitmap?, backgroundColor: Color?, backgroundImage: Bitmap?): Bitmap {
+    val width = bitmap?.width ?: 1
+    val height = bitmap?.height ?: 1
+    val resultBitmap = Bitmap.createBitmap(width, height, Bitmap.Config.ARGB_8888)
     val canvas = Canvas(resultBitmap)
+
+    backgroundImage?.let {
+        val scaledBackground = Bitmap.createScaledBitmap(it, width, height, true)
+        canvas.drawBitmap(scaledBackground, 0f, 0f, null)
+    }
 
     backgroundColor?.let {
         val paint = Paint().apply {
             color = it.toArgb()
             style = Paint.Style.FILL
         }
-        canvas.drawRect(0f, 0f, resultBitmap.width.toFloat(), resultBitmap.height.toFloat(), paint)
+        canvas.drawRect(0f, 0f, width.toFloat(), height.toFloat(), paint)
     }
 
-    canvas.drawBitmap(bitmap, 0f, 0f, null)
+    bitmap?.let {
+        canvas.drawBitmap(it, 0f, 0f, null)
+    }
 
     return resultBitmap
 }
 
 
+fun getBitmapFromDrawable(context: Context, drawableId: Int): Bitmap? {
+    val drawable = ContextCompat.getDrawable(context, drawableId)
+    return drawable?.let {
+        Bitmap.createBitmap(it.intrinsicWidth, it.intrinsicHeight, Bitmap.Config.ARGB_8888).apply {
+            val canvas = Canvas(this)
+            it.setBounds(0, 0, canvas.width, canvas.height)
+            it.draw(canvas)
+        }
+    }
+}
 
-@SuppressLint("ServiceCast")
-fun saveImage(bitmap: Bitmap?, context: Context, isHd: Boolean, backgroundColor: Color?) {
+
+fun saveImage(bitmap: Bitmap?, context: Context, isHd: Boolean, backgroundColor: Color?, backgroundImageId: Int?) {
     createNotificationChannel(context)
 
     val notificationManager = context.getSystemService(Context.NOTIFICATION_SERVICE) as NotificationManager
@@ -379,7 +399,10 @@ fun saveImage(bitmap: Bitmap?, context: Context, isHd: Boolean, backgroundColor:
                 bitmap
             }
 
-            val finalBitmap = compositeBackground(scaledBitmap ?: return, backgroundColor)
+            // Convert backgroundImageId to Bitmap
+            val backgroundImageBitmap = backgroundImageId?.let { getBitmapFromDrawable(context, it) }
+
+            val finalBitmap = compositeBackground(scaledBitmap, backgroundColor, backgroundImageBitmap)
 
             finalBitmap.compress(Bitmap.CompressFormat.PNG, 100, outputStream)
             Toast.makeText(context, "Image saved to Pictures", Toast.LENGTH_SHORT).show()
@@ -396,6 +419,7 @@ fun saveImage(bitmap: Bitmap?, context: Context, isHd: Boolean, backgroundColor:
         notificationManager.notify(1, notificationBuilder.build())
     }
 }
+
 
 
 

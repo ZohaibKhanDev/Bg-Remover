@@ -277,8 +277,8 @@ fun BgDetail(
                                 contentAlignment = Alignment.Center
                             ) {
                                 if (selectedPhoto != null) {
-                                    AsyncImage(
-                                        model = selectedPhoto,
+                                    Image(
+                                        painter = painterResource(id = selectedPhoto!!),
                                         contentDescription = "",
                                         modifier = Modifier.fillMaxSize(),
                                         contentScale = ContentScale.Crop
@@ -310,6 +310,7 @@ fun BgDetail(
                                         .clip(RoundedCornerShape(11.dp))
                                 )
                             }
+
                         } ?: run {
                             Text(
                                 text = "No background removed image available",
@@ -450,7 +451,7 @@ fun BgDetail(
                                                 .height(50.dp)
                                                 .background(color)
                                                 .clickable {
-                                                    selectedPhoto=null
+                                                    selectedPhoto = null
                                                     selectedColor = color
                                                 })
                                         }
@@ -565,7 +566,8 @@ fun BgDetail(
                                                 bitmap,
                                                 context = context,
                                                 false,
-                                                selectedColor
+                                                selectedColor,
+                                                selectedPhoto
                                             )
                                         }
                                     }, contentAlignment = Alignment.TopEnd
@@ -602,16 +604,18 @@ fun BgDetail(
                                     .clickable {
                                         bgremoveimage?.let { base64 ->
                                             val imageBytes = Base64.decode(base64, Base64.DEFAULT)
-                                            val bitmap = BitmapFactory.decodeByteArray(
-                                                imageBytes,
-                                                0,
-                                                imageBytes.size
-                                            )
+                                            val bitmap =
+                                                BitmapFactory.decodeByteArray(
+                                                    imageBytes,
+                                                    0,
+                                                    imageBytes.size
+                                                )
                                             saveImage(
                                                 bitmap,
                                                 context = context,
                                                 true,
-                                                selectedColor
+                                                selectedColor,
+                                                selectedPhoto
                                             )
                                         }
                                     },
