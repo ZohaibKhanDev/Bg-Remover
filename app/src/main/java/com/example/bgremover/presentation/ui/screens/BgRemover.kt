@@ -361,6 +361,7 @@ fun compositeBackground(
 
 
 
+
 fun getBitmapFromDrawable(context: Context, drawableId: Int): Bitmap? {
     val drawable = ContextCompat.getDrawable(context, drawableId)
     return drawable?.let {
