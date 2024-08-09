@@ -168,7 +168,7 @@ fun BgDetail(
             modifier = Modifier
                 .verticalScroll(vertical)
                 .fillMaxSize()
-                .height(1150.dp)
+                .height(if (addBg) 1030.dp else 900.dp)
                 .background(Color.White)
                 .padding(top = it.calculateTopPadding()),
             verticalArrangement = Arrangement.spacedBy(15.dp),
@@ -292,7 +292,7 @@ fun BgDetail(
 
                                     if (selectedColor != Color.Transparent) {
                                         Box(
-                                            modifier = Modifier
+                                            modifier = Modifier.clip(RoundedCornerShape(11.dp))
                                                 .fillMaxSize()
                                                 .background(selectedColor)
                                         )
@@ -387,7 +387,7 @@ fun BgDetail(
                                         rows = GridCells.Fixed(2),
                                         modifier = Modifier
                                             .fillMaxWidth()
-                                            .height(130.dp)
+                                            .height(135.dp)
                                             .padding(top = 7.dp),
                                         horizontalArrangement = Arrangement.spacedBy(20.dp),
                                         verticalArrangement = Arrangement.spacedBy(10.dp),
@@ -442,9 +442,9 @@ fun BgDetail(
                                             )
                                         ) { color ->
                                             Box(modifier = Modifier
-                                                .clip(RoundedCornerShape(11.dp))
-                                                .width(55.dp)
-                                                .height(40.dp)
+                                                .clip(RoundedCornerShape(6.dp))
+                                                .width(60.dp)
+                                                .height(50.dp)
                                                 .background(color)
                                                 .clickable {
                                                     selectedColor = color
@@ -456,7 +456,7 @@ fun BgDetail(
                                         rows = GridCells.Fixed(2),
                                         modifier = Modifier
                                             .fillMaxWidth()
-                                            .height(130.dp)
+                                            .height(135.dp)
                                             .padding(top = 7.dp),
                                         horizontalArrangement = Arrangement.spacedBy(20.dp),
                                         verticalArrangement = Arrangement.spacedBy(10.dp),
@@ -469,16 +469,25 @@ fun BgDetail(
                                                 R.drawable.phone,
                                             )
                                         ) { photoResId ->
-                                            Box(modifier = Modifier
-                                                .clip(RoundedCornerShape(11.dp))
-                                                .width(55.dp)
-                                                .height(40.dp)
-                                                .background(Color.Gray)
-                                                .clickable {
-                                                    selectedPhoto = photoResId
-                                                })
+                                            Box(
+                                                modifier = Modifier
+                                                    .clip(RoundedCornerShape(6.dp))
+                                                    .width(60.dp)
+                                                    .height(50.dp)
+                                                    .clickable {
+                                                        selectedPhoto = photoResId
+                                                    }
+                                            ) {
+                                                Image(
+                                                    painter = painterResource(id = photoResId),
+                                                    contentDescription = null,
+                                                    modifier = Modifier.fillMaxSize(),
+                                                    contentScale = ContentScale.Crop
+                                                )
+                                            }
                                         }
                                     }
+
                                 }
 
                                 Spacer(modifier = Modifier.height(7.dp))
