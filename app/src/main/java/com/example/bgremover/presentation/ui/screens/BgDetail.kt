@@ -3,6 +3,7 @@ package com.example.bgremover.presentation.ui.screens
 import android.annotation.SuppressLint
 import android.content.ActivityNotFoundException
 import android.content.Intent
+import android.graphics.Bitmap
 import android.graphics.BitmapFactory
 import android.net.Uri
 import android.util.Base64
@@ -102,13 +103,27 @@ fun BgDetail(
     var showImageAnimation by remember { mutableStateOf(true) }
     var showDialog by remember { mutableStateOf(false) }
     var selectedColor by remember { mutableStateOf(Color.Transparent) }
-    var selectedPhoto by remember { mutableStateOf<Int?>(null) }
-    var selectedGallery by remember { mutableStateOf<Uri?>(null) }
-    var isPressing by remember { mutableStateOf(false) }
 
-    val launcher= rememberLauncherForActivityResult(contract = ActivityResultContracts.GetContent(), onResult = {
-        selectedGallery=it
-    })
+    var isPressing by remember { mutableStateOf(false) }
+    val context = LocalContext.current
+
+    var selectedPhoto by remember { mutableStateOf<Int?>(null) }
+    var selectedGallery by remember { mutableStateOf<Bitmap?>(null) }
+    val launcher = rememberLauncherForActivityResult(
+        contract = ActivityResultContracts.GetContent(),
+        onResult = { uri ->
+            uri?.let { uri ->
+                val inputStream = context.contentResolver.openInputStream(uri)
+                val selectedBitmap = BitmapFactory.decodeStream(inputStream)
+                selectedBitmap?.let { bitmap ->
+                    selectedPhoto = null
+                    selectedGallery = bitmap
+                }
+            }
+        }
+    )
+
+
 
 
 
@@ -154,7 +169,7 @@ fun BgDetail(
                     .size(60.dp),
             )
         }, actions = {
-            IconButton(onClick = {  }) {
+            IconButton(onClick = { }) {
                 Icon(imageVector = Icons.Filled.Splitscreen, contentDescription = "")
             }
             IconButton(onClick = { /* TODO */ }) {
@@ -287,40 +302,59 @@ fun BgDetail(
                                     .clip(RoundedCornerShape(11.dp)),
                                 contentAlignment = Alignment.Center
                             ) {
+
                                 if (selectedPhoto != null) {
                                     Image(
                                         painter = painterResource(id = selectedPhoto!!),
-                                        contentDescription = "",
+                                        contentDescription = null,
                                         modifier = Modifier.fillMaxSize(),
                                         contentScale = ContentScale.Crop
                                     )
                                 } else {
-                                    Image(
-                                        painter = painterResource(id = R.drawable.transparntbg),
-                                        contentDescription = "",
-                                        modifier = Modifier.fillMaxSize(),
-                                        contentScale = ContentScale.Crop
-                                    )
-
-                                    selectedColor?.let { color ->
-                                        Box(
-                                            modifier = Modifier
-                                                .clip(RoundedCornerShape(11.dp))
-                                                .fillMaxSize()
-                                                .background(color)
+                                    if (selectedGallery != null) {
+                                        Image(
+                                            bitmap = selectedGallery!!.asImageBitmap(),
+                                            contentDescription = null,
+                                            contentScale = ContentScale.Crop,
+                                            modifier = Modifier.fillMaxSize()
                                         )
+                                    } else {
+                                        Image(
+                                            painter = painterResource(id = R.drawable.transparntbg),
+                                            contentDescription = "",
+                                            modifier = Modifier.fillMaxSize(),
+                                            contentScale = ContentScale.Crop
+                                        )
+                                        selectedColor?.let { color ->
+                                            Box(
+                                                modifier = Modifier
+                                                    .clip(RoundedCornerShape(11.dp))
+                                                    .fillMaxSize()
+                                                    .background(color)
+                                            )
+                                        }
                                     }
                                 }
 
-                                Image(
-                                    bitmap = bitmap.asImageBitmap(),
-                                    contentDescription = null,
-                                    contentScale = ContentScale.Crop,
-                                    modifier = Modifier
-                                        .size(400.dp, 550.dp)
-                                        .clip(RoundedCornerShape(11.dp))
-                                )
+                                bgremoveimage?.let { base64 ->
+                                    val imageBytes = Base64.decode(base64, Base64.DEFAULT)
+                                    val bitmap = BitmapFactory.decodeByteArray(
+                                        imageBytes,
+                                        0,
+                                        imageBytes.size
+                                    )
+
+                                    Image(
+                                        bitmap = bitmap.asImageBitmap(),
+                                        contentDescription = null,
+                                        contentScale = ContentScale.Crop,
+                                        modifier = Modifier
+                                            .size(400.dp, 550.dp)
+                                            .clip(RoundedCornerShape(11.dp))
+                                    )
+                                }
                             }
+
 
                         } ?: run {
                             Text(
@@ -486,11 +520,12 @@ fun BgDetail(
                                                     .height(50.dp)
                                                     .clickable {
                                                         launcher.launch("image/*")
-                                                    }
+                                                    }, contentAlignment = Alignment.Center
                                             ) {
                                                 Icon(
                                                     imageVector = Icons.Default.Add,
                                                     contentDescription = null,
+                                                    modifier = Modifier.align(Alignment.Center)
                                                 )
                                             }
 
@@ -596,7 +631,8 @@ fun BgDetail(
                                                 context = context,
                                                 false,
                                                 selectedColor,
-                                                selectedPhoto
+                                                selectedPhoto,
+                                                galleryBitmap = selectedGallery
                                             )
                                         }
                                     }, contentAlignment = Alignment.TopEnd
@@ -639,14 +675,17 @@ fun BgDetail(
                                                     0,
                                                     imageBytes.size
                                                 )
+
                                             saveImage(
                                                 bitmap,
                                                 context = context,
                                                 true,
                                                 selectedColor,
-                                                selectedPhoto
+                                                selectedPhoto,
+                                                galleryBitmap = selectedGallery
                                             )
                                         }
+
                                     },
                                 contentAlignment = Alignment.TopEnd
                             ) {
@@ -705,7 +744,8 @@ fun BgDetail(
                                 }) {
                             Box(
                                 modifier = Modifier
-                                    .size(45.dp).clip(CircleShape)
+                                    .size(45.dp)
+                                    .clip(CircleShape)
                                     .clickable {
 
                                     }, contentAlignment = Alignment.TopEnd
@@ -713,7 +753,8 @@ fun BgDetail(
                                 Icon(
                                     imageVector = Icons.Outlined.Brush,
                                     contentDescription = "Erase/Restore",
-                                    modifier = Modifier.clip(CircleShape)
+                                    modifier = Modifier
+                                        .clip(CircleShape)
                                         .size(24.dp)
                                         .align(Alignment.Center),
                                 )

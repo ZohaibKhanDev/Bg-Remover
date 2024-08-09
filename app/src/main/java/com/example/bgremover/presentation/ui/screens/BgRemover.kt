@@ -328,7 +328,11 @@ fun BgRemover(navController: NavController) {
 }
 
 
-fun compositeBackground(bitmap: Bitmap?, backgroundColor: Color?, backgroundImage: Bitmap?): Bitmap {
+fun compositeBackground(
+    bitmap: Bitmap?,
+    backgroundColor: Color?,
+    backgroundImage: Bitmap?
+): Bitmap {
     val width = bitmap?.width ?: 1
     val height = bitmap?.height ?: 1
     val resultBitmap = Bitmap.createBitmap(width, height, Bitmap.Config.ARGB_8888)
@@ -355,6 +359,8 @@ fun compositeBackground(bitmap: Bitmap?, backgroundColor: Color?, backgroundImag
 }
 
 
+
+
 fun getBitmapFromDrawable(context: Context, drawableId: Int): Bitmap? {
     val drawable = ContextCompat.getDrawable(context, drawableId)
     return drawable?.let {
@@ -367,7 +373,14 @@ fun getBitmapFromDrawable(context: Context, drawableId: Int): Bitmap? {
 }
 
 
-fun saveImage(bitmap: Bitmap?, context: Context, isHd: Boolean, backgroundColor: Color?, backgroundImageId: Int?) {
+fun saveImage(
+    bitmap: Bitmap?,
+    context: Context,
+    isHd: Boolean,
+    backgroundColor: Color?,
+    backgroundImageId: Int?,
+    galleryBitmap: Bitmap?
+) {
     createNotificationChannel(context)
 
     val notificationManager = context.getSystemService(Context.NOTIFICATION_SERVICE) as NotificationManager
@@ -399,7 +412,7 @@ fun saveImage(bitmap: Bitmap?, context: Context, isHd: Boolean, backgroundColor:
                 bitmap
             }
 
-            val backgroundImageBitmap = backgroundImageId?.let { getBitmapFromDrawable(context, it) }
+            val backgroundImageBitmap = galleryBitmap ?: backgroundImageId?.let { getBitmapFromDrawable(context, it) }
 
             val finalBitmap = compositeBackground(scaledBitmap, backgroundColor, backgroundImageBitmap)
 
@@ -418,6 +431,8 @@ fun saveImage(bitmap: Bitmap?, context: Context, isHd: Boolean, backgroundColor:
         notificationManager.notify(1, notificationBuilder.build())
     }
 }
+
+
 
 
 
