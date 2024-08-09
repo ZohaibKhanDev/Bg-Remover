@@ -101,6 +101,7 @@ fun BgDetail(
     var selectedColor by remember { mutableStateOf(Color.Transparent) }
     var selectedPhoto by remember { mutableStateOf<Int?>(null) }
 
+
     LaunchedEffect(Unit) {
         delay(3000)
         showBgRemovedImage = true
@@ -290,11 +291,12 @@ fun BgDetail(
                                         contentScale = ContentScale.Crop
                                     )
 
-                                    if (selectedColor != Color.Transparent) {
+                                    selectedColor?.let { color ->
                                         Box(
-                                            modifier = Modifier.clip(RoundedCornerShape(11.dp))
+                                            modifier = Modifier
+                                                .clip(RoundedCornerShape(11.dp))
                                                 .fillMaxSize()
-                                                .background(selectedColor)
+                                                .background(color)
                                         )
                                     }
                                 }
@@ -365,6 +367,7 @@ fun BgDetail(
                                         modifier = Modifier.clickable {
                                             showColor = false
                                             showPhoto = true
+                                            selectedColor
                                             selectedPhoto = null
                                         }
                                     )
@@ -447,6 +450,7 @@ fun BgDetail(
                                                 .height(50.dp)
                                                 .background(color)
                                                 .clickable {
+                                                    selectedPhoto=null
                                                     selectedColor = color
                                                 })
                                         }
