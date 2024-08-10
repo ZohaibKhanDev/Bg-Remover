@@ -167,13 +167,14 @@ fun BgRemover(navController: NavController) {
         }, actions = {
             IconButton(onClick = { isMore = !isMore }) {
                 Icon(
-                    imageVector = Icons.Default.MoreVert, contentDescription = "", modifier = Modifier.size(39.dp)
+                    imageVector = Icons.Default.MoreVert, contentDescription = "",
                 )
 
                 DropdownMenu(expanded = isMore, onDismissRequest = { isMore = false }) {
                     DropdownMenuItem(text = {
-                        Text(text = "Log Out")
+                        Text(text = "Log In")
                     }, onClick = {
+                        isMore=false
                         Toast.makeText(context, "Please Create New Account", Toast.LENGTH_SHORT).show()
                     })
                 }
