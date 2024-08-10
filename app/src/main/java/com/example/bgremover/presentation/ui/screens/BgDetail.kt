@@ -81,6 +81,7 @@ import androidx.compose.ui.geometry.Offset
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.asImageBitmap
 import androidx.compose.ui.graphics.graphicsLayer
+import androidx.compose.ui.graphics.isUnspecified
 import androidx.compose.ui.input.pointer.pointerInput
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.platform.LocalContext
@@ -110,22 +111,22 @@ fun BgDetail(
     var offset by remember { mutableStateOf(Offset.Zero) }
     var isPressing by remember { mutableStateOf(false) }
     val context = LocalContext.current
+    var colorRest = selectedColor
 
     var selectedPhoto by remember { mutableStateOf<Int?>(null) }
     var selectedGallery by remember { mutableStateOf<Bitmap?>(null) }
-    val launcher = rememberLauncherForActivityResult(
-        contract = ActivityResultContracts.GetContent(),
-        onResult = { uri ->
-            uri?.let { uri ->
-                val inputStream = context.contentResolver.openInputStream(uri)
-                val selectedBitmap = BitmapFactory.decodeStream(inputStream)
-                selectedBitmap?.let { bitmap ->
-                    selectedPhoto = null
-                    selectedGallery = bitmap
+    val launcher =
+        rememberLauncherForActivityResult(contract = ActivityResultContracts.GetContent(),
+            onResult = { uri ->
+                uri?.let { uri ->
+                    val inputStream = context.contentResolver.openInputStream(uri)
+                    val selectedBitmap = BitmapFactory.decodeStream(inputStream)
+                    selectedBitmap?.let { bitmap ->
+                        selectedPhoto = null
+                        selectedGallery = bitmap
+                    }
                 }
-            }
-        }
-    )
+            })
 
 
 
@@ -343,22 +344,17 @@ fun BgDetail(
                                 bgremoveimage?.let { base64 ->
                                     val imageBytes = Base64.decode(base64, Base64.DEFAULT)
                                     val bitmap = BitmapFactory.decodeByteArray(
-                                        imageBytes,
-                                        0,
-                                        imageBytes.size
+                                        imageBytes, 0, imageBytes.size
                                     )
 
-                                    Box(
-                                        modifier = Modifier.pointerInput(Unit) {
-                                            detectTransformGestures { _, pan, zoom, _ ->
-                                                scale *= zoom
-                                                offset = Offset(
-                                                    offset.x + pan.x,
-                                                    offset.y + pan.y
-                                                )
-                                            }
+                                    Box(modifier = Modifier.pointerInput(Unit) {
+                                        detectTransformGestures { _, pan, zoom, _ ->
+                                            scale *= zoom
+                                            offset = Offset(
+                                                offset.x + pan.x, offset.y + pan.y
+                                            )
                                         }
-                                    ) {
+                                    }) {
                                         Image(
                                             bitmap = bitmap.asImageBitmap(),
                                             contentDescription = null,
@@ -426,8 +422,7 @@ fun BgDetail(
                                     horizontalArrangement = Arrangement.SpaceBetween,
                                     verticalAlignment = Alignment.CenterVertically
                                 ) {
-                                    Text(
-                                        text = "Reset",
+                                    Text(text = "Reset",
                                         fontSize = 15.sp,
                                         fontWeight = FontWeight.Medium,
                                         modifier = Modifier.clickable {
@@ -435,17 +430,15 @@ fun BgDetail(
                                             showPhoto = true
                                             selectedColor
                                             selectedPhoto = null
-                                        }
-                                    )
-                                    Text(
-                                        text = "Done",
+                                            selectedGallery=null
+                                        })
+                                    Text(text = "Done",
                                         fontSize = 15.sp,
                                         fontWeight = FontWeight.Medium,
                                         color = Color.Blue.copy(alpha = 0.60f),
                                         modifier = Modifier.clickable {
                                             addBg = false
-                                        }
-                                    )
+                                        })
                                 }
 
                                 Spacer(modifier = Modifier.height(11.dp))
@@ -517,7 +510,7 @@ fun BgDetail(
                                                 .background(color)
                                                 .clickable {
                                                     selectedPhoto = null
-                                                    selectedGallery= null
+                                                    selectedGallery = null
                                                     selectedColor = color
                                                 })
                                         }
@@ -559,16 +552,14 @@ fun BgDetail(
                                                 R.drawable.phone,
                                             )
                                         ) { photoResId ->
-                                            Box(
-                                                modifier = Modifier
-                                                    .clip(RoundedCornerShape(6.dp))
-                                                    .width(60.dp)
-                                                    .height(50.dp)
-                                                    .clickable {
-                                                        selectedGallery= null
-                                                        selectedPhoto = photoResId
-                                                    }
-                                            ) {
+                                            Box(modifier = Modifier
+                                                .clip(RoundedCornerShape(6.dp))
+                                                .width(60.dp)
+                                                .height(50.dp)
+                                                .clickable {
+                                                    selectedGallery = null
+                                                    selectedPhoto = photoResId
+                                                }) {
                                                 Image(
                                                     painter = painterResource(id = photoResId),
                                                     contentDescription = null,
@@ -592,8 +583,7 @@ fun BgDetail(
                                         onClick = {
                                             showPhoto = true
                                             showColor = false
-                                        },
-                                        colors = ButtonDefaults.buttonColors(
+                                        }, colors = ButtonDefaults.buttonColors(
                                             Color.LightGray.copy(alpha = 0.40f)
                                         )
                                     ) {
@@ -606,8 +596,7 @@ fun BgDetail(
                                         onClick = {
                                             showPhoto = false
                                             showColor = true
-                                        },
-                                        colors = ButtonDefaults.buttonColors(
+                                        }, colors = ButtonDefaults.buttonColors(
                                             Color.LightGray.copy(alpha = 0.40f)
                                         )
                                     ) {
@@ -642,12 +631,9 @@ fun BgDetail(
                                     .clickable {
                                         bgremoveimage?.let { base64 ->
                                             val imageBytes = Base64.decode(base64, Base64.DEFAULT)
-                                            val bitmap =
-                                                BitmapFactory.decodeByteArray(
-                                                    imageBytes,
-                                                    0,
-                                                    imageBytes.size
-                                                )
+                                            val bitmap = BitmapFactory.decodeByteArray(
+                                                imageBytes, 0, imageBytes.size
+                                            )
                                             saveImage(
                                                 bitmap,
                                                 context = context,
@@ -691,12 +677,9 @@ fun BgDetail(
                                     .clickable {
                                         bgremoveimage?.let { base64 ->
                                             val imageBytes = Base64.decode(base64, Base64.DEFAULT)
-                                            val bitmap =
-                                                BitmapFactory.decodeByteArray(
-                                                    imageBytes,
-                                                    0,
-                                                    imageBytes.size
-                                                )
+                                            val bitmap = BitmapFactory.decodeByteArray(
+                                                imageBytes, 0, imageBytes.size
+                                            )
 
                                             saveImage(
                                                 bitmap,
@@ -708,8 +691,7 @@ fun BgDetail(
                                             )
                                         }
 
-                                    },
-                                contentAlignment = Alignment.TopEnd
+                                    }, contentAlignment = Alignment.TopEnd
                             ) {
                                 Icon(
                                     imageVector = Icons.Outlined.FileDownload,
@@ -739,8 +721,7 @@ fun BgDetail(
                                     .size(45.dp)
                                     .clickable {
                                         addBg = true
-                                    },
-                                contentAlignment = Alignment.TopEnd
+                                    }, contentAlignment = Alignment.TopEnd
                             ) {
                                 Icon(
                                     imageVector = Icons.Outlined.Add,
