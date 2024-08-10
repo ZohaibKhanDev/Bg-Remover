@@ -37,8 +37,11 @@ import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.MoreVert
 import androidx.compose.material3.Button
 import androidx.compose.material3.ButtonDefaults
+import androidx.compose.material3.DropdownMenu
+import androidx.compose.material3.DropdownMenuItem
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Icon
+import androidx.compose.material3.IconButton
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
 import androidx.compose.material3.TopAppBar
@@ -83,6 +86,7 @@ fun BgRemover(navController: NavController) {
     var imageUri by remember { mutableStateOf<Uri?>(null) }
     var imageFile by remember { mutableStateOf<File?>(null) }
     var isLoading by remember { mutableStateOf(false) }
+    var isMore by remember { mutableStateOf(false) }
     var bgRemovedImageBase64 by remember { mutableStateOf<String?>(null) }
     val bgRemovalState by viewModel.bgRemoval.collectAsState()
     val context = LocalContext.current
@@ -161,11 +165,20 @@ fun BgRemover(navController: NavController) {
                     .size(60.dp),
             )
         }, actions = {
-            Icon(
-                imageVector = Icons.Default.MoreVert,
-                contentDescription = "",
-                modifier = Modifier.height(39.dp)
-            )
+            IconButton(onClick = { isMore = !isMore }) {
+                Icon(
+                    imageVector = Icons.Default.MoreVert, contentDescription = "", modifier = Modifier.size(39.dp)
+                )
+
+                DropdownMenu(expanded = isMore, onDismissRequest = { isMore = false }) {
+                    DropdownMenuItem(text = {
+                        Text(text = "Log Out")
+                    }, onClick = {
+                        Toast.makeText(context, "Please Create New Account", Toast.LENGTH_SHORT).show()
+                    })
+                }
+
+            }
         })
     }) {
 

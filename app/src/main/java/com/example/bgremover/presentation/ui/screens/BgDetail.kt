@@ -59,6 +59,8 @@ import androidx.compose.material3.Button
 import androidx.compose.material3.ButtonDefaults
 import androidx.compose.material3.Card
 import androidx.compose.material3.CardDefaults
+import androidx.compose.material3.DropdownMenu
+import androidx.compose.material3.DropdownMenuItem
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
@@ -92,6 +94,7 @@ import androidx.compose.ui.unit.sp
 import androidx.navigation.NavController
 import coil.compose.AsyncImage
 import com.example.bgremover.R
+import com.example.bgremover.presentation.ui.navigation.Screens
 import kotlinx.coroutines.delay
 
 @OptIn(ExperimentalMaterial3Api::class)
@@ -112,6 +115,9 @@ fun BgDetail(
     var isPressing by remember { mutableStateOf(false) }
     val context = LocalContext.current
     var colorRest = Color.Transparent
+    var isMore by remember {
+        mutableStateOf(false)
+    }
 
     var selectedPhoto by remember { mutableStateOf<Int?>(null) }
     var selectedGallery by remember { mutableStateOf<Bitmap?>(null) }
@@ -187,10 +193,19 @@ fun BgDetail(
                     imageVector = Icons.Default.Redo, contentDescription = ""
                 )
             }
-            IconButton(onClick = { /* TODO */ }) {
+            IconButton(onClick = { isMore = !isMore }) {
                 Icon(
                     imageVector = Icons.Default.MoreVert, contentDescription = ""
                 )
+
+                DropdownMenu(expanded = isMore, onDismissRequest = { isMore = false }) {
+                    DropdownMenuItem(text = {
+                        Text(text = "Log Out")
+                    }, onClick = {
+                        navController.navigate(Screens.BgRemover.route)
+                    })
+                }
+
             }
         }, colors = TopAppBarDefaults.topAppBarColors(containerColor = Color.White)
         )
@@ -428,9 +443,9 @@ fun BgDetail(
                                         modifier = Modifier.clickable {
                                             showColor = false
                                             showPhoto = true
-                                            selectedColor=colorRest
+                                            selectedColor = colorRest
                                             selectedPhoto = null
-                                            selectedGallery=null
+                                            selectedGallery = null
                                         })
                                     Text(text = "Done",
                                         fontSize = 15.sp,
