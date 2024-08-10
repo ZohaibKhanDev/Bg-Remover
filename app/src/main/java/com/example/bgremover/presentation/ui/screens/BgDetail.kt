@@ -262,8 +262,8 @@ fun BgDetail(
         Column(
             modifier = Modifier
                 .verticalScroll(vertical)
-                .fillMaxSize()
-                .fillMaxHeight()
+                .height(if (addBg) 1130.dp else 1050.dp)
+                .fillMaxWidth()
                 .background(Color.White)
                 .padding(top = it.calculateTopPadding()),
             verticalArrangement = Arrangement.spacedBy(15.dp),
