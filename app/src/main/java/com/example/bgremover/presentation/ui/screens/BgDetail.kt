@@ -517,6 +517,7 @@ fun BgDetail(
                                                 .background(color)
                                                 .clickable {
                                                     selectedPhoto = null
+                                                    selectedGallery= null
                                                     selectedColor = color
                                                 })
                                         }
@@ -564,6 +565,7 @@ fun BgDetail(
                                                     .width(60.dp)
                                                     .height(50.dp)
                                                     .clickable {
+                                                        selectedGallery= null
                                                         selectedPhoto = photoResId
                                                     }
                                             ) {
