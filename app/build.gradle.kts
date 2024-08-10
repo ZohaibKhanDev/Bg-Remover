@@ -103,4 +103,6 @@ dependencies {
     implementation("androidx.media3:media3-transformer:1.1.1")
     implementation ("com.github.bumptech.glide:glide:4.12.0")
     annotationProcessor ("com.github.bumptech.glide:compiler:4.12.0")
+    implementation("com.google.android.gms:play-services-ads:23.2.0")
+
 }

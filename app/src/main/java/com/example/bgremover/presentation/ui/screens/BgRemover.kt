@@ -1,6 +1,7 @@
 package com.example.bgremover.presentation.ui.screens
 
 import android.annotation.SuppressLint
+import android.app.Activity
 import android.app.NotificationManager
 import android.content.ContentValues
 import android.content.Context
@@ -11,16 +12,12 @@ import android.net.Uri
 import android.os.Build
 import android.os.Environment
 import android.provider.MediaStore
+import android.util.Log
 import android.widget.Toast
 import androidx.activity.compose.rememberLauncherForActivityResult
 import androidx.activity.result.contract.ActivityResultContracts
-import androidx.compose.foundation.BorderStroke
 import androidx.compose.foundation.Image
-import androidx.compose.foundation.background
-import androidx.compose.foundation.border
-import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
-import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
@@ -30,8 +27,6 @@ import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
-import androidx.compose.foundation.lazy.items
-import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.MoreVert
@@ -75,6 +70,10 @@ import com.example.bgremover.createNotificationChannel
 import com.example.bgremover.domain.usecase.ResultState
 import com.example.bgremover.presentation.ui.navigation.Screens
 import com.example.bgremover.presentation.viewmodel.MainViewModel
+import com.google.android.gms.ads.AdRequest
+import com.google.android.gms.ads.LoadAdError
+import com.google.android.gms.ads.interstitial.InterstitialAd
+import com.google.android.gms.ads.interstitial.InterstitialAdLoadCallback
 import org.koin.compose.koinInject
 import java.io.File
 
@@ -82,6 +81,23 @@ import java.io.File
 @SuppressLint("UnusedMaterial3ScaffoldPaddingParameter")
 @Composable
 fun BgRemover(navController: NavController) {
+    var mInterstitialAd: InterstitialAd? = null
+    var addRequest = AdRequest.Builder().build()
+    val context = LocalContext.current
+    InterstitialAd.load(context, "ca-app-pub-3940256099942544~3347511713", addRequest, object :
+        InterstitialAdLoadCallback() {
+        override fun onAdFailedToLoad(p0: LoadAdError) {
+            mInterstitialAd = null
+            Toast.makeText(context, "$p0", Toast.LENGTH_SHORT).show()
+        }
+
+        override fun onAdLoaded(p0: InterstitialAd) {
+            mInterstitialAd = p0
+
+        }
+
+    })
+
     val viewModel: MainViewModel = koinInject()
     var imageUri by remember { mutableStateOf<Uri?>(null) }
     var imageFile by remember { mutableStateOf<File?>(null) }
@@ -89,7 +105,7 @@ fun BgRemover(navController: NavController) {
     var isMore by remember { mutableStateOf(false) }
     var bgRemovedImageBase64 by remember { mutableStateOf<String?>(null) }
     val bgRemovalState by viewModel.bgRemoval.collectAsState()
-    val context = LocalContext.current
+
 
     val launcher = rememberLauncherForActivityResult(ActivityResultContracts.GetContent()) { uri ->
         imageUri = uri
@@ -107,6 +123,11 @@ fun BgRemover(navController: NavController) {
         imageFile?.let { file ->
             isLoading = true
             viewModel.removeBackground(file)
+            if (mInterstitialAd != null) {
+                mInterstitialAd?.show(Activity())
+            } else {
+                Log.d("TAG", "The interstitial ad wasn't ready yet.")
+            }
         }
     }
 
@@ -123,13 +144,14 @@ fun BgRemover(navController: NavController) {
             }
 
             is ResultState.Success -> {
+
                 isLoading = false
                 bgRemovedImageBase64 = (bgRemovalState as ResultState.Success<String>).success
                 imageUri?.let {
-                    bgRemovedImageBase64?.let {imagebg->
+                    bgRemovedImageBase64?.let { imagebg ->
                         navController.navigate(
                             Screens.BgDetail.route + "/${Uri.encode(it.toString())}/${
-                                Uri.encode(imagebg )
+                                Uri.encode(imagebg)
                             }"
                         )
                     }
@@ -174,8 +196,9 @@ fun BgRemover(navController: NavController) {
                     DropdownMenuItem(text = {
                         Text(text = "Log In")
                     }, onClick = {
-                        isMore=false
-                        Toast.makeText(context, "Please Create New Account", Toast.LENGTH_SHORT).show()
+                        isMore = false
+                        Toast.makeText(context, "Please Create New Account", Toast.LENGTH_SHORT)
+                            .show()
                     })
                 }
 
@@ -373,9 +396,6 @@ fun compositeBackground(
 }
 
 
-
-
-
 fun getBitmapFromDrawable(context: Context, drawableId: Int): Bitmap? {
     val drawable = ContextCompat.getDrawable(context, drawableId)
     return drawable?.let {
@@ -398,7 +418,8 @@ fun saveImage(
 ) {
     createNotificationChannel(context)
 
-    val notificationManager = context.getSystemService(Context.NOTIFICATION_SERVICE) as NotificationManager
+    val notificationManager =
+        context.getSystemService(Context.NOTIFICATION_SERVICE) as NotificationManager
     val notificationBuilder = NotificationCompat.Builder(context, "DOWNLOAD_CHANNEL")
         .setSmallIcon(R.drawable.baseline_download_24)
         .setContentTitle("Image Download")
@@ -409,7 +430,10 @@ fun saveImage(
     notificationManager.notify(1, notificationBuilder.build())
 
     val contentValues = ContentValues().apply {
-        put(MediaStore.MediaColumns.DISPLAY_NAME, if (isHd) "bg_removed_image_hd.png" else "bg_removed_image.png")
+        put(
+            MediaStore.MediaColumns.DISPLAY_NAME,
+            if (isHd) "bg_removed_image_hd.png" else "bg_removed_image.png"
+        )
         put(MediaStore.MediaColumns.MIME_TYPE, "image/png")
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.Q) {
             put(MediaStore.MediaColumns.RELATIVE_PATH, Environment.DIRECTORY_PICTURES)
@@ -427,22 +451,27 @@ fun saveImage(
                 bitmap
             }
 
-            val backgroundImageBitmap = galleryBitmap ?: backgroundImageId?.let { getBitmapFromDrawable(context, it) }
+            val backgroundImageBitmap =
+                galleryBitmap ?: backgroundImageId?.let { getBitmapFromDrawable(context, it) }
 
-            val finalBitmap = compositeBackground(scaledBitmap, backgroundColor, backgroundImageBitmap)
+            val finalBitmap =
+                compositeBackground(scaledBitmap, backgroundColor, backgroundImageBitmap)
 
             finalBitmap.compress(Bitmap.CompressFormat.PNG, 100, outputStream)
             Toast.makeText(context, "Image saved to Pictures", Toast.LENGTH_SHORT).show()
-            notificationBuilder.setContentText("Download complete").setProgress(0, 0, false).setOngoing(false)
+            notificationBuilder.setContentText("Download complete").setProgress(0, 0, false)
+                .setOngoing(false)
             notificationManager.notify(1, notificationBuilder.build())
         } ?: run {
             Toast.makeText(context, "Error saving image", Toast.LENGTH_SHORT).show()
-            notificationBuilder.setContentText("Download failed").setProgress(0, 0, false).setOngoing(false)
+            notificationBuilder.setContentText("Download failed").setProgress(0, 0, false)
+                .setOngoing(false)
             notificationManager.notify(1, notificationBuilder.build())
         }
     } ?: run {
         Toast.makeText(context, "Error saving image", Toast.LENGTH_SHORT).show()
-        notificationBuilder.setContentText("Download failed").setProgress(0, 0, false).setOngoing(false)
+        notificationBuilder.setContentText("Download failed").setProgress(0, 0, false)
+            .setOngoing(false)
         notificationManager.notify(1, notificationBuilder.build())
     }
 }
