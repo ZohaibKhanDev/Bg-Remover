@@ -1,12 +1,14 @@
 package com.example.bgremover.presentation.ui.screens
 
 import android.annotation.SuppressLint
+import android.app.Activity
 import android.content.ActivityNotFoundException
 import android.content.Intent
 import android.graphics.Bitmap
 import android.graphics.BitmapFactory
 import android.net.Uri
 import android.util.Base64
+import android.util.Log
 import androidx.activity.compose.rememberLauncherForActivityResult
 import androidx.activity.result.contract.ActivityResultContracts
 import androidx.compose.animation.core.LinearOutSlowInEasing
@@ -95,6 +97,10 @@ import androidx.navigation.NavController
 import coil.compose.AsyncImage
 import com.example.bgremover.R
 import com.example.bgremover.presentation.ui.navigation.Screens
+import com.google.android.gms.ads.AdRequest
+import com.google.android.gms.ads.LoadAdError
+import com.google.android.gms.ads.interstitial.InterstitialAd
+import com.google.android.gms.ads.interstitial.InterstitialAdLoadCallback
 import kotlinx.coroutines.delay
 
 @OptIn(ExperimentalMaterial3Api::class)
@@ -118,9 +124,28 @@ fun BgDetail(
     var isMore by remember {
         mutableStateOf(false)
     }
-
+    var interstitialAd: InterstitialAd? by remember { mutableStateOf(null) }
     var selectedPhoto by remember { mutableStateOf<Int?>(null) }
     var selectedGallery by remember { mutableStateOf<Bitmap?>(null) }
+
+    InterstitialAd.load(
+        context,
+        "ca-app-pub-3940256099942544/1033173712",
+        AdRequest.Builder().build(),
+        object : InterstitialAdLoadCallback() {
+            override fun onAdFailedToLoad(adError: LoadAdError) {
+                interstitialAd = null
+                Log.d("ADD", "onAdFailedToLoad: True")
+            }
+
+            override fun onAdLoaded(ad: InterstitialAd) {
+                interstitialAd = ad
+                Log.d("ADD", "onAdLoaded: True")
+            }
+        }
+    )
+
+
     val launcher =
         rememberLauncherForActivityResult(contract = ActivityResultContracts.GetContent(),
             onResult = { uri ->
@@ -644,6 +669,7 @@ fun BgDetail(
                                     .size(45.dp)
                                     .background(Color(0XFF0077ff))
                                     .clickable {
+                                        interstitialAd?.show(context as Activity)
                                         bgremoveimage?.let { base64 ->
                                             val imageBytes = Base64.decode(base64, Base64.DEFAULT)
                                             val bitmap = BitmapFactory.decodeByteArray(
@@ -690,6 +716,8 @@ fun BgDetail(
                                     .size(45.dp)
                                     .background(Color(0XFFc1dff5))
                                     .clickable {
+                                        interstitialAd?.show(context as Activity)
+
                                         bgremoveimage?.let { base64 ->
                                             val imageBytes = Base64.decode(base64, Base64.DEFAULT)
                                             val bitmap = BitmapFactory.decodeByteArray(

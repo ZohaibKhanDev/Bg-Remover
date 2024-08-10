@@ -70,7 +70,9 @@ import com.example.bgremover.createNotificationChannel
 import com.example.bgremover.domain.usecase.ResultState
 import com.example.bgremover.presentation.ui.navigation.Screens
 import com.example.bgremover.presentation.viewmodel.MainViewModel
+import com.google.android.gms.ads.AdError
 import com.google.android.gms.ads.AdRequest
+import com.google.android.gms.ads.FullScreenContentCallback
 import com.google.android.gms.ads.LoadAdError
 import com.google.android.gms.ads.interstitial.InterstitialAd
 import com.google.android.gms.ads.interstitial.InterstitialAdLoadCallback
@@ -81,23 +83,7 @@ import java.io.File
 @SuppressLint("UnusedMaterial3ScaffoldPaddingParameter")
 @Composable
 fun BgRemover(navController: NavController) {
-    var mInterstitialAd: InterstitialAd? = null
-    var addRequest = AdRequest.Builder().build()
     val context = LocalContext.current
-    InterstitialAd.load(context, "ca-app-pub-3940256099942544~3347511713", addRequest, object :
-        InterstitialAdLoadCallback() {
-        override fun onAdFailedToLoad(p0: LoadAdError) {
-            mInterstitialAd = null
-            Toast.makeText(context, "$p0", Toast.LENGTH_SHORT).show()
-        }
-
-        override fun onAdLoaded(p0: InterstitialAd) {
-            mInterstitialAd = p0
-
-        }
-
-    })
-
     val viewModel: MainViewModel = koinInject()
     var imageUri by remember { mutableStateOf<Uri?>(null) }
     var imageFile by remember { mutableStateOf<File?>(null) }
@@ -106,27 +92,68 @@ fun BgRemover(navController: NavController) {
     var bgRemovedImageBase64 by remember { mutableStateOf<String?>(null) }
     val bgRemovalState by viewModel.bgRemoval.collectAsState()
 
+    var interstitialAd: InterstitialAd? by remember { mutableStateOf(null) }
+
+
+    LaunchedEffect(Unit) {
+        InterstitialAd.load(
+            context,
+            "ca-app-pub-3940256099942544/1033173712",
+            AdRequest.Builder().build(),
+            object : InterstitialAdLoadCallback() {
+                override fun onAdFailedToLoad(adError: LoadAdError) {
+                    interstitialAd = null
+                    Log.d("ADD", "onAdFailedToLoad: True")
+                }
+
+                override fun onAdLoaded(ad: InterstitialAd) {
+                    interstitialAd = ad
+                    Log.d("ADD", "onAdLoaded: True")
+                }
+            }
+        )
+    }
+
 
     val launcher = rememberLauncherForActivityResult(ActivityResultContracts.GetContent()) { uri ->
-        imageUri = uri
-        bgRemovedImageBase64 = null
-        imageFile = uri?.let {
-            val inputStream = context.contentResolver.openInputStream(it)
-            inputStream?.let { stream ->
-                val file = File(context.cacheDir, "selected_image.png")
-                file.outputStream().use { output ->
-                    stream.copyTo(output)
+        uri?.let {
+            imageUri = it
+            bgRemovedImageBase64 = null
+            imageFile = it.let {
+                val inputStream = context.contentResolver.openInputStream(it)
+                inputStream?.let { stream ->
+                    val file = File(context.cacheDir, "selected_image.png")
+                    file.outputStream().use { output ->
+                        stream.copyTo(output)
+                    }
+                    file
                 }
-                file
             }
-        }
-        imageFile?.let { file ->
-            isLoading = true
-            viewModel.removeBackground(file)
-            if (mInterstitialAd != null) {
-                mInterstitialAd?.show(Activity())
-            } else {
-                Log.d("TAG", "The interstitial ad wasn't ready yet.")
+            imageFile?.let { file ->
+                interstitialAd?.let { ad ->
+                    ad.fullScreenContentCallback = object : FullScreenContentCallback() {
+                        override fun onAdDismissedFullScreenContent() {
+                            interstitialAd = null
+                            Log.d("ADD", "onAdDismissedFullScreenContent: Ad dismissed, continue processing.")
+                            isLoading = true
+                            viewModel.removeBackground(file)
+                        }
+
+                        override fun onAdFailedToShowFullScreenContent(adError: AdError) {
+                            Log.d("ADD", "onAdFailedToShowFullScreenContent: Failed to show ad, continue processing.")
+                            isLoading = true
+                            viewModel.removeBackground(file)
+                        }
+
+                        override fun onAdShowedFullScreenContent() {
+                            interstitialAd = null // Reset the ad
+                        }
+                    }
+                    ad.show(context as Activity)
+                } ?: run {
+                    isLoading = true
+                    viewModel.removeBackground(file)
+                }
             }
         }
     }
