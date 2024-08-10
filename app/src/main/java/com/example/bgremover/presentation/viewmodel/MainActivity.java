@@ -18,5 +18,12 @@ public class MainActivity extends AppCompatActivity {
 
         setContentView(textView);
     }
+
+    public class HelloWorld {
+        public  void main(String[] args) {
+            System.out.println("Hello, World!");
+        }
+    }
+
 }
 
