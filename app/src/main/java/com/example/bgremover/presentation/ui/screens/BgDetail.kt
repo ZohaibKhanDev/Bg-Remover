@@ -139,6 +139,7 @@ fun BgDetail(
     var effect by remember {
         mutableStateOf(false)
     }
+
     var interstitialAd: InterstitialAd? by remember { mutableStateOf(null) }
     var selectedPhoto by remember { mutableStateOf<Int?>(null) }
     var selectedGallery by remember { mutableStateOf<Bitmap?>(null) }

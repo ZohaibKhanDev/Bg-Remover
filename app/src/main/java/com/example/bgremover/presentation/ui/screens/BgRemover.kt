@@ -154,8 +154,7 @@ fun BgRemover(navController: NavController) {
             imageFile?.let { file ->
                 isLoading = true
                 viewModel.removeBackground(file)
-                rewardedAd?.show(context as Activity, OnUserEarnedRewardListener {
-                })
+
             }
         }
     }
@@ -170,6 +169,8 @@ fun BgRemover(navController: NavController) {
 
             ResultState.Loading -> {
                 isLoading = true
+                rewardedAd?.show(context as Activity, OnUserEarnedRewardListener {
+                })
 
             }
 
