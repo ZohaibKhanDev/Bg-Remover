@@ -74,8 +74,11 @@ import com.google.android.gms.ads.AdError
 import com.google.android.gms.ads.AdRequest
 import com.google.android.gms.ads.FullScreenContentCallback
 import com.google.android.gms.ads.LoadAdError
+import com.google.android.gms.ads.OnUserEarnedRewardListener
 import com.google.android.gms.ads.interstitial.InterstitialAd
 import com.google.android.gms.ads.interstitial.InterstitialAdLoadCallback
+import com.google.android.gms.ads.rewarded.RewardedAd
+import com.google.android.gms.ads.rewarded.RewardedAdLoadCallback
 import org.koin.compose.koinInject
 import java.io.File
 
@@ -92,26 +95,44 @@ fun BgRemover(navController: NavController) {
     var bgRemovedImageBase64 by remember { mutableStateOf<String?>(null) }
     val bgRemovalState by viewModel.bgRemoval.collectAsState()
 
-    var interstitialAd: InterstitialAd? by remember { mutableStateOf(null) }
-
-
-    LaunchedEffect(Unit) {
-        InterstitialAd.load(
-            context,
-            "ca-app-pub-3940256099942544/1033173712",
-            AdRequest.Builder().build(),
-            object : InterstitialAdLoadCallback() {
-                override fun onAdFailedToLoad(adError: LoadAdError) {
-                    interstitialAd = null
-                    Log.d("ADD", "onAdFailedToLoad: True")
-                }
-
-                override fun onAdLoaded(ad: InterstitialAd) {
-                    interstitialAd = ad
-                    Log.d("ADD", "onAdLoaded: True")
-                }
+    var rewardedAd: RewardedAd? = null
+    RewardedAd.load(
+        context,
+        "ca-app-pub-3940256099942544/5224354917",
+        AdRequest.Builder().build(),
+        object : RewardedAdLoadCallback() {
+            override fun onAdFailedToLoad(p0: LoadAdError) {
+                super.onAdFailedToLoad(p0)
+                rewardedAd = null
             }
-        )
+
+            override fun onAdLoaded(p0: RewardedAd) {
+                super.onAdLoaded(p0)
+                rewardedAd = p0
+            }
+        }
+    )
+
+    rewardedAd?.fullScreenContentCallback = object : FullScreenContentCallback() {
+        override fun onAdClicked() {
+            super.onAdClicked()
+        }
+
+        override fun onAdDismissedFullScreenContent() {
+            super.onAdDismissedFullScreenContent()
+        }
+
+        override fun onAdFailedToShowFullScreenContent(p0: AdError) {
+            super.onAdFailedToShowFullScreenContent(p0)
+        }
+
+        override fun onAdImpression() {
+            super.onAdImpression()
+        }
+
+        override fun onAdShowedFullScreenContent() {
+            super.onAdShowedFullScreenContent()
+        }
     }
 
 
@@ -130,30 +151,12 @@ fun BgRemover(navController: NavController) {
                 }
             }
             imageFile?.let { file ->
-                interstitialAd?.let { ad ->
-                    ad.fullScreenContentCallback = object : FullScreenContentCallback() {
-                        override fun onAdDismissedFullScreenContent() {
-                            interstitialAd = null
-                            Log.d("ADD", "onAdDismissedFullScreenContent: Ad dismissed, continue processing.")
-                            isLoading = true
-                            viewModel.removeBackground(file)
-                        }
 
-                        override fun onAdFailedToShowFullScreenContent(adError: AdError) {
-                            Log.d("ADD", "onAdFailedToShowFullScreenContent: Failed to show ad, continue processing.")
-                            isLoading = true
-                            viewModel.removeBackground(file)
-                        }
-
-                        override fun onAdShowedFullScreenContent() {
-                            interstitialAd = null // Reset the ad
-                        }
-                    }
-                    ad.show(context as Activity)
-                } ?: run {
-                    isLoading = true
-                    viewModel.removeBackground(file)
-                }
+                isLoading = true
+                viewModel.removeBackground(file)
+                rewardedAd?.show(context as Activity, OnUserEarnedRewardListener {
+                    Toast.makeText(context, "$it", Toast.LENGTH_SHORT).show()
+                })
             }
         }
     }
@@ -168,10 +171,10 @@ fun BgRemover(navController: NavController) {
 
             ResultState.Loading -> {
                 isLoading = true
+
             }
 
             is ResultState.Success -> {
-
                 isLoading = false
                 bgRemovedImageBase64 = (bgRemovalState as ResultState.Success<String>).success
                 imageUri?.let {
