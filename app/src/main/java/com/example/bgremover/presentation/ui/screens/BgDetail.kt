@@ -111,7 +111,7 @@ fun BgDetail(
     var offset by remember { mutableStateOf(Offset.Zero) }
     var isPressing by remember { mutableStateOf(false) }
     val context = LocalContext.current
-    var colorRest = selectedColor
+    var colorRest = Color.Transparent
 
     var selectedPhoto by remember { mutableStateOf<Int?>(null) }
     var selectedGallery by remember { mutableStateOf<Bitmap?>(null) }
@@ -428,7 +428,7 @@ fun BgDetail(
                                         modifier = Modifier.clickable {
                                             showColor = false
                                             showPhoto = true
-                                            selectedColor
+                                            selectedColor=colorRest
                                             selectedPhoto = null
                                             selectedGallery=null
                                         })
