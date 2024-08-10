@@ -5,6 +5,7 @@ plugins {
     id("kotlin-kapt")
 }
 
+
 android {
     namespace = "com.example.bgremover"
     compileSdk = 34
@@ -21,6 +22,7 @@ android {
             useSupportLibrary = true
         }
     }
+
 
     buildTypes {
         release {
