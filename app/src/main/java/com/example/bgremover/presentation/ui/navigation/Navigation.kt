@@ -1,4 +1,4 @@
-package com.example.bgremover.presentation.ui.navigation
+ package com.example.bgremover.presentation.ui.navigation
 
 import androidx.compose.runtime.Composable
 import androidx.navigation.NavType
@@ -29,12 +29,15 @@ fun Navigation() {
                 }
             )
         ) { backStackEntry ->
+
             val imageurl = backStackEntry.arguments?.getString("imageUrl")
             val bgremoveimage = backStackEntry.arguments?.getString("bgremoveimage")
             BgDetail(navController = navController, imageurl, bgremoveimage)
+
         }
     }
 }
+
 
 
 sealed class Screens(
