@@ -95,6 +95,7 @@ fun BgRemover(navController: NavController) {
     var bgRemovedImageBase64 by remember { mutableStateOf<String?>(null) }
     val bgRemovalState by viewModel.bgRemoval.collectAsState()
 
+
     var rewardedAd: RewardedAd? = null
     RewardedAd.load(
         context,
@@ -151,11 +152,9 @@ fun BgRemover(navController: NavController) {
                 }
             }
             imageFile?.let { file ->
-
                 isLoading = true
                 viewModel.removeBackground(file)
                 rewardedAd?.show(context as Activity, OnUserEarnedRewardListener {
-                    Toast.makeText(context, "$it", Toast.LENGTH_SHORT).show()
                 })
             }
         }
