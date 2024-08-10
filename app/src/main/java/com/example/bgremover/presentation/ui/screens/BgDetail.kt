@@ -30,6 +30,7 @@ import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
+import androidx.compose.foundation.layout.fillMaxHeight
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
@@ -70,6 +71,7 @@ import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Slider
 import androidx.compose.material3.SliderDefaults
 import androidx.compose.material3.Switch
+import androidx.compose.material3.SwitchDefaults
 import androidx.compose.material3.Text
 import androidx.compose.material3.TextButton
 import androidx.compose.material3.TopAppBar
@@ -140,6 +142,21 @@ fun BgDetail(
     var interstitialAd: InterstitialAd? by remember { mutableStateOf(null) }
     var selectedPhoto by remember { mutableStateOf<Int?>(null) }
     var selectedGallery by remember { mutableStateOf<Bitmap?>(null) }
+    var slider by remember {
+        mutableStateOf(1f)
+    }
+
+    var slider1 by remember {
+        mutableStateOf(1f)
+    }
+
+    var blurof by remember {
+        mutableStateOf(false)
+    }
+
+    var opasity by remember {
+        mutableStateOf(false)
+    }
 
     InterstitialAd.load(context,
         "ca-app-pub-3940256099942544/1033173712",
@@ -246,7 +263,7 @@ fun BgDetail(
             modifier = Modifier
                 .verticalScroll(vertical)
                 .fillMaxSize()
-                .height(if (addBg) 1030.dp else 950.dp)
+                .fillMaxHeight()
                 .background(Color.White)
                 .padding(top = it.calculateTopPadding()),
             verticalArrangement = Arrangement.spacedBy(15.dp),
@@ -658,7 +675,7 @@ fun BgDetail(
                     Card(
                         modifier = Modifier
                             .fillMaxWidth()
-                            .height(200.dp),
+                            .height(300.dp),
                         colors = CardDefaults.cardColors(Color.White),
                         elevation = CardDefaults.cardElevation(2.dp),
                         shape = RoundedCornerShape(topStart = 4.dp, topEnd = 4.dp)
@@ -676,9 +693,19 @@ fun BgDetail(
                                     fontWeight = FontWeight.Medium
                                 )
                                 Spacer(modifier = Modifier.width(10.dp))
-                                Switch(checked = switch, onCheckedChange = {
-                                    switch = it
-                                })
+                                Switch(
+                                    checked = switch,
+                                    onCheckedChange = {
+                                        switch = it
+                                    },
+                                    colors = SwitchDefaults.colors(
+                                        checkedTrackColor = Color(0XFF976d00),
+                                        uncheckedTrackColor = Color.LightGray.copy(alpha = 0.50f),
+                                        uncheckedThumbColor = Color.White,
+                                        checkedBorderColor = Color.Transparent,
+                                        uncheckedBorderColor = Color.Transparent
+                                    )
+                                )
                             }
 
                             Row(
@@ -691,15 +718,23 @@ fun BgDetail(
                             ) {
                                 Text(text = "Blur amount", fontSize = 15.sp)
 
-                            Slider(
-                                value = 0f,
-                                onValueChange = {},
-                                valueRange = 0f..100f,
-                                modifier = Modifier
-                                    .fillMaxWidth()
-                                    .padding(vertical = 8.dp), colors = SliderDefaults.colors(thumbColor = Color.LightGray,)
-                            )
-                        }
+                                Slider(
+                                    value = if (switch) slider else 0f,
+                                    onValueChange = {
+                                        if (switch) slider = it else 0f
+                                    },
+                                    valueRange = 0f..100f,
+                                    modifier = Modifier
+                                        .fillMaxWidth()
+                                        .padding(vertical = 8.dp),
+                                    colors = SliderDefaults.colors(
+                                        thumbColor = if (switch) Color(
+                                            0XFF976d00
+                                        ) else Color.LightGray,
+                                        activeTrackColor = if (switch) Color(0XFF976d00) else Color.LightGray
+                                    )
+                                )
+                            }
 
 
                             Row(
@@ -708,7 +743,19 @@ fun BgDetail(
                             ) {
                                 Text(text = "Add Shadow")
                                 Spacer(modifier = Modifier.width(10.dp))
-                                Switch(checked = false, onCheckedChange = {})
+                                Switch(
+                                    checked = switch1,
+                                    onCheckedChange = {
+                                        switch1 = it
+                                    },
+                                    colors = SwitchDefaults.colors(
+                                        checkedTrackColor = Color(0XFF976d00),
+                                        uncheckedTrackColor = Color.LightGray.copy(alpha = 0.50f),
+                                        uncheckedThumbColor = Color.White,
+                                        checkedBorderColor = Color.Transparent,
+                                        uncheckedBorderColor = Color.Transparent
+                                    )
+                                )
                                 Text(
                                     text = "Beta",
                                     modifier = Modifier
@@ -718,20 +765,30 @@ fun BgDetail(
                                 )
                             }
 
-                            Row(modifier = Modifier.fillMaxWidth()
-                                .padding(top = 6.dp),
+                            Row(
+                                modifier = Modifier
+                                    .fillMaxWidth()
+                                    .padding(top = 6.dp),
                                 verticalAlignment = Alignment.CenterVertically,
                                 horizontalArrangement = Arrangement.spacedBy(10.dp)
-                            ){
+                            ) {
                                 Text(text = "Opacity", fontSize = 15.sp)
 
                                 Slider(
-                                    value = 0f,
-                                    onValueChange = {},
+                                    value = if (switch1) slider1 else 0f,
+                                    onValueChange = {
+                                        if (switch1) slider1 = it else 0f
+                                    },
                                     valueRange = 0f..1f,
                                     modifier = Modifier
                                         .fillMaxWidth()
-                                        .padding(vertical = 8.dp)
+                                        .padding(vertical = 8.dp),
+                                    colors = SliderDefaults.colors(
+                                        thumbColor = if (switch) Color(
+                                            0XFF976d00
+                                        ) else Color.LightGray,
+                                        activeTrackColor = if (switch) Color(0XFF976d00) else Color.LightGray
+                                    )
                                 )
                             }
 
