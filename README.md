@@ -3,7 +3,7 @@
 
 ## 🚀 Key Features
 - ** AI-Powered Background Removal **
-- ** High-Resolution Support **
+- ** High-Resolution Support ** 
 - ** User-Friendly Interface **
 - ** Instant Preview **
 - ** Multiple Image Formats **
