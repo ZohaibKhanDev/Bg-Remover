@@ -30,7 +30,6 @@ import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
-import androidx.compose.foundation.layout.fillMaxHeight
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
@@ -176,18 +175,18 @@ fun BgDetail(
         })
 
 
-    val launcher = rememberLauncherForActivityResult(
-        contract = ActivityResultContracts.GetContent(),
-        onResult = { uri ->
-            uri?.let { uri ->
-                val inputStream = context.contentResolver.openInputStream(uri)
-                val selectedBitmap = BitmapFactory.decodeStream(inputStream)
-                selectedBitmap?.let { bitmap ->
-                    selectedPhoto = null
-                    selectedGallery = bitmap
+    val launcher =
+        rememberLauncherForActivityResult(contract = ActivityResultContracts.GetContent(),
+            onResult = { uri ->
+                uri?.let { uri ->
+                    val inputStream = context.contentResolver.openInputStream(uri)
+                    val selectedBitmap = BitmapFactory.decodeStream(inputStream)
+                    selectedBitmap?.let { bitmap ->
+                        selectedPhoto = null
+                        selectedGallery = bitmap
+                    }
                 }
-            }
-        })
+            })
 
     LaunchedEffect(Unit) {
         delay(3000)
@@ -217,7 +216,8 @@ fun BgDetail(
                 TextButton(onClick = { showDialog = false }) {
                     Text("No")
                 }
-            })
+            }
+        )
     }
 
     Scaffold(topBar = {
@@ -696,11 +696,9 @@ fun BgDetail(
                                 )
                                 Spacer(modifier = Modifier.width(10.dp))
                                 Switch(
-                                    checked = switch,
-                                    onCheckedChange = {
+                                    checked = switch, onCheckedChange = {
                                         switch = it
-                                    },
-                                    colors = SwitchDefaults.colors(
+                                    }, colors = SwitchDefaults.colors(
                                         checkedTrackColor = Color(0XFF976d00),
                                         uncheckedTrackColor = Color.LightGray.copy(alpha = 0.50f),
                                         uncheckedThumbColor = Color.White,
@@ -746,11 +744,9 @@ fun BgDetail(
                                 Text(text = "Add Shadow")
                                 Spacer(modifier = Modifier.width(10.dp))
                                 Switch(
-                                    checked = switch1,
-                                    onCheckedChange = {
+                                    checked = switch1, onCheckedChange = {
                                         switch1 = it
-                                    },
-                                    colors = SwitchDefaults.colors(
+                                    }, colors = SwitchDefaults.colors(
                                         checkedTrackColor = Color(0XFF976d00),
                                         uncheckedTrackColor = Color.LightGray.copy(alpha = 0.50f),
                                         uncheckedThumbColor = Color.White,
