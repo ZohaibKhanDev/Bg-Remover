@@ -5,7 +5,6 @@ plugins {
     id("kotlin-kapt")
 }
 
-
 android {
     namespace = "com.example.bgremover"
     compileSdk = 34
@@ -23,7 +22,6 @@ android {
         }
     }
 
-
     buildTypes {
         release {
             isMinifyEnabled = false
@@ -33,7 +31,6 @@ android {
             )
         }
     }
-
 
     compileOptions {
         sourceCompatibility = JavaVersion.VERSION_1_8
