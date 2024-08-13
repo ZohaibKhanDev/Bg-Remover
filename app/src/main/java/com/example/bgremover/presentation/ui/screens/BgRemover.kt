@@ -104,16 +104,17 @@ fun BgRemover(navController: NavController) {
         object : RewardedAdLoadCallback() {
             override fun onAdFailedToLoad(p0: LoadAdError) {
                 super.onAdFailedToLoad(p0)
-                rewardedAd = null
+                rewardedAd = null 
             }
 
             override fun onAdLoaded(p0: RewardedAd) {
                 super.onAdLoaded(p0)
-                rewardedAd = p0
+                rewardedAd = p0 
             }
         }
     )
 
+    
     rewardedAd?.fullScreenContentCallback = object : FullScreenContentCallback() {
         override fun onAdClicked() {
             super.onAdClicked()
@@ -135,8 +136,7 @@ fun BgRemover(navController: NavController) {
             super.onAdShowedFullScreenContent()
         }
     }
-
-
+    
     val launcher = rememberLauncherForActivityResult(ActivityResultContracts.GetContent()) { uri ->
         uri?.let {
             imageUri = it
