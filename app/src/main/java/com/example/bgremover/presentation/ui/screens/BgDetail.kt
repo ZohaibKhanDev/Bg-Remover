@@ -83,8 +83,10 @@ import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.draw.blur
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.draw.scale
+import androidx.compose.ui.draw.shadow
 import androidx.compose.ui.geometry.Offset
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.asImageBitmap
@@ -143,21 +145,8 @@ fun BgDetail(
     var interstitialAd: InterstitialAd? by remember { mutableStateOf(null) }
     var selectedPhoto by remember { mutableStateOf<Int?>(null) }
     var selectedGallery by remember { mutableStateOf<Bitmap?>(null) }
-    var slider by remember {
-        mutableStateOf(1f)
-    }
-
-    var slider1 by remember {
-        mutableStateOf(1f)
-    }
-
-    var blurof by remember {
-        mutableStateOf(false)
-    }
-
-    var opasity by remember {
-        mutableStateOf(false)
-    }
+    var slider by remember { mutableStateOf(0f) }
+    var slider1 by remember { mutableStateOf(1f) }
 
     InterstitialAd.load(context,
         "ca-app-pub-3940256099942544/1033173712",
@@ -175,18 +164,18 @@ fun BgDetail(
         })
 
 
-    val launcher =
-        rememberLauncherForActivityResult(contract = ActivityResultContracts.GetContent(),
-            onResult = { uri ->
-                uri?.let { uri ->
-                    val inputStream = context.contentResolver.openInputStream(uri)
-                    val selectedBitmap = BitmapFactory.decodeStream(inputStream)
-                    selectedBitmap?.let { bitmap ->
-                        selectedPhoto = null
-                        selectedGallery = bitmap
-                    }
+    val launcher = rememberLauncherForActivityResult(
+        contract = ActivityResultContracts.GetContent(),
+        onResult = { uri ->
+            uri?.let { uri ->
+                val inputStream = context.contentResolver.openInputStream(uri)
+                val selectedBitmap = BitmapFactory.decodeStream(inputStream)
+                selectedBitmap?.let { bitmap ->
+                    selectedPhoto = null
+                    selectedGallery = bitmap
                 }
-            })
+            }
+        })
 
     LaunchedEffect(Unit) {
         delay(3000)
@@ -216,8 +205,7 @@ fun BgDetail(
                 TextButton(onClick = { showDialog = false }) {
                     Text("No")
                 }
-            }
-        )
+            })
     }
 
     Scaffold(topBar = {
@@ -362,17 +350,34 @@ fun BgDetail(
                         exit = slideOutHorizontally(targetOffsetX = { -it })
                     ) {
                         bgremoveimage?.let { base64 ->
-                            val imageBytes = Base64.decode(base64, Base64.DEFAULT)
-                            val bitmap =
-                                BitmapFactory.decodeByteArray(imageBytes, 0, imageBytes.size)
+                            var scale by remember { mutableStateOf(1f) }
+                            var offset by remember { mutableStateOf(Offset.Zero) }
 
                             Box(
                                 modifier = Modifier
                                     .size(400.dp, 550.dp)
-                                    .clip(RoundedCornerShape(11.dp)),
+                                    .clip(RoundedCornerShape(11.dp))
+                                    .background(Color.Transparent)
+                                    .then(
+                                        if (switch1) {
+                                            Modifier.shadow(
+                                                elevation = 8.dp,
+                                                shape = RoundedCornerShape(11.dp),
+                                                clip = true
+                                            )
+                                        } else {
+                                            Modifier
+                                        }
+                                    )
+                                    .then(
+                                        if (switch) {
+                                            Modifier.blur(radius = slider.dp)
+                                        } else {
+                                            Modifier
+                                        }
+                                    ),
                                 contentAlignment = Alignment.Center
                             ) {
-
                                 if (selectedPhoto != null) {
                                     Image(
                                         painter = painterResource(id = selectedPhoto!!),
@@ -401,6 +406,9 @@ fun BgDetail(
                                                     .clip(RoundedCornerShape(11.dp))
                                                     .fillMaxSize()
                                                     .background(color)
+                                                    .graphicsLayer {
+                                                        alpha = slider1
+                                                    }
                                             )
                                         }
                                     }
@@ -412,14 +420,29 @@ fun BgDetail(
                                         imageBytes, 0, imageBytes.size
                                     )
 
-                                    Box(modifier = Modifier.pointerInput(Unit) {
-                                        detectTransformGestures { _, pan, zoom, _ ->
-                                            scale *= zoom
-                                            offset = Offset(
-                                                offset.x + pan.x, offset.y + pan.y
-                                            )
-                                        }
-                                    }) {
+                                    Box(
+                                        modifier = Modifier
+                                            .pointerInput(Unit) {
+                                                detectTransformGestures { _, pan, zoom, _ ->
+                                                    scale *= zoom
+
+                                                    val viewWidth = 400.dp.toPx()
+                                                    val viewHeight = 550.dp.toPx()
+
+                                                    val imageWidth = bitmap.width * scale
+                                                    val imageHeight = bitmap.height * scale
+
+                                                    val maxOffsetX = maxOf((imageWidth - viewWidth) / 2, 0f)
+                                                    val maxOffsetY = maxOf((imageHeight - viewHeight) / 2, 0f)
+
+                                                    offset = Offset(
+                                                        (offset.x + pan.x).coerceIn(-maxOffsetX, maxOffsetX),
+                                                        (offset.y + pan.y).coerceIn(-maxOffsetY, maxOffsetY)
+                                                    )
+                                                }
+                                            }
+                                            .fillMaxSize()
+                                    ) {
                                         Image(
                                             bitmap = bitmap.asImageBitmap(),
                                             contentDescription = null,
@@ -436,6 +459,8 @@ fun BgDetail(
                                     }
                                 }
                             }
+
+
 
                         } ?: run {
                             Text(
@@ -674,132 +699,125 @@ fun BgDetail(
                 }
             } else {
                 if (effect) {
-                    Card(
-                        modifier = Modifier
-                            .fillMaxWidth()
-                            .height(300.dp),
-                        colors = CardDefaults.cardColors(Color.White),
-                        elevation = CardDefaults.cardElevation(2.dp),
-                        shape = RoundedCornerShape(topStart = 4.dp, topEnd = 4.dp)
-                    ) {
-                        Column(
-                            modifier = Modifier.padding(16.dp)
-                        ) {
-                            Row(
-                                modifier = Modifier.fillMaxWidth(),
-                                verticalAlignment = Alignment.CenterVertically
+                    LazyColumn {
+                        item {
+                            TextButton(
+                                onClick = {},
+                                modifier = Modifier
+                                    .align(Alignment.End)
+                                    .padding(16.dp)
                             ) {
-                                Text(
-                                    text = "Blur background",
-                                    fontSize = 18.sp,
-                                    fontWeight = FontWeight.Medium
-                                )
-                                Spacer(modifier = Modifier.width(10.dp))
-                                Switch(
-                                    checked = switch, onCheckedChange = {
-                                        switch = it
-                                    }, colors = SwitchDefaults.colors(
-                                        checkedTrackColor = Color(0XFF976d00),
-                                        uncheckedTrackColor = Color.LightGray.copy(alpha = 0.50f),
-                                        uncheckedThumbColor = Color.White,
-                                        checkedBorderColor = Color.Transparent,
-                                        uncheckedBorderColor = Color.Transparent
-                                    )
-                                )
+                                Text(text = "Done", color = Color.Blue)
                             }
 
-                            Row(
+                            Card(
                                 modifier = Modifier
                                     .fillMaxWidth()
-                                    .padding(top = 6.dp),
-                                verticalAlignment = Alignment.CenterVertically,
-                                horizontalArrangement = Arrangement.spacedBy(10.dp)
-
+                                    .height(300.dp),
+                                colors = CardDefaults.cardColors(Color.White),
+                                elevation = CardDefaults.cardElevation(2.dp),
+                                shape = RoundedCornerShape(topStart = 4.dp, topEnd = 4.dp)
                             ) {
-                                Text(text = "Blur amount", fontSize = 15.sp)
+                                Column(modifier = Modifier.padding(16.dp)) {
+                                    Row(
+                                        modifier = Modifier.fillMaxWidth(),
+                                        verticalAlignment = Alignment.CenterVertically
+                                    ) {
+                                        Text(
+                                            text = "Blur background",
+                                            fontSize = 18.sp,
+                                            fontWeight = FontWeight.Medium
+                                        )
+                                        Spacer(modifier = Modifier.width(10.dp))
+                                        Switch(
+                                            checked = switch,
+                                            onCheckedChange = { switch = it },
+                                            colors = SwitchDefaults.colors(
+                                                checkedTrackColor = Color(0XFF976d00),
+                                                uncheckedTrackColor = Color.LightGray.copy(alpha = 0.50f),
+                                                uncheckedThumbColor = Color.White,
+                                                checkedBorderColor = Color.Transparent,
+                                                uncheckedBorderColor = Color.Transparent
+                                            )
+                                        )
+                                    }
 
-                                Slider(
-                                    value = if (switch) slider else 0f,
-                                    onValueChange = {
-                                        if (switch) slider = it else 0f
-                                    },
-                                    valueRange = 0f..100f,
-                                    modifier = Modifier
-                                        .fillMaxWidth()
-                                        .padding(vertical = 8.dp),
-                                    colors = SliderDefaults.colors(
-                                        thumbColor = if (switch) Color(
-                                            0XFF976d00
-                                        ) else Color.LightGray,
-                                        activeTrackColor = if (switch) Color(0XFF976d00) else Color.LightGray
-                                    )
-                                )
+                                    Row(
+                                        modifier = Modifier
+                                            .fillMaxWidth()
+                                            .padding(top = 6.dp),
+                                        verticalAlignment = Alignment.CenterVertically,
+                                        horizontalArrangement = Arrangement.spacedBy(10.dp)
+                                    ) {
+                                        Text(text = "Blur amount", fontSize = 15.sp)
+
+                                        Slider(
+                                            value = if (switch) slider else 0f,
+                                            onValueChange = { if (switch) slider = it },
+                                            valueRange = 0f..100f,
+                                            modifier = Modifier
+                                                .fillMaxWidth()
+                                                .padding(vertical = 8.dp),
+                                            colors = SliderDefaults.colors(
+                                                thumbColor = if (switch) Color(0XFF976d00) else Color.LightGray,
+                                                activeTrackColor = if (switch) Color(0XFF976d00) else Color.LightGray
+                                            )
+                                        )
+                                    }
+
+                                    Row(
+                                        modifier = Modifier.fillMaxWidth(),
+                                        verticalAlignment = Alignment.CenterVertically
+                                    ) {
+                                        Text(text = "Add Shadow")
+                                        Spacer(modifier = Modifier.width(10.dp))
+                                        Switch(
+                                            checked = switch1,
+                                            onCheckedChange = { switch1 = it },
+                                            colors = SwitchDefaults.colors(
+                                                checkedTrackColor = Color(0XFF976d00),
+                                                uncheckedTrackColor = Color.LightGray.copy(alpha = 0.50f),
+                                                uncheckedThumbColor = Color.White,
+                                                checkedBorderColor = Color.Transparent,
+                                                uncheckedBorderColor = Color.Transparent
+                                            )
+                                        )
+                                        Text(
+                                            text = "Beta",
+                                            modifier = Modifier
+                                                .padding(start = 4.dp)
+                                                .clickable { },
+                                            style = TextStyle(color = Color.Blue)
+                                        )
+                                    }
+
+                                    Row(
+                                        modifier = Modifier
+                                            .fillMaxWidth()
+                                            .padding(top = 6.dp),
+                                        verticalAlignment = Alignment.CenterVertically,
+                                        horizontalArrangement = Arrangement.spacedBy(10.dp)
+                                    ) {
+                                        Text(text = "Opacity", fontSize = 15.sp)
+
+                                        Slider(
+                                            value = if (switch1) slider1 else 0f,
+                                            onValueChange = { if (switch1) slider1 = it },
+                                            valueRange = 0f..1f,
+                                            modifier = Modifier
+                                                .fillMaxWidth()
+                                                .padding(vertical = 8.dp),
+                                            colors = SliderDefaults.colors(
+                                                thumbColor = if (switch1) Color(0XFF976d00) else Color.LightGray,
+                                                activeTrackColor = if (switch1) Color(0XFF976d00) else Color.LightGray
+                                            )
+                                        )
+                                    }
+                                }
                             }
-
-
-                            Row(
-                                modifier = Modifier.fillMaxWidth(),
-                                verticalAlignment = Alignment.CenterVertically
-                            ) {
-                                Text(text = "Add Shadow")
-                                Spacer(modifier = Modifier.width(10.dp))
-                                Switch(
-                                    checked = switch1, onCheckedChange = {
-                                        switch1 = it
-                                    }, colors = SwitchDefaults.colors(
-                                        checkedTrackColor = Color(0XFF976d00),
-                                        uncheckedTrackColor = Color.LightGray.copy(alpha = 0.50f),
-                                        uncheckedThumbColor = Color.White,
-                                        checkedBorderColor = Color.Transparent,
-                                        uncheckedBorderColor = Color.Transparent
-                                    )
-                                )
-                                Text(
-                                    text = "Beta",
-                                    modifier = Modifier
-                                        .padding(start = 4.dp)
-                                        .clickable { },
-                                    style = TextStyle(color = Color.Blue)
-                                )
-                            }
-
-                            Row(
-                                modifier = Modifier
-                                    .fillMaxWidth()
-                                    .padding(top = 6.dp),
-                                verticalAlignment = Alignment.CenterVertically,
-                                horizontalArrangement = Arrangement.spacedBy(10.dp)
-                            ) {
-                                Text(text = "Opacity", fontSize = 15.sp)
-
-                                Slider(
-                                    value = if (switch1) slider1 else 0f,
-                                    onValueChange = {
-                                        if (switch1) slider1 = it else 0f
-                                    },
-                                    valueRange = 0f..1f,
-                                    modifier = Modifier
-                                        .fillMaxWidth()
-                                        .padding(vertical = 8.dp),
-                                    colors = SliderDefaults.colors(
-                                        thumbColor = if (switch) Color(
-                                            0XFF976d00
-                                        ) else Color.LightGray,
-                                        activeTrackColor = if (switch) Color(0XFF976d00) else Color.LightGray
-                                    )
-                                )
-                            }
-
                         }
                     }
 
-                    TextButton(
-                        onClick = {}, modifier = Modifier
-                            .align(Alignment.End)
-                            .padding(16.dp)
-                    ) {
-                        Text(text = "Done", color = Color.Blue)
-                    }
                 } else {
                     LazyRow(
                         modifier = Modifier
