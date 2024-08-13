@@ -136,6 +136,7 @@ fun BgDetail(
     var switch1 by remember {
         mutableStateOf(false)
     }
+
     var effect by remember {
         mutableStateOf(false)
     }
