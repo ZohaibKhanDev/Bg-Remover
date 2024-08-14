@@ -4,7 +4,7 @@ plugins {
     alias(libs.plugins.kotlinxSerialization)
     id("kotlin-kapt")
 }
-
+ 
 android {
     namespace = "com.example.bgremover"
     compileSdk = 34
@@ -21,6 +21,7 @@ android {
             useSupportLibrary = true
         }
     }
+
 
     buildTypes {
         release {
@@ -48,7 +49,7 @@ android {
     composeOptions {
         kotlinCompilerExtensionVersion = "1.5.1"
     }
-
+ 
     packaging {
         resources {
             excludes += "/META-INF/{AL2.0,LGPL2.1}"
