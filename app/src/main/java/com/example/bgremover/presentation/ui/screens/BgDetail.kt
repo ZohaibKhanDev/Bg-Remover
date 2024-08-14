@@ -677,7 +677,7 @@ fun BgDetail(
                     LazyColumn {
                         item {
                             TextButton(
-                                onClick = {},
+                                onClick = {effect=false},
                                 modifier = Modifier
                                     .align(Alignment.End)
                                     .padding(16.dp)
