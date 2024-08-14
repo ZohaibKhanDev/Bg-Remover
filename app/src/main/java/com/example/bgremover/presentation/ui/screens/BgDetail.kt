@@ -439,7 +439,6 @@ fun BgDetail(
                                                 translationY = offset.y
                                             )
                                             .fillMaxSize()
-                                            .blur(radius = 100.dp)
                                             .then(
                                                 if (switch) Modifier.blur(radius = slider.dp) else Modifier
                                             )
