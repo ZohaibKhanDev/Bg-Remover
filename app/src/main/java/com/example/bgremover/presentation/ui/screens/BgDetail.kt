@@ -359,17 +359,6 @@ fun BgDetail(
                                     .clip(RoundedCornerShape(11.dp))
                                     .background(Color.Transparent)
                                     .then(
-                                        if (switch1) {
-                                            Modifier.shadow(
-                                                elevation = 8.dp,
-                                                shape = RoundedCornerShape(11.dp),
-                                                clip = true
-                                            )
-                                        } else {
-                                            Modifier
-                                        }
-                                    )
-                                    .then(
                                         if (switch) {
                                             Modifier.blur(radius = slider.dp)
                                         } else {
@@ -378,22 +367,29 @@ fun BgDetail(
                                     ),
                                 contentAlignment = Alignment.Center
                             ) {
-                                if (selectedPhoto != null) {
-                                    Image(
-                                        painter = painterResource(id = selectedPhoto!!),
-                                        contentDescription = null,
-                                        modifier = Modifier.fillMaxSize(),
-                                        contentScale = ContentScale.Crop
-                                    )
-                                } else {
-                                    if (selectedGallery != null) {
+
+                                when {
+                                    selectedPhoto != null -> {
+                                        Image(
+                                            painter = painterResource(id = selectedPhoto!!),
+                                            contentDescription = null,
+                                            modifier = Modifier
+                                                .fillMaxSize(),
+                                            contentScale = ContentScale.Crop
+                                        )
+                                    }
+
+                                    selectedGallery != null -> {
                                         Image(
                                             bitmap = selectedGallery!!.asImageBitmap(),
                                             contentDescription = null,
                                             contentScale = ContentScale.Crop,
-                                            modifier = Modifier.fillMaxSize()
+                                            modifier = Modifier
+                                                .fillMaxSize(),
                                         )
-                                    } else {
+                                    }
+
+                                    else -> {
                                         Image(
                                             painter = painterResource(id = R.drawable.transparntbg),
                                             contentDescription = "",
@@ -409,6 +405,9 @@ fun BgDetail(
                                                     .graphicsLayer {
                                                         alpha = slider1
                                                     }
+                                                    .then(
+                                                        if (switch) Modifier.blur(radius = slider.dp) else Modifier
+                                                    )
                                             )
                                         }
                                     }
@@ -420,47 +419,23 @@ fun BgDetail(
                                         imageBytes, 0, imageBytes.size
                                     )
 
-                                    Box(
+                                    Image(
+                                        bitmap = bitmap.asImageBitmap(),
+                                        contentDescription = null,
                                         modifier = Modifier
-                                            .pointerInput(Unit) {
-                                                detectTransformGestures { _, pan, zoom, _ ->
-                                                    scale *= zoom
-
-                                                    val viewWidth = 400.dp.toPx()
-                                                    val viewHeight = 550.dp.toPx()
-
-                                                    val imageWidth = bitmap.width * scale
-                                                    val imageHeight = bitmap.height * scale
-
-                                                    val maxOffsetX = maxOf((imageWidth - viewWidth) / 2, 0f)
-                                                    val maxOffsetY = maxOf((imageHeight - viewHeight) / 2, 0f)
-
-                                                    offset = Offset(
-                                                        (offset.x + pan.x).coerceIn(-maxOffsetX, maxOffsetX),
-                                                        (offset.y + pan.y).coerceIn(-maxOffsetY, maxOffsetY)
-                                                    )
-                                                }
-                                            }
-                                            .fillMaxSize()
-                                    ) {
-                                        Image(
-                                            bitmap = bitmap.asImageBitmap(),
-                                            contentDescription = null,
-                                            modifier = Modifier
-                                                .graphicsLayer(
-                                                    scaleX = scale,
-                                                    scaleY = scale,
-                                                    translationX = offset.x,
-                                                    translationY = offset.y
-                                                )
-                                                .fillMaxSize(),
-                                            contentScale = ContentScale.Crop
-                                        )
-                                    }
+                                            .graphicsLayer(
+                                                scaleX = scale,
+                                                scaleY = scale,
+                                                translationX = offset.x,
+                                                translationY = offset.y
+                                            )
+                                            .fillMaxSize().blur(radius = 100.dp)
+                                            .then(
+                                                if (switch) Modifier.blur(radius = slider.dp) else Modifier
+                                            )
+                                    )
                                 }
                             }
-
-
 
                         } ?: run {
                             Text(
@@ -719,6 +694,7 @@ fun BgDetail(
                                 shape = RoundedCornerShape(topStart = 4.dp, topEnd = 4.dp)
                             ) {
                                 Column(modifier = Modifier.padding(16.dp)) {
+                                    // Blur background section
                                     Row(
                                         modifier = Modifier.fillMaxWidth(),
                                         verticalAlignment = Alignment.CenterVertically
@@ -765,6 +741,7 @@ fun BgDetail(
                                         )
                                     }
 
+                                    // Add shadow section (similar to blur)
                                     Row(
                                         modifier = Modifier.fillMaxWidth(),
                                         verticalAlignment = Alignment.CenterVertically
@@ -817,7 +794,6 @@ fun BgDetail(
                             }
                         }
                     }
-
                 } else {
                     LazyRow(
                         modifier = Modifier
