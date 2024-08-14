@@ -675,6 +675,7 @@ fun BgDetail(
             } else {
                 if (effect) {
                     LazyColumn {
+
                         item {
                             TextButton(
                                 onClick = {effect=false},
