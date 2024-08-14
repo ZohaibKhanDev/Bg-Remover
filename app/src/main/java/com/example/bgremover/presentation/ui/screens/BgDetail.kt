@@ -9,6 +9,7 @@ import android.graphics.BitmapFactory
 import android.net.Uri
 import android.util.Base64
 import android.util.Log
+import android.widget.Toast
 import androidx.activity.compose.rememberLauncherForActivityResult
 import androidx.activity.result.contract.ActivityResultContracts
 import androidx.compose.animation.core.LinearOutSlowInEasing
@@ -126,25 +127,20 @@ fun BgDetail(
         })
     var slider by remember { mutableStateOf(0f) }
 
-    val launcher =
-        rememberLauncherForActivityResult(ActivityResultContracts.GetContent()) { uri: Uri? ->
-            uri?.let {
-                val inputStream = context.contentResolver.openInputStream(it)
-
-
-                val options = BitmapFactory.Options().apply {
-                    inJustDecodeBounds = true
-                    BitmapFactory.decodeStream(inputStream, null, this)
-                    inSampleSize = calculateInSampleSize(this, 400, 400)
-                    inJustDecodeBounds = false
+    val launcher = rememberLauncherForActivityResult(
+        contract = ActivityResultContracts.GetContent(),
+        onResult = { uri ->
+            uri?.let { uri ->
+                val inputStream = context.contentResolver.openInputStream(uri)
+                val selectedBitmap = BitmapFactory.decodeStream(inputStream)
+                selectedBitmap?.let { bitmap ->
+                    selectedPhoto = null
+                    selectedGallery = bitmap
                 }
-
-
-                val bitmap = BitmapFactory.decodeStream(inputStream, null, options)
-                selectedGallery = bitmap
-                selectedPhoto = null
             }
         }
+    )
+
 
 
 
@@ -328,6 +324,7 @@ fun BgDetail(
                             var scale by remember { mutableStateOf(1f) }
                             var offset by remember { mutableStateOf(Offset.Zero) }
 
+
                             Box(
                                 modifier = Modifier
                                     .size(400.dp, 550.dp)
@@ -335,34 +332,29 @@ fun BgDetail(
                                     .background(Color.Transparent),
                                 contentAlignment = Alignment.Center
                             ) {
-                                Box(
-                                    modifier = Modifier
-                                        .fillMaxSize()
-                                        .then(
-                                            if (switch) Modifier.blur(radius = slider.dp) else Modifier
+
+                                Box(modifier =  Modifier
+                                    .fillMaxSize()
+                                    .then(
+                                        if (switch) Modifier.blur(radius = slider.dp) else Modifier
+                                    )
+                                ){
+                                    if (selectedPhoto != null) {
+                                        Image(
+                                            painter = painterResource(id = selectedPhoto!!),
+                                            contentDescription = null,
+                                            modifier = Modifier.fillMaxSize(),
+                                            contentScale = ContentScale.Crop
                                         )
-                                ) {
-                                    when {
-                                        selectedPhoto != null -> {
-                                            Image(
-                                                painter = painterResource(id = selectedPhoto!!),
-                                                contentDescription = null,
-                                                modifier = Modifier.fillMaxSize(),
-                                                contentScale = ContentScale.Crop
-                                            )
-                                        }
-
-
-                                        selectedGallery != null -> {
+                                    } else {
+                                        if (selectedGallery != null) {
                                             Image(
                                                 bitmap = selectedGallery!!.asImageBitmap(),
-                                                contentDescription = "",
+                                                contentDescription = null,
                                                 contentScale = ContentScale.Crop,
                                                 modifier = Modifier.fillMaxSize()
                                             )
-                                        }
-
-                                        else -> {
+                                        } else {
                                             Image(
                                                 painter = painterResource(id = R.drawable.transparntbg),
                                                 contentDescription = "",
@@ -370,18 +362,19 @@ fun BgDetail(
                                                 contentScale = ContentScale.Crop
                                             )
                                             selectedColor?.let { color ->
-                                                Box(modifier = Modifier
-                                                    .clip(RoundedCornerShape(11.dp))
-                                                    .fillMaxSize()
-                                                    .background(color)
-                                                    .graphicsLayer {
-                                                        alpha = slider1
-                                                    })
+                                                Box(
+                                                    modifier = Modifier
+                                                        .clip(RoundedCornerShape(11.dp))
+                                                        .fillMaxSize()
+                                                        .background(color)
+                                                        .graphicsLayer {
+                                                            alpha = slider1
+                                                        }
+                                                )
                                             }
                                         }
                                     }
                                 }
-
 
                                 bgremoveimage?.let { base64 ->
                                     val imageBytes = Base64.decode(base64, Base64.DEFAULT)
@@ -402,8 +395,8 @@ fun BgDetail(
                                             .fillMaxSize()
                                     )
                                 }
-                            }
 
+                            }
 
                         } ?: run {
                             Text(
@@ -461,7 +454,7 @@ fun BgDetail(
                                         modifier = Modifier.clickable {
                                             showColor = false
                                             showPhoto = true
-                                            selectedColor = colorRest
+                                            selectedColor = Color.Transparent
                                             selectedPhoto = null
                                             selectedGallery = null
                                         })
@@ -575,9 +568,8 @@ fun BgDetail(
                                                     modifier = Modifier.align(Alignment.Center)
                                                 )
                                             }
+
                                         }
-
-
                                         items(
                                             listOf(
                                                 R.drawable.car,
@@ -586,14 +578,15 @@ fun BgDetail(
                                                 R.drawable.phone,
                                             )
                                         ) { photoResId ->
-                                            Box(modifier = Modifier
-                                                .clip(RoundedCornerShape(6.dp))
-                                                .width(60.dp)
-                                                .height(50.dp)
-                                                .clickable {
-                                                    selectedGallery = null
-                                                    selectedPhoto = photoResId
-                                                }) {
+                                            Box(
+                                                modifier = Modifier
+                                                    .clip(RoundedCornerShape(6.dp))
+                                                    .width(60.dp)
+                                                    .height(50.dp)
+                                                    .clickable {
+                                                        selectedPhoto = photoResId
+                                                    }
+                                            ) {
                                                 Image(
                                                     painter = painterResource(id = photoResId),
                                                     contentDescription = null,
@@ -972,30 +965,44 @@ fun BgDetail(
 
                         item {
                             val context = LocalContext.current
-                            Column(horizontalAlignment = Alignment.CenterHorizontally,
+                            Column(
+                                horizontalAlignment = Alignment.CenterHorizontally,
                                 modifier = Modifier
                                     .padding(vertical = 8.dp)
                                     .pointerInput(Unit) {
                                         detectTapGestures(onLongPress = { /* Trigger tooltip */ })
-                                    }) {
+                                    }
+                            ) {
                                 Box(
                                     modifier = Modifier
                                         .size(45.dp)
                                         .clickable {
-                                            Intent(Intent.ACTION_MAIN).also {
-                                                it.`package` = "com.canva.editor"
+                                            val imageUrl = "$bgremoveimage"
+                                            val encodedImageUrl = Uri.encode(imageUrl)
+                                            val canvaUrl =
+                                                "https://www.canva.com/create/design?upload=$encodedImageUrl"
+
+                                            val intent = Intent(Intent.ACTION_VIEW, Uri.parse(canvaUrl))
+                                            intent.setPackage("com.android.chrome")
+
+                                            try {
+                                                context.startActivity(intent)
+                                            } catch (e: ActivityNotFoundException) {
+                                                e.printStackTrace()
+
+                                                val fallbackIntent = Intent(Intent.ACTION_VIEW, Uri.parse(canvaUrl))
                                                 try {
-                                                    context.startActivity(it)
-                                                } catch (e: ActivityNotFoundException) {
-                                                    e.printStackTrace()
-                                                    val playStoreIntent = Intent(
-                                                        Intent.ACTION_VIEW,
-                                                        Uri.parse("https://play.google.com/store/apps/details?id=com.canva.editor")
-                                                    )
-                                                    context.startActivity(playStoreIntent)
+                                                    context.startActivity(fallbackIntent)
+                                                } catch (e: Exception) {
+                                                    Toast.makeText(
+                                                        context,
+                                                        "No browser found to open the link",
+                                                        Toast.LENGTH_SHORT
+                                                    ).show()
                                                 }
                                             }
-                                        }, contentAlignment = Alignment.TopEnd
+                                        },
+                                    contentAlignment = Alignment.TopEnd
                                 ) {
                                     Image(
                                         painter = painterResource(id = R.drawable.canva),
@@ -1011,6 +1018,8 @@ fun BgDetail(
                                 )
                             }
                         }
+
+
                     }
                 }
             }
