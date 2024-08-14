@@ -12,6 +12,10 @@ import android.net.Uri
 import android.os.Build
 import android.os.Environment
 import android.provider.MediaStore
+import android.renderscript.Allocation
+import android.renderscript.Element
+import android.renderscript.RenderScript
+import android.renderscript.ScriptIntrinsicBlur
 import android.util.Log
 import android.widget.Toast
 import androidx.activity.compose.rememberLauncherForActivityResult
@@ -104,17 +108,17 @@ fun BgRemover(navController: NavController) {
         object : RewardedAdLoadCallback() {
             override fun onAdFailedToLoad(p0: LoadAdError) {
                 super.onAdFailedToLoad(p0)
-                rewardedAd = null 
+                rewardedAd = null
             }
 
             override fun onAdLoaded(p0: RewardedAd) {
                 super.onAdLoaded(p0)
-                rewardedAd = p0 
+                rewardedAd = p0
             }
         }
     )
 
-    
+
     rewardedAd?.fullScreenContentCallback = object : FullScreenContentCallback() {
         override fun onAdClicked() {
             super.onAdClicked()
@@ -136,7 +140,7 @@ fun BgRemover(navController: NavController) {
             super.onAdShowedFullScreenContent()
         }
     }
-    
+
     val launcher = rememberLauncherForActivityResult(ActivityResultContracts.GetContent()) { uri ->
         uri?.let {
             imageUri = it
@@ -438,13 +442,30 @@ fun getBitmapFromDrawable(context: Context, drawableId: Int): Bitmap? {
 }
 
 
+fun applyBlurToBitmap(bitmap: Bitmap, radius: Float, context: Context): Bitmap {
+    val validRadius = radius.coerceIn(1f, 25f)
+    val blurredBitmap = Bitmap.createBitmap(bitmap.width, bitmap.height, Bitmap.Config.ARGB_8888)
+    val renderScript = RenderScript.create(context)
+    val input = Allocation.createFromBitmap(renderScript, bitmap)
+    val output = Allocation.createFromBitmap(renderScript, blurredBitmap)
+    val script = ScriptIntrinsicBlur.create(renderScript, Element.U8_4(renderScript))
+    script.setRadius(validRadius)
+    script.setInput(input)
+    script.forEach(output)
+    output.copyTo(blurredBitmap)
+    renderScript.destroy()
+    return blurredBitmap
+}
+
+
 fun saveImage(
     bitmap: Bitmap?,
     context: Context,
     isHd: Boolean,
     backgroundColor: Color?,
     backgroundImageId: Int?,
-    galleryBitmap: Bitmap?
+    galleryBitmap: Bitmap?,
+    blurRadius: Float
 ) {
     createNotificationChannel(context)
 
@@ -475,17 +496,25 @@ fun saveImage(
 
     uri?.let {
         resolver.openOutputStream(it)?.use { outputStream ->
+
             val scaledBitmap = if (isHd) {
                 bitmap?.let { Bitmap.createScaledBitmap(it, it.width * 2, it.height * 2, true) }
             } else {
                 bitmap
             }
 
-            val backgroundImageBitmap =
-                galleryBitmap ?: backgroundImageId?.let { getBitmapFromDrawable(context, it) }
 
-            val finalBitmap =
-                compositeBackground(scaledBitmap, backgroundColor, backgroundImageBitmap)
+            val backgroundImageBitmap = galleryBitmap ?: backgroundImageId?.let { getBitmapFromDrawable(context, it) }
+            val finalBackgroundBitmap = if (blurRadius > 0 && backgroundImageBitmap != null) {
+                val clampedBlurRadius = blurRadius.coerceIn(1f, 25f) // Clamp blur radius
+                applyBlurToBitmap(backgroundImageBitmap, clampedBlurRadius, context)
+            } else {
+                backgroundImageBitmap
+            }
+
+
+            val finalBitmap = compositeBackground(scaledBitmap, backgroundColor, finalBackgroundBitmap)
+
 
             finalBitmap.compress(Bitmap.CompressFormat.PNG, 100, outputStream)
             Toast.makeText(context, "Image saved to Pictures", Toast.LENGTH_SHORT).show()
@@ -505,13 +534,3 @@ fun saveImage(
         notificationManager.notify(1, notificationBuilder.build())
     }
 }
-
-
-
-
-
-
-
-
-
-

@@ -366,61 +366,58 @@ fun BgDetail(
                                 modifier = Modifier
                                     .size(400.dp, 550.dp)
                                     .clip(RoundedCornerShape(11.dp))
-                                    .background(Color.Transparent)
-                                    .then(
-                                        if (switch) {
-                                            Modifier.blur(radius = slider.dp)
-                                        } else {
-                                            Modifier
-                                        }
-                                    ),
+                                    .background(Color.Transparent),
                                 contentAlignment = Alignment.Center
                             ) {
 
-                                when {
-                                    selectedPhoto != null -> {
-                                        Image(
-                                            painter = painterResource(id = selectedPhoto!!),
-                                            contentDescription = null,
-                                            modifier = Modifier
-                                                .fillMaxSize(),
-                                            contentScale = ContentScale.Crop
+                                Box(
+                                    modifier = Modifier
+                                        .fillMaxSize()
+                                        .then(
+                                            if (switch) Modifier.blur(radius = slider.dp) else Modifier
                                         )
-                                    }
-
-                                    selectedGallery != null -> {
-                                        Image(
-                                            bitmap = selectedGallery!!.asImageBitmap(),
-                                            contentDescription = null,
-                                            contentScale = ContentScale.Crop,
-                                            modifier = Modifier
-                                                .fillMaxSize(),
-                                        )
-                                    }
-
-                                    else -> {
-                                        Image(
-                                            painter = painterResource(id = R.drawable.transparntbg),
-                                            contentDescription = "",
-                                            modifier = Modifier.fillMaxSize(),
-                                            contentScale = ContentScale.Crop
-                                        )
-                                        selectedColor?.let { color ->
-                                            Box(
+                                ) {
+                                    when {
+                                        selectedPhoto != null -> {
+                                            Image(
+                                                painter = painterResource(id = selectedPhoto!!),
+                                                contentDescription = null,
                                                 modifier = Modifier
-                                                    .clip(RoundedCornerShape(11.dp))
-                                                    .fillMaxSize()
-                                                    .background(color)
-                                                    .graphicsLayer {
-                                                        alpha = slider1
-                                                    }
-                                                    .then(
-                                                        if (switch) Modifier.blur(radius = slider.dp) else Modifier
-                                                    )
+                                                    .fillMaxSize(),
+                                                contentScale = ContentScale.Crop
                                             )
+                                        }
+                                        selectedGallery != null -> {
+                                            Image(
+                                                bitmap = selectedGallery!!.asImageBitmap(),
+                                                contentDescription = null,
+                                                contentScale = ContentScale.Crop,
+                                                modifier = Modifier
+                                                    .fillMaxSize(),
+                                            )
+                                        }
+                                        else -> {
+                                            Image(
+                                                painter = painterResource(id = R.drawable.transparntbg),
+                                                contentDescription = "",
+                                                modifier = Modifier.fillMaxSize(),
+                                                contentScale = ContentScale.Crop
+                                            )
+                                            selectedColor?.let { color ->
+                                                Box(
+                                                    modifier = Modifier
+                                                        .clip(RoundedCornerShape(11.dp))
+                                                        .fillMaxSize()
+                                                        .background(color)
+                                                        .graphicsLayer {
+                                                            alpha = slider1
+                                                        }
+                                                )
+                                            }
                                         }
                                     }
                                 }
+
 
                                 bgremoveimage?.let { base64 ->
                                     val imageBytes = Base64.decode(base64, Base64.DEFAULT)
@@ -439,9 +436,6 @@ fun BgDetail(
                                                 translationY = offset.y
                                             )
                                             .fillMaxSize()
-                                            .then(
-                                                if (switch) Modifier.blur(radius = slider.dp) else Modifier
-                                            )
                                     )
                                 }
                             }
@@ -684,7 +678,6 @@ fun BgDetail(
             } else {
                 if (effect) {
                     LazyColumn {
-
                         item {
                             TextButton(
                                 onClick = { effect = false },
@@ -738,8 +731,8 @@ fun BgDetail(
                                         Text(text = "Blur amount", fontSize = 15.sp)
 
                                         Slider(
-                                            value = if (switch) slider else 0f,
-                                            onValueChange = { if (switch) slider = it },
+                                            value = if (switch) slider.coerceIn(0f, 100f) else 0f,
+                                            onValueChange = { if (switch) slider = it.coerceIn(0f, 100f) },
                                             valueRange = 0f..100f,
                                             modifier = Modifier
                                                 .fillMaxWidth()
@@ -749,9 +742,10 @@ fun BgDetail(
                                                 activeTrackColor = if (switch) Color(0XFF976d00) else Color.LightGray
                                             )
                                         )
+
                                     }
 
-                                    // Add shadow section (similar to blur)
+
                                     Row(
                                         modifier = Modifier.fillMaxWidth(),
                                         verticalAlignment = Alignment.CenterVertically
@@ -818,7 +812,7 @@ fun BgDetail(
                                 modifier = Modifier
                                     .padding(vertical = 8.dp)
                                     .pointerInput(Unit) {
-                                        detectTapGestures(onLongPress = { /* Trigger tooltip */ })
+                                        detectTapGestures(onLongPress = {  })
                                     }) {
                                 Box(
                                     modifier = Modifier
@@ -839,7 +833,8 @@ fun BgDetail(
                                                     false,
                                                     selectedColor,
                                                     selectedPhoto,
-                                                    galleryBitmap = selectedGallery
+                                                    galleryBitmap = selectedGallery,
+                                                    if (switch) slider else 0f
                                                 )
                                             }
                                         }, contentAlignment = Alignment.TopEnd
@@ -889,7 +884,8 @@ fun BgDetail(
                                                     true,
                                                     selectedColor,
                                                     selectedPhoto,
-                                                    galleryBitmap = selectedGallery
+                                                    galleryBitmap = selectedGallery,
+                                                    if (switch) slider else 0f
                                                 )
                                             }
 
