@@ -134,6 +134,10 @@ fun BgDetail(
         mutableStateOf(false)
     }
 
+    var isBrushSelected by remember { mutableStateOf(false) }
+    var brushOffset by remember { mutableStateOf(Offset.Zero) }
+    var brushRadius by remember { mutableStateOf(50.dp) }
+
     var switch1 by remember {
         mutableStateOf(false)
     }
@@ -218,9 +222,12 @@ fun BgDetail(
                     .size(60.dp),
             )
         }, actions = {
-            IconButton(onClick = { }) {
+            IconButton(
+                onClick = { showBgRemovedImage = !showBgRemovedImage }
+            ) {
                 Icon(imageVector = Icons.Filled.Splitscreen, contentDescription = "")
             }
+
             IconButton(onClick = { /* TODO */ }) {
                 Icon(
                     imageVector = Icons.Default.Undo, contentDescription = ""
@@ -293,7 +300,9 @@ fun BgDetail(
                         .height(58.dp),
                     contentAlignment = Alignment.Center
                 ) {
+
                     imageUrl?.let {
+
                         AsyncImage(
                             model = it,
                             contentDescription = "",
@@ -429,7 +438,8 @@ fun BgDetail(
                                                 translationX = offset.x,
                                                 translationY = offset.y
                                             )
-                                            .fillMaxSize().blur(radius = 100.dp)
+                                            .fillMaxSize()
+                                            .blur(radius = 100.dp)
                                             .then(
                                                 if (switch) Modifier.blur(radius = slider.dp) else Modifier
                                             )
@@ -678,7 +688,7 @@ fun BgDetail(
 
                         item {
                             TextButton(
-                                onClick = {effect=false},
+                                onClick = { effect = false },
                                 modifier = Modifier
                                     .align(Alignment.End)
                                     .padding(16.dp)
@@ -932,25 +942,30 @@ fun BgDetail(
 
 
                         item {
-                            Column(horizontalAlignment = Alignment.CenterHorizontally,
+                            Column(
+                                horizontalAlignment = Alignment.CenterHorizontally,
                                 modifier = Modifier
                                     .padding(vertical = 8.dp)
                                     .pointerInput(Unit) {
                                         detectTapGestures(onLongPress = { /* Trigger tooltip */ })
-                                    }) {
+                                    }
+                            ) {
                                 Box(
                                     modifier = Modifier
                                         .size(45.dp)
-                                        .clip(CircleShape)
                                         .clickable {
-
-                                        }, contentAlignment = Alignment.TopEnd
+                                            isBrushSelected = !isBrushSelected
+                                        }
+                                        .background(
+                                            if (isBrushSelected) Color.Yellow else Color.Transparent,
+                                            shape = RoundedCornerShape(50)
+                                        ),
+                                    contentAlignment = Alignment.TopEnd
                                 ) {
                                     Icon(
                                         imageVector = Icons.Outlined.Brush,
                                         contentDescription = "Erase/Restore",
                                         modifier = Modifier
-                                            .clip(CircleShape)
                                             .size(24.dp)
                                             .align(Alignment.Center),
                                     )
@@ -1035,12 +1050,11 @@ fun BgDetail(
                         }
                     }
                 }
-
-
             }
         }
     }
 }
+
 
 
 
