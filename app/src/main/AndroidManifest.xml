@@ -16,11 +16,7 @@
         android:supportsRtl="true"
         android:theme="@style/Theme.BgRemover"
         tools:replace="android:theme"
-        android:enableOnBackInvokedCallback="true"
         tools:targetApi="tiramisu">
-
-
-
         <activity
             android:name=".MainActivity"
             android:exported="true"

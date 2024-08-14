@@ -24,19 +24,7 @@ import androidx.compose.foundation.background
 import androidx.compose.foundation.border
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.gestures.detectTapGestures
-import androidx.compose.foundation.gestures.detectTransformGestures
-import androidx.compose.foundation.layout.Arrangement
-import androidx.compose.foundation.layout.Box
-import androidx.compose.foundation.layout.Column
-import androidx.compose.foundation.layout.Row
-import androidx.compose.foundation.layout.Spacer
-import androidx.compose.foundation.layout.fillMaxSize
-import androidx.compose.foundation.layout.fillMaxWidth
-import androidx.compose.foundation.layout.height
-import androidx.compose.foundation.layout.offset
-import androidx.compose.foundation.layout.padding
-import androidx.compose.foundation.layout.size
-import androidx.compose.foundation.layout.width
+import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.LazyRow
 import androidx.compose.foundation.lazy.grid.GridCells
@@ -52,41 +40,14 @@ import androidx.compose.material.icons.filled.MoreVert
 import androidx.compose.material.icons.filled.Redo
 import androidx.compose.material.icons.filled.Splitscreen
 import androidx.compose.material.icons.filled.Undo
-import androidx.compose.material.icons.outlined.Add
-import androidx.compose.material.icons.outlined.Brush
-import androidx.compose.material.icons.outlined.FileDownload
-import androidx.compose.material.icons.outlined.JoinLeft
-import androidx.compose.material3.AlertDialog
-import androidx.compose.material3.Button
-import androidx.compose.material3.ButtonDefaults
-import androidx.compose.material3.Card
-import androidx.compose.material3.CardDefaults
-import androidx.compose.material3.DropdownMenu
-import androidx.compose.material3.DropdownMenuItem
-import androidx.compose.material3.ExperimentalMaterial3Api
-import androidx.compose.material3.Icon
-import androidx.compose.material3.IconButton
-import androidx.compose.material3.Scaffold
-import androidx.compose.material3.Slider
-import androidx.compose.material3.SliderDefaults
-import androidx.compose.material3.Switch
-import androidx.compose.material3.SwitchDefaults
-import androidx.compose.material3.Text
-import androidx.compose.material3.TextButton
-import androidx.compose.material3.TopAppBar
-import androidx.compose.material3.TopAppBarDefaults
-import androidx.compose.runtime.Composable
-import androidx.compose.runtime.LaunchedEffect
-import androidx.compose.runtime.getValue
-import androidx.compose.runtime.mutableStateOf
-import androidx.compose.runtime.remember
-import androidx.compose.runtime.setValue
+import androidx.compose.material.icons.outlined.*
+import androidx.compose.material3.*
+import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.blur
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.draw.scale
-import androidx.compose.ui.draw.shadow
 import androidx.compose.ui.geometry.Offset
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.asImageBitmap
@@ -101,6 +62,7 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.navigation.NavController
 import coil.compose.AsyncImage
+import coil.decode.DecodeUtils.calculateInSampleSize
 import com.example.bgremover.R
 import com.example.bgremover.presentation.ui.navigation.Screens
 import com.google.android.gms.ads.AdRequest
@@ -116,16 +78,17 @@ fun BgDetail(
     navController: NavController, imageUrl: String?, bgremoveimage: String?
 ) {
     var showBgRemovedImage by remember { mutableStateOf(false) }
+    var selectedGallery by remember { mutableStateOf<Bitmap?>(null) }
+    var blurRadius by remember { mutableStateOf(0f) }
+    val context = LocalContext.current
+
     var showPhoto by remember { mutableStateOf(true) }
     var showColor by remember { mutableStateOf(false) }
     var addBg by remember { mutableStateOf(false) }
     var showImageAnimation by remember { mutableStateOf(true) }
     var showDialog by remember { mutableStateOf(false) }
     var selectedColor by remember { mutableStateOf(Color.Transparent) }
-    var scale by remember { mutableStateOf(1f) }
-    var offset by remember { mutableStateOf(Offset.Zero) }
     var isPressing by remember { mutableStateOf(false) }
-    val context = LocalContext.current
     var colorRest = Color.Transparent
     var isMore by remember {
         mutableStateOf(false)
@@ -133,10 +96,6 @@ fun BgDetail(
     var switch by remember {
         mutableStateOf(false)
     }
-
-    var isBrushSelected by remember { mutableStateOf(false) }
-    var brushOffset by remember { mutableStateOf(Offset.Zero) }
-    var brushRadius by remember { mutableStateOf(50.dp) }
 
     var switch1 by remember {
         mutableStateOf(false)
@@ -148,9 +107,8 @@ fun BgDetail(
 
     var interstitialAd: InterstitialAd? by remember { mutableStateOf(null) }
     var selectedPhoto by remember { mutableStateOf<Int?>(null) }
-    var selectedGallery by remember { mutableStateOf<Bitmap?>(null) }
-    var slider by remember { mutableStateOf(0f) }
-    var slider1 by remember { mutableStateOf(1f) }
+
+    var slider1 by remember { mutableStateOf(0f) }
 
     InterstitialAd.load(context,
         "ca-app-pub-3940256099942544/1033173712",
@@ -166,20 +124,29 @@ fun BgDetail(
                 Log.d("ADD", "onAdLoaded: True")
             }
         })
+    var slider by remember { mutableStateOf(0f) }
+
+    val launcher = rememberLauncherForActivityResult(ActivityResultContracts.GetContent()) { uri: Uri? ->
+        uri?.let {
+            val inputStream = context.contentResolver.openInputStream(it)
 
 
-    val launcher = rememberLauncherForActivityResult(
-        contract = ActivityResultContracts.GetContent(),
-        onResult = { uri ->
-            uri?.let { uri ->
-                val inputStream = context.contentResolver.openInputStream(uri)
-                val selectedBitmap = BitmapFactory.decodeStream(inputStream)
-                selectedBitmap?.let { bitmap ->
-                    selectedPhoto = null
-                    selectedGallery = bitmap
-                }
+            val options = BitmapFactory.Options().apply {
+                inJustDecodeBounds = true
+                BitmapFactory.decodeStream(inputStream, null, this)
+                inSampleSize = calculateInSampleSize(this, 400, 400)
+                inJustDecodeBounds = false
             }
-        })
+
+
+            val bitmap = BitmapFactory.decodeStream(inputStream, null, options)
+            selectedGallery = bitmap
+            selectedPhoto = null
+        }
+    }
+
+
+
 
     LaunchedEffect(Unit) {
         delay(3000)
@@ -369,7 +336,6 @@ fun BgDetail(
                                     .background(Color.Transparent),
                                 contentAlignment = Alignment.Center
                             ) {
-
                                 Box(
                                     modifier = Modifier
                                         .fillMaxSize()
@@ -388,13 +354,13 @@ fun BgDetail(
                                             )
                                         }
 
+
                                         selectedGallery != null -> {
                                             Image(
                                                 bitmap = selectedGallery!!.asImageBitmap(),
-                                                contentDescription = null,
+                                                contentDescription = "",
                                                 contentScale = ContentScale.Crop,
-                                                modifier = Modifier
-                                                    .fillMaxSize(),
+                                                modifier = Modifier.fillMaxSize()
                                             )
                                         }
 
@@ -424,7 +390,9 @@ fun BgDetail(
                                 bgremoveimage?.let { base64 ->
                                     val imageBytes = Base64.decode(base64, Base64.DEFAULT)
                                     val bitmap = BitmapFactory.decodeByteArray(
-                                        imageBytes, 0, imageBytes.size
+                                        imageBytes,
+                                        0,
+                                        imageBytes.size
                                     )
 
                                     Image(
@@ -441,6 +409,7 @@ fun BgDetail(
                                     )
                                 }
                             }
+
 
                         } ?: run {
                             Text(
@@ -604,7 +573,8 @@ fun BgDetail(
                                                     .height(50.dp)
                                                     .clickable {
                                                         launcher.launch("image/*")
-                                                    }, contentAlignment = Alignment.Center
+                                                    },
+                                                contentAlignment = Alignment.Center
                                             ) {
                                                 Icon(
                                                     imageVector = Icons.Default.Add,
@@ -612,8 +582,9 @@ fun BgDetail(
                                                     modifier = Modifier.align(Alignment.Center)
                                                 )
                                             }
-
                                         }
+
+
                                         items(
                                             listOf(
                                                 R.drawable.car,
@@ -622,14 +593,16 @@ fun BgDetail(
                                                 R.drawable.phone,
                                             )
                                         ) { photoResId ->
-                                            Box(modifier = Modifier
-                                                .clip(RoundedCornerShape(6.dp))
-                                                .width(60.dp)
-                                                .height(50.dp)
-                                                .clickable {
-                                                    selectedGallery = null
-                                                    selectedPhoto = photoResId
-                                                }) {
+                                            Box(
+                                                modifier = Modifier
+                                                    .clip(RoundedCornerShape(6.dp))
+                                                    .width(60.dp)
+                                                    .height(50.dp)
+                                                    .clickable {
+                                                        selectedGallery = null
+                                                        selectedPhoto = photoResId
+                                                    }
+                                            ) {
                                                 Image(
                                                     painter = painterResource(id = photoResId),
                                                     contentDescription = null,
@@ -639,8 +612,9 @@ fun BgDetail(
                                             }
                                         }
                                     }
-
                                 }
+
+
 
                                 Spacer(modifier = Modifier.height(7.dp))
 
@@ -727,6 +701,7 @@ fun BgDetail(
                                         )
                                     }
 
+
                                     Row(
                                         modifier = Modifier
                                             .fillMaxWidth()
@@ -735,13 +710,13 @@ fun BgDetail(
                                         horizontalArrangement = Arrangement.spacedBy(10.dp)
                                     ) {
                                         Text(text = "Blur amount", fontSize = 15.sp)
-
                                         Slider(
-                                            value = if (switch) slider.coerceIn(0f, 600f) else 0f,
-                                            onValueChange = {
-                                                if (switch) slider = it.coerceIn(0f, 600f)
+                                            value = slider,
+                                            onValueChange = { newValue ->
+                                                slider = newValue
+                                                blurRadius = newValue * 10 // Adjust the factor as needed
                                             },
-                                            valueRange = 0f..100f,
+                                            valueRange = 0f..10f,
                                             modifier = Modifier
                                                 .fillMaxWidth()
                                                 .padding(vertical = 8.dp),
@@ -788,11 +763,12 @@ fun BgDetail(
                                         horizontalArrangement = Arrangement.spacedBy(10.dp)
                                     ) {
                                         Text(text = "Opacity", fontSize = 15.sp)
-
                                         Slider(
-                                            value = if (switch1) slider1 else 0f,
-                                            onValueChange = { if (switch1) slider1 = it },
-                                            valueRange = 0f..1f,
+                                            value = if (switch1) slider1.coerceIn(1f, 100f) else 0f,
+                                            onValueChange = {
+                                                if (switch1) slider1 = it.coerceIn(1f, 100f)
+                                            },
+                                            valueRange = 0f..100f,
                                             modifier = Modifier
                                                 .fillMaxWidth()
                                                 .padding(vertical = 8.dp),
@@ -842,7 +818,7 @@ fun BgDetail(
                                                     selectedColor,
                                                     selectedPhoto,
                                                     galleryBitmap = selectedGallery,
-                                                    if (switch) slider else 0f
+                                                    blurRadius
                                                 )
                                             }
                                         }, contentAlignment = Alignment.TopEnd
@@ -893,7 +869,7 @@ fun BgDetail(
                                                     selectedColor,
                                                     selectedPhoto,
                                                     galleryBitmap = selectedGallery,
-                                                    if (switch) slider else 0f
+                                                    blurRadius
                                                 )
                                             }
 
@@ -909,7 +885,9 @@ fun BgDetail(
                                     )
                                 }
                                 Text(
-                                    text = "DownloadHd", fontSize = 12.sp, color = Color(0XFF0077ff)
+                                    text = "DownloadHd",
+                                    fontSize = 12.sp,
+                                    color = Color(0XFF0077ff)
                                 )
                             }
                         }
@@ -957,10 +935,10 @@ fun BgDetail(
                                     modifier = Modifier
                                         .size(45.dp)
                                         .clickable {
-                                            isBrushSelected = !isBrushSelected
+                                            // isBrushSelected = !isBrushSelected
                                         }
                                         .background(
-                                            if (isBrushSelected) Color.Yellow else Color.Transparent,
+                                            Color.Transparent,
                                             shape = RoundedCornerShape(50)
                                         ),
                                     contentAlignment = Alignment.TopEnd
@@ -1059,7 +1037,23 @@ fun BgDetail(
 }
 
 
+ fun calculateInSampleSize(options: BitmapFactory.Options, reqWidth: Int, reqHeight: Int): Int {
 
+    val (height: Int, width: Int) = options.run { outHeight to outWidth }
+    var inSampleSize = 1
+
+    if (height > reqHeight || width > reqWidth) {
+
+        val halfHeight: Int = height / 2
+        val halfWidth: Int = width / 2
+
+        while (halfHeight / inSampleSize >= reqHeight && halfWidth / inSampleSize >= reqWidth) {
+            inSampleSize *= 2
+        }
+    }
+
+    return inSampleSize
+}
 
 
 

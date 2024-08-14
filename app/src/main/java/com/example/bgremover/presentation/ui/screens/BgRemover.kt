@@ -498,40 +498,49 @@ fun saveImage(
     uri?.let {
         resolver.openOutputStream(it)?.use { outputStream ->
 
-            val scaledBitmap = if (isHd) {
-                bitmap?.let { Bitmap.createScaledBitmap(it, it.width * 2, it.height * 2, true) }
-            } else {
-                bitmap
+
+            val scaledBitmap = bitmap?.let { original ->
+                if (isHd) {
+                    Bitmap.createScaledBitmap(original, original.width * 2, original.height * 2, true)
+                } else {
+                    original
+                }
             }
 
-
             val backgroundImageBitmap = galleryBitmap ?: backgroundImageId?.let { getBitmapFromDrawable(context, it) }
+
             val finalBackgroundBitmap = if (blurRadius > 0 && backgroundImageBitmap != null) {
-                val clampedBlurRadius = blurRadius.coerceIn(1f, 25f) // Clamp blur radius
+                val clampedBlurRadius = blurRadius.coerceIn(1f, 25f)
                 applyBlurToBitmap(backgroundImageBitmap, clampedBlurRadius, context)
             } else {
                 backgroundImageBitmap
             }
 
-
             val finalBitmap = compositeBackground(scaledBitmap, backgroundColor, finalBackgroundBitmap)
 
 
-            finalBitmap.compress(Bitmap.CompressFormat.PNG, 100, outputStream)
+            finalBitmap.compress(Bitmap.CompressFormat.PNG, 80, outputStream)  // Use lower quality to reduce size
             Toast.makeText(context, "Image saved to Pictures", Toast.LENGTH_SHORT).show()
+
             notificationBuilder.setContentText("Download complete").setProgress(0, 0, false)
                 .setOngoing(false)
             notificationManager.notify(1, notificationBuilder.build())
         } ?: run {
-            Toast.makeText(context, "Error saving image", Toast.LENGTH_SHORT).show()
-            notificationBuilder.setContentText("Download failed").setProgress(0, 0, false)
-                .setOngoing(false)
-            notificationManager.notify(1, notificationBuilder.build())
+            handleImageSaveError(context, notificationBuilder, notificationManager)
         }
     } ?: run {
-        Toast.makeText(context, "Error saving image", Toast.LENGTH_SHORT).show()
-        notificationBuilder.setContentText("Download failed").setProgress(0, 0, false)
-            .setOngoing(false)
-        notificationManager.notify(1, notificationBuilder.build())
+        handleImageSaveError(context, notificationBuilder, notificationManager)
     }
 }
+
+private fun handleImageSaveError(
+    context: Context,
+    notificationBuilder: NotificationCompat.Builder,
+    notificationManager: NotificationManager
+) {
+    Toast.makeText(context, "Error saving image", Toast.LENGTH_SHORT).show()
+    notificationBuilder.setContentText("Download failed").setProgress(0, 0, false)
+        .setOngoing(false)
+    notificationManager.notify(1, notificationBuilder.build())
+}
+
