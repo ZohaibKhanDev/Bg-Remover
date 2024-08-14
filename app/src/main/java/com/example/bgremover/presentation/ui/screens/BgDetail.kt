@@ -681,7 +681,7 @@ fun BgDetail(
                         item {
                             TextButton(
                                 onClick = { effect = false },
-                                modifier = Modifier
+                                modifier = Modifier.size(50.dp)
                                     .align(Alignment.End)
                                     .padding(16.dp)
                             ) {
