@@ -443,7 +443,7 @@ fun getBitmapFromDrawable(context: Context, drawableId: Int): Bitmap? {
 
 
 fun applyBlurToBitmap(bitmap: Bitmap, radius: Float, context: Context): Bitmap {
-    val validRadius = radius.coerceIn(1f, 25f) // Clamp radius between 1 and 25
+    val validRadius = radius.coerceIn(0f, 200f)
     val blurredBitmap = Bitmap.createBitmap(bitmap.width, bitmap.height, Bitmap.Config.ARGB_8888)
     val renderScript = RenderScript.create(context)
     val input = Allocation.createFromBitmap(renderScript, bitmap)

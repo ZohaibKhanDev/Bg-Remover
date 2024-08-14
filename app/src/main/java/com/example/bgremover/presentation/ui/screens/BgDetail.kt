@@ -387,6 +387,7 @@ fun BgDetail(
                                                 contentScale = ContentScale.Crop
                                             )
                                         }
+
                                         selectedGallery != null -> {
                                             Image(
                                                 bitmap = selectedGallery!!.asImageBitmap(),
@@ -396,6 +397,7 @@ fun BgDetail(
                                                     .fillMaxSize(),
                                             )
                                         }
+
                                         else -> {
                                             Image(
                                                 painter = painterResource(id = R.drawable.transparntbg),
@@ -681,11 +683,15 @@ fun BgDetail(
                         item {
                             TextButton(
                                 onClick = { effect = false },
-                                modifier = Modifier.size(50.dp)
+                                modifier = Modifier
                                     .align(Alignment.End)
                                     .padding(16.dp)
                             ) {
-                                Text(text = "Done", color = Color.Blue)
+                                Text(
+                                    text = "Done",
+                                    color = Color.Blue,
+                                    modifier = Modifier.size(30.dp)
+                                )
                             }
 
                             Card(
@@ -697,7 +703,7 @@ fun BgDetail(
                                 shape = RoundedCornerShape(topStart = 4.dp, topEnd = 4.dp)
                             ) {
                                 Column(modifier = Modifier.padding(16.dp)) {
-                                    // Blur background section
+
                                     Row(
                                         modifier = Modifier.fillMaxWidth(),
                                         verticalAlignment = Alignment.CenterVertically
@@ -731,8 +737,10 @@ fun BgDetail(
                                         Text(text = "Blur amount", fontSize = 15.sp)
 
                                         Slider(
-                                            value = if (switch) slider.coerceIn(0f, 100f) else 0f,
-                                            onValueChange = { if (switch) slider = it.coerceIn(0f, 100f) },
+                                            value = if (switch) slider.coerceIn(0f, 600f) else 0f,
+                                            onValueChange = {
+                                                if (switch) slider = it.coerceIn(0f, 600f)
+                                            },
                                             valueRange = 0f..100f,
                                             modifier = Modifier
                                                 .fillMaxWidth()
@@ -812,7 +820,7 @@ fun BgDetail(
                                 modifier = Modifier
                                     .padding(vertical = 8.dp)
                                     .pointerInput(Unit) {
-                                        detectTapGestures(onLongPress = {  })
+                                        detectTapGestures(onLongPress = { })
                                     }) {
                                 Box(
                                     modifier = Modifier
