@@ -6,7 +6,6 @@
 - ** High-Resolution Support ** 
 - ** User-Friendly Interface **
 - ** Instant Preview **
-- ** Multiple Image Formats **
 - ** Quick Upload Options **
 
 
