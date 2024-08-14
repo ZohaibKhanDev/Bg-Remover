@@ -16,6 +16,9 @@
         android:supportsRtl="true"
         android:theme="@style/Theme.BgRemover"
         tools:replace="android:theme"
+        android:resizeableActivity="true"
+        android:configChanges="screenSize|smallestScreenSize|screenLayout|orientation|keyboardHidden"
+        android:screenOrientation="unspecified"
         tools:targetApi="tiramisu">
         <activity
             android:name=".MainActivity"

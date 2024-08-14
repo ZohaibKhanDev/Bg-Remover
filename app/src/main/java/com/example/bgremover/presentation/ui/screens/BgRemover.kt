@@ -21,6 +21,8 @@ import android.widget.Toast
 import androidx.activity.compose.rememberLauncherForActivityResult
 import androidx.activity.result.contract.ActivityResultContracts
 import androidx.compose.foundation.Image
+import androidx.compose.foundation.clickable
+import androidx.compose.foundation.gestures.detectDragGestures
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
@@ -54,14 +56,17 @@ import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
+import androidx.compose.ui.geometry.Offset
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.toArgb
+import androidx.compose.ui.input.pointer.pointerInput
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.SpanStyle
 import androidx.compose.ui.text.buildAnnotatedString
 import androidx.compose.ui.text.font.FontWeight
+import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.text.style.TextDecoration
 import androidx.compose.ui.text.withStyle
 import androidx.compose.ui.unit.dp
@@ -99,7 +104,6 @@ fun BgRemover(navController: NavController) {
     var bgRemovedImageBase64 by remember { mutableStateOf<String?>(null) }
     val bgRemovalState by viewModel.bgRemoval.collectAsState()
 
-
     var rewardedAd: RewardedAd? = null
     RewardedAd.load(
         context,
@@ -118,27 +122,12 @@ fun BgRemover(navController: NavController) {
         }
     )
 
-
     rewardedAd?.fullScreenContentCallback = object : FullScreenContentCallback() {
-        override fun onAdClicked() {
-            super.onAdClicked()
-        }
-
-        override fun onAdDismissedFullScreenContent() {
-            super.onAdDismissedFullScreenContent()
-        }
-
-        override fun onAdFailedToShowFullScreenContent(p0: AdError) {
-            super.onAdFailedToShowFullScreenContent(p0)
-        }
-
-        override fun onAdImpression() {
-            super.onAdImpression()
-        }
-
-        override fun onAdShowedFullScreenContent() {
-            super.onAdShowedFullScreenContent()
-        }
+        override fun onAdClicked() { super.onAdClicked() }
+        override fun onAdDismissedFullScreenContent() { super.onAdDismissedFullScreenContent() }
+        override fun onAdFailedToShowFullScreenContent(p0: AdError) { super.onAdFailedToShowFullScreenContent(p0) }
+        override fun onAdImpression() { super.onAdImpression() }
+        override fun onAdShowedFullScreenContent() { super.onAdShowedFullScreenContent() }
     }
 
     val launcher = rememberLauncherForActivityResult(ActivityResultContracts.GetContent()) { uri ->
@@ -158,8 +147,7 @@ fun BgRemover(navController: NavController) {
             imageFile?.let { file ->
                 isLoading = true
                 viewModel.removeBackground(file)
-                rewardedAd?.show(context as Activity, OnUserEarnedRewardListener {
-                })
+                rewardedAd?.show(context as Activity, OnUserEarnedRewardListener {})
             }
         }
     }
@@ -171,13 +159,9 @@ fun BgRemover(navController: NavController) {
                 val error = (bgRemovalState as ResultState.Error).error
                 Toast.makeText(context, "$error", Toast.LENGTH_SHORT).show()
             }
-
             ResultState.Loading -> {
                 isLoading = true
-
-
             }
-
             is ResultState.Success -> {
                 isLoading = false
                 bgRemovedImageBase64 = (bgRemovalState as ResultState.Success<String>).success
@@ -189,12 +173,10 @@ fun BgRemover(navController: NavController) {
                             }"
                         )
                     }
-
                 }
             }
         }
     }
-
 
     Scaffold(topBar = {
         TopAppBar(title = {
@@ -239,7 +221,6 @@ fun BgRemover(navController: NavController) {
             }
         })
     }) {
-
         Column(
             modifier = Modifier
                 .fillMaxSize()
@@ -281,7 +262,6 @@ fun BgRemover(navController: NavController) {
                 modifier = Modifier.align(Alignment.CenterHorizontally)
             )
 
-
             Spacer(modifier = Modifier.height(12.dp))
 
             Button(
@@ -290,6 +270,30 @@ fun BgRemover(navController: NavController) {
                 modifier = Modifier
                     .width(230.dp)
                     .height(60.dp)
+                    .pointerInput(Unit) {
+                        detectDragGestures { change, _ ->
+                            change.consume()
+                            imageUri = change.position.toUri(context)
+                            imageUri?.let { uri ->
+                                bgRemovedImageBase64 = null
+                                imageFile = uri.let {
+                                    val inputStream = context.contentResolver.openInputStream(it)
+                                    inputStream?.let { stream ->
+                                        val file = File(context.cacheDir, "dragged_image.png")
+                                        file.outputStream().use { output ->
+                                            stream.copyTo(output)
+                                        }
+                                        file
+                                    }
+                                }
+                                imageFile?.let { file ->
+                                    isLoading = true
+                                    viewModel.removeBackground(file)
+                                    rewardedAd?.show(context as Activity, OnUserEarnedRewardListener {})
+                                }
+                            }
+                        }
+                    }
             ) {
                 Text(
                     text = "Upload Image",
@@ -397,6 +401,12 @@ fun BgRemover(navController: NavController) {
         }
     }
 }
+
+
+fun Offset.toUri(context: Context): Uri? {
+    return null
+}
+
 
 
 fun compositeBackground(

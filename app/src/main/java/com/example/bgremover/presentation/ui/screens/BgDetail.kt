@@ -126,24 +126,25 @@ fun BgDetail(
         })
     var slider by remember { mutableStateOf(0f) }
 
-    val launcher = rememberLauncherForActivityResult(ActivityResultContracts.GetContent()) { uri: Uri? ->
-        uri?.let {
-            val inputStream = context.contentResolver.openInputStream(it)
+    val launcher =
+        rememberLauncherForActivityResult(ActivityResultContracts.GetContent()) { uri: Uri? ->
+            uri?.let {
+                val inputStream = context.contentResolver.openInputStream(it)
 
 
-            val options = BitmapFactory.Options().apply {
-                inJustDecodeBounds = true
-                BitmapFactory.decodeStream(inputStream, null, this)
-                inSampleSize = calculateInSampleSize(this, 400, 400)
-                inJustDecodeBounds = false
+                val options = BitmapFactory.Options().apply {
+                    inJustDecodeBounds = true
+                    BitmapFactory.decodeStream(inputStream, null, this)
+                    inSampleSize = calculateInSampleSize(this, 400, 400)
+                    inJustDecodeBounds = false
+                }
+
+
+                val bitmap = BitmapFactory.decodeStream(inputStream, null, options)
+                selectedGallery = bitmap
+                selectedPhoto = null
             }
-
-
-            val bitmap = BitmapFactory.decodeStream(inputStream, null, options)
-            selectedGallery = bitmap
-            selectedPhoto = null
         }
-    }
 
 
 
@@ -189,9 +190,7 @@ fun BgDetail(
                     .size(60.dp),
             )
         }, actions = {
-            IconButton(
-                onClick = { showBgRemovedImage = !showBgRemovedImage }
-            ) {
+            IconButton(onClick = { showBgRemovedImage = !showBgRemovedImage }) {
                 Icon(imageVector = Icons.Filled.Splitscreen, contentDescription = "")
             }
 
@@ -348,8 +347,7 @@ fun BgDetail(
                                             Image(
                                                 painter = painterResource(id = selectedPhoto!!),
                                                 contentDescription = null,
-                                                modifier = Modifier
-                                                    .fillMaxSize(),
+                                                modifier = Modifier.fillMaxSize(),
                                                 contentScale = ContentScale.Crop
                                             )
                                         }
@@ -372,15 +370,13 @@ fun BgDetail(
                                                 contentScale = ContentScale.Crop
                                             )
                                             selectedColor?.let { color ->
-                                                Box(
-                                                    modifier = Modifier
-                                                        .clip(RoundedCornerShape(11.dp))
-                                                        .fillMaxSize()
-                                                        .background(color)
-                                                        .graphicsLayer {
-                                                            alpha = slider1
-                                                        }
-                                                )
+                                                Box(modifier = Modifier
+                                                    .clip(RoundedCornerShape(11.dp))
+                                                    .fillMaxSize()
+                                                    .background(color)
+                                                    .graphicsLayer {
+                                                        alpha = slider1
+                                                    })
                                             }
                                         }
                                     }
@@ -390,9 +386,7 @@ fun BgDetail(
                                 bgremoveimage?.let { base64 ->
                                     val imageBytes = Base64.decode(base64, Base64.DEFAULT)
                                     val bitmap = BitmapFactory.decodeByteArray(
-                                        imageBytes,
-                                        0,
-                                        imageBytes.size
+                                        imageBytes, 0, imageBytes.size
                                     )
 
                                     Image(
@@ -573,8 +567,7 @@ fun BgDetail(
                                                     .height(50.dp)
                                                     .clickable {
                                                         launcher.launch("image/*")
-                                                    },
-                                                contentAlignment = Alignment.Center
+                                                    }, contentAlignment = Alignment.Center
                                             ) {
                                                 Icon(
                                                     imageVector = Icons.Default.Add,
@@ -593,16 +586,14 @@ fun BgDetail(
                                                 R.drawable.phone,
                                             )
                                         ) { photoResId ->
-                                            Box(
-                                                modifier = Modifier
-                                                    .clip(RoundedCornerShape(6.dp))
-                                                    .width(60.dp)
-                                                    .height(50.dp)
-                                                    .clickable {
-                                                        selectedGallery = null
-                                                        selectedPhoto = photoResId
-                                                    }
-                                            ) {
+                                            Box(modifier = Modifier
+                                                .clip(RoundedCornerShape(6.dp))
+                                                .width(60.dp)
+                                                .height(50.dp)
+                                                .clickable {
+                                                    selectedGallery = null
+                                                    selectedPhoto = photoResId
+                                                }) {
                                                 Image(
                                                     painter = painterResource(id = photoResId),
                                                     contentDescription = null,
@@ -662,9 +653,7 @@ fun BgDetail(
                                     .padding(16.dp)
                             ) {
                                 Text(
-                                    text = "Done",
-                                    color = Color.Blue,
-                                    modifier = Modifier.size(30.dp)
+                                    text = "Done", color = Color.Blue, modifier = Modifier
                                 )
                             }
 
@@ -714,7 +703,8 @@ fun BgDetail(
                                             value = slider,
                                             onValueChange = { newValue ->
                                                 slider = newValue
-                                                blurRadius = newValue * 10 // Adjust the factor as needed
+                                                blurRadius =
+                                                    newValue * 10
                                             },
                                             valueRange = 0f..10f,
                                             modifier = Modifier
@@ -885,9 +875,7 @@ fun BgDetail(
                                     )
                                 }
                                 Text(
-                                    text = "DownloadHd",
-                                    fontSize = 12.sp,
-                                    color = Color(0XFF0077ff)
+                                    text = "DownloadHd", fontSize = 12.sp, color = Color(0XFF0077ff)
                                 )
                             }
                         }
@@ -923,26 +911,20 @@ fun BgDetail(
 
 
                         item {
-                            Column(
-                                horizontalAlignment = Alignment.CenterHorizontally,
+                            Column(horizontalAlignment = Alignment.CenterHorizontally,
                                 modifier = Modifier
                                     .padding(vertical = 8.dp)
                                     .pointerInput(Unit) {
                                         detectTapGestures(onLongPress = { /* Trigger tooltip */ })
+                                    }) {
+                                Box(modifier = Modifier
+                                    .size(45.dp)
+                                    .clickable {
+                                        // isBrushSelected = !isBrushSelected
                                     }
-                            ) {
-                                Box(
-                                    modifier = Modifier
-                                        .size(45.dp)
-                                        .clickable {
-                                            // isBrushSelected = !isBrushSelected
-                                        }
-                                        .background(
-                                            Color.Transparent,
-                                            shape = RoundedCornerShape(50)
-                                        ),
-                                    contentAlignment = Alignment.TopEnd
-                                ) {
+                                    .background(
+                                        Color.Transparent, shape = RoundedCornerShape(50)
+                                    ), contentAlignment = Alignment.TopEnd) {
                                     Icon(
                                         imageVector = Icons.Outlined.Brush,
                                         contentDescription = "Erase/Restore",
@@ -1037,7 +1019,7 @@ fun BgDetail(
 }
 
 
- fun calculateInSampleSize(options: BitmapFactory.Options, reqWidth: Int, reqHeight: Int): Int {
+fun calculateInSampleSize(options: BitmapFactory.Options, reqWidth: Int, reqHeight: Int): Int {
 
     val (height: Int, width: Int) = options.run { outHeight to outWidth }
     var inSampleSize = 1
