@@ -420,25 +420,32 @@ fun BgDetail(
 
 
                                         if (isBackgroundRemoved) {
-                                            Canvas(
-                                                modifier = Modifier
-                                                    .fillMaxSize()
-                                                    .pointerInput("dragging") {
-                                                        detectDragGestures { change, dragAmount ->
-                                                            pointerOffset += dragAmount
+                                            Box {
+                                                Canvas(
+                                                    modifier = Modifier
+                                                        .fillMaxSize()
+                                                        .pointerInput("dragging") {
+                                                            detectDragGestures { change, dragAmount ->
+                                                                pointerOffset += dragAmount
+                                                            }
                                                         }
-                                                    }
-                                                    .drawWithContent {
-                                                        drawContent()
-                                                        drawRect(
-                                                            Brush.radialGradient(
-                                                                listOf(Color.Yellow, Color.Transparent),
-                                                                center = pointerOffset,
-                                                                radius = brushSize.toPx()
+                                                        .drawWithContent {
+                                                            drawContent()
+                                                            drawRect(
+                                                                Brush.radialGradient(
+                                                                    listOf(
+                                                                        Color.Yellow,
+                                                                        Color.Transparent
+                                                                    ),
+                                                                    center = pointerOffset,
+                                                                    radius = brushSize.toPx()
+                                                                )
                                                             )
-                                                        )
-                                                    }
-                                            ) { }
+                                                        }
+                                                ) {
+
+                                                }
+                                            }
                                         }
                                     }
                                 } else {
@@ -876,6 +883,7 @@ fun BgDetail(
                                             fontSize = 15.sp,
                                             fontWeight = FontWeight.Medium,
                                             modifier = Modifier.clickable {
+
                                                 isBackgroundRemoved = false
                                                 showBgRemovedImage = !restore
                                             }
@@ -888,6 +896,7 @@ fun BgDetail(
                                             color = Color(0xFF03A9F4),
                                             modifier = Modifier.clickable {
                                                 brush = false
+                                                isBackgroundRemoved=false
                                             }
                                         )
                                     }
