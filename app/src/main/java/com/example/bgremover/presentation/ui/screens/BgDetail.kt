@@ -368,6 +368,7 @@ fun BgDetail(
                                                 modifier = Modifier.fillMaxSize()
                                             )
                                         }
+
                                         else -> {
                                             Image(
                                                 painter = painterResource(id = R.drawable.transparntbg),
