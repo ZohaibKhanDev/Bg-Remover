@@ -20,10 +20,12 @@ import androidx.compose.animation.fadeOut
 import androidx.compose.animation.slideInHorizontally
 import androidx.compose.animation.slideOutHorizontally
 import androidx.compose.foundation.BorderStroke
+import androidx.compose.foundation.Canvas
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.border
 import androidx.compose.foundation.clickable
+import androidx.compose.foundation.gestures.detectDragGestures
 import androidx.compose.foundation.gestures.detectTapGestures
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.LazyColumn
@@ -48,17 +50,21 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.blur
 import androidx.compose.ui.draw.clip
+import androidx.compose.ui.draw.drawWithContent
 import androidx.compose.ui.draw.scale
 import androidx.compose.ui.geometry.Offset
+import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.asImageBitmap
 import androidx.compose.ui.graphics.graphicsLayer
 import androidx.compose.ui.input.pointer.pointerInput
 import androidx.compose.ui.layout.ContentScale
+import androidx.compose.ui.layout.onSizeChanged
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.text.font.FontWeight
+import androidx.compose.ui.unit.IntOffset
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.navigation.NavController
@@ -91,6 +97,7 @@ fun BgDetail(
     var addBg by remember { mutableStateOf(false) }
     var showImageAnimation by remember { mutableStateOf(true) }
     var showDialog by remember { mutableStateOf(false) }
+    var restore by remember { mutableStateOf(false) }
     var selectedColor by remember { mutableStateOf(Color.Transparent) }
     var isMagicBrushEnabled by remember { mutableStateOf(false) }
     var isMore by remember {
@@ -132,7 +139,7 @@ fun BgDetail(
         mutableStateOf(false)
     }
     var isBackgroundRemoved by remember { mutableStateOf(false) }
-    val launcher =
+        val launcher =
         rememberLauncherForActivityResult(contract = ActivityResultContracts.GetContent(),
             onResult = { uri ->
                 uri?.let { uri ->
@@ -143,11 +150,8 @@ fun BgDetail(
                         selectedGallery = bitmap
                     }
                 }
-            })
-
-
-
-
+            }
+        )
 
     LaunchedEffect(Unit) {
         delay(3000)
@@ -326,7 +330,6 @@ fun BgDetail(
                         )
                     }
 
-
                     androidx.compose.animation.AnimatedVisibility(
                         visible = showBgRemovedImage,
                         enter = slideInHorizontally(initialOffsetX = { it }),
@@ -368,7 +371,6 @@ fun BgDetail(
                                                 modifier = Modifier.fillMaxSize()
                                             )
                                         }
-
                                         else -> {
                                             Image(
                                                 painter = painterResource(id = R.drawable.transparntbg),
@@ -389,6 +391,7 @@ fun BgDetail(
                                     }
                                 }
 
+
                                 if (isBackgroundRemoved) {
                                     bgremoveimage?.let { base64 ->
                                         val imageBytes = Base64.decode(base64, Base64.DEFAULT)
@@ -408,27 +411,82 @@ fun BgDetail(
                                                 )
                                                 .fillMaxSize()
                                         )
+                                        var pointerOffset by remember {
+                                            mutableStateOf(Offset(0f, 0f))
+                                        }
+
+
+                                        if (isBackgroundRemoved) {
+                                            Canvas(
+                                                modifier = Modifier
+                                                    .fillMaxSize()
+                                                    .pointerInput("dragging") {
+                                                        detectDragGestures { change, dragAmount ->
+                                                            pointerOffset += dragAmount
+                                                        }
+                                                    }
+                                                    .onSizeChanged {
+                                                        pointerOffset = Offset(it.width / 2f, it.height / 2f)
+                                                    }
+                                                    .drawWithContent {
+                                                        drawContent()
+                                                        drawRect(
+                                                            Brush.radialGradient(
+                                                                listOf(Color.Transparent, Color.Black),
+                                                                center = pointerOffset,
+                                                                radius = 100.dp.toPx(),
+                                                            )
+                                                        )
+                                                    }
+
+                                            ) {
+
+                                            }
+                                        }
                                     }
                                 } else {
-                                    bgremoveimage?.let { base64 ->
-                                        val imageBytes = Base64.decode(base64, Base64.DEFAULT)
-                                        val bitmap = BitmapFactory.decodeByteArray(
-                                            imageBytes, 0, imageBytes.size
-                                        )
 
-                                        Image(
-                                            bitmap = bitmap.asImageBitmap(),
-                                            contentDescription = null,
-                                            modifier = Modifier
-                                                .graphicsLayer(
-                                                    scaleX = scale,
-                                                    scaleY = scale,
-                                                    translationX = offset.x,
-                                                    translationY = offset.y
+                                    if (restore){
+                                        imageUrl?.let {
+                                            androidx.compose.animation.AnimatedVisibility(
+                                                visible = showImageAnimation,
+                                                enter = fadeIn(animationSpec = tween(durationMillis = 1500)),
+                                                exit = fadeOut(animationSpec = tween(durationMillis = 1500))
+                                            ) {
+                                                AsyncImage(
+                                                    model = it,
+                                                    contentDescription = null,
+                                                    modifier = Modifier
+                                                        .size(400.dp, 550.dp)
+                                                        .clip(RoundedCornerShape(11.dp))
+                                                        .scale(animatedScale.value),
+                                                    contentScale = ContentScale.Crop
                                                 )
-                                                .fillMaxSize()
-                                        )
+                                            }
+                                        }
+                                    }else{
+                                        bgremoveimage?.let { base64 ->
+                                            val imageBytes = Base64.decode(base64, Base64.DEFAULT)
+                                            val bitmap = BitmapFactory.decodeByteArray(
+                                                imageBytes, 0, imageBytes.size
+                                            )
+
+                                            Image(
+                                                bitmap = bitmap.asImageBitmap(),
+                                                contentDescription = null,
+                                                modifier = Modifier
+                                                    .graphicsLayer(
+                                                        scaleX = scale,
+                                                        scaleY = scale,
+                                                        translationX = offset.x,
+                                                        translationY = offset.y
+                                                    )
+                                                    .fillMaxSize()
+                                            )
+
+                                        }
                                     }
+
                                 }
                             }
                         } ?: run {
@@ -796,8 +854,6 @@ fun BgDetail(
                         }
                     }
                 } else {
-
-
                     if (brush) {
                         Card(
                             modifier = Modifier.fillMaxWidth(),
@@ -807,7 +863,7 @@ fun BgDetail(
                             LazyColumn(
                                 modifier = Modifier
                                     .fillMaxWidth()
-                                    .height(130.dp)
+                                    .height(180.dp)
                                     .padding(16.dp)
                             ) {
                                 item {
@@ -823,9 +879,8 @@ fun BgDetail(
                                             fontSize = 15.sp,
                                             fontWeight = FontWeight.Medium,
                                             modifier = Modifier.clickable {
-                                                selectedPhoto = null
-                                                selectedColor = Color.Transparent
-                                                selectedGallery = null
+                                                isBackgroundRemoved = false
+                                                showBgRemovedImage = !restore
                                             }
                                         )
 
@@ -851,6 +906,7 @@ fun BgDetail(
                                         OutlinedButton(
                                             onClick = {
                                                 isBackgroundRemoved = true
+                                                restore=false
                                             },
                                             modifier = Modifier
                                                 .width(120.dp)
@@ -865,6 +921,10 @@ fun BgDetail(
 
                                         OutlinedButton(
                                             onClick = {
+                                                restore = !restore
+                                                showImageAnimation = restore
+                                                showBgRemovedImage = !restore
+
                                                 isBackgroundRemoved = false
                                             },
                                             modifier = Modifier
