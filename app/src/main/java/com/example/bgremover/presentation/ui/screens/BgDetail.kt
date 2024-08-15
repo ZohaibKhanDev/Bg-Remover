@@ -389,7 +389,6 @@ fun BgDetail(
                                     }
                                 }
 
-
                                 if (isBackgroundRemoved) {
                                     bgremoveimage?.let { base64 ->
                                         val imageBytes = Base64.decode(base64, Base64.DEFAULT)
