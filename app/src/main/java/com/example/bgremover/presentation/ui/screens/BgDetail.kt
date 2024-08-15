@@ -82,7 +82,9 @@ fun BgDetail(
     var selectedGallery by remember { mutableStateOf<Bitmap?>(null) }
     var blurRadius by remember { mutableStateOf(0f) }
     val context = LocalContext.current
-
+    var brush by remember {
+        mutableStateOf(false)
+    }
     var showPhoto by remember { mutableStateOf(true) }
     var showColor by remember { mutableStateOf(false) }
     var addBg by remember { mutableStateOf(false) }
@@ -333,12 +335,13 @@ fun BgDetail(
                                 contentAlignment = Alignment.Center
                             ) {
 
-                                Box(modifier =  Modifier
-                                    .fillMaxSize()
-                                    .then(
-                                        if (switch) Modifier.blur(radius = slider.dp) else Modifier
-                                    )
-                                ){
+                                Box(
+                                    modifier = Modifier
+                                        .fillMaxSize()
+                                        .then(
+                                            if (switch) Modifier.blur(radius = slider.dp) else Modifier
+                                        )
+                                ) {
                                     if (selectedPhoto != null) {
                                         Image(
                                             painter = painterResource(id = selectedPhoto!!),
@@ -766,261 +769,282 @@ fun BgDetail(
                         }
                     }
                 } else {
-                    LazyRow(
-                        modifier = Modifier
-                            .fillMaxWidth()
-                            .padding(horizontal = 16.dp),
-                        horizontalArrangement = Arrangement.spacedBy(16.dp),
-                        verticalAlignment = Alignment.CenterVertically
-                    ) {
-                        item {
-                            val context = LocalContext.current
-                            Column(horizontalAlignment = Alignment.CenterHorizontally,
-                                modifier = Modifier
-                                    .padding(vertical = 8.dp)
-                                    .pointerInput(Unit) {
-                                        detectTapGestures(onLongPress = { })
-                                    }) {
-                                Box(
-                                    modifier = Modifier
-                                        .clip(CircleShape)
-                                        .size(45.dp)
-                                        .background(Color(0XFF0077ff))
-                                        .clickable {
-                                            interstitialAd?.show(context as Activity)
-                                            bgremoveimage?.let { base64 ->
-                                                val imageBytes =
-                                                    Base64.decode(base64, Base64.DEFAULT)
-                                                val bitmap = BitmapFactory.decodeByteArray(
-                                                    imageBytes, 0, imageBytes.size
-                                                )
-                                                saveImage(
-                                                    bitmap,
-                                                    context = context,
-                                                    false,
-                                                    selectedColor,
-                                                    selectedPhoto,
-                                                    galleryBitmap = selectedGallery,
-                                                    blurRadius
-                                                )
-                                            }
-                                        }, contentAlignment = Alignment.TopEnd
-                                ) {
-                                    Icon(
-                                        imageVector = Icons.Outlined.FileDownload,
-                                        contentDescription = "Download",
-                                        modifier = Modifier
-                                            .size(24.dp)
-                                            .align(Alignment.Center),
-                                        tint = Color.White
-                                    )
-                                }
-                                Text(
-                                    text = "Download", fontSize = 12.sp, color = Color(0XFF0077ff)
-                                )
-                            }
+                    if (brush){
+                        Card {
+
                         }
+                        
 
-                        item {
-                            val context = LocalContext.current
-
-                            Column(horizontalAlignment = Alignment.CenterHorizontally,
-                                modifier = Modifier
-                                    .padding(vertical = 8.dp)
-                                    .pointerInput(Unit) {
-                                        detectTapGestures(onLongPress = { /* Trigger tooltip */ })
-                                    }) {
-                                Box(
+                    }else{
+                        LazyRow(
+                            modifier = Modifier
+                                .fillMaxWidth()
+                                .padding(horizontal = 16.dp),
+                            horizontalArrangement = Arrangement.spacedBy(16.dp),
+                            verticalAlignment = Alignment.CenterVertically
+                        ) {
+                            item {
+                                val context = LocalContext.current
+                                Column(horizontalAlignment = Alignment.CenterHorizontally,
                                     modifier = Modifier
-                                        .clip(CircleShape)
-                                        .size(45.dp)
-                                        .background(Color(0XFFc1dff5))
-                                        .clickable {
-                                            interstitialAd?.show(context as Activity)
-
-                                            bgremoveimage?.let { base64 ->
-                                                val imageBytes =
-                                                    Base64.decode(base64, Base64.DEFAULT)
-                                                val bitmap = BitmapFactory.decodeByteArray(
-                                                    imageBytes, 0, imageBytes.size
-                                                )
-
-                                                saveImage(
-                                                    bitmap,
-                                                    context = context,
-                                                    true,
-                                                    selectedColor,
-                                                    selectedPhoto,
-                                                    galleryBitmap = selectedGallery,
-                                                    blurRadius
-                                                )
-                                            }
-
-                                        }, contentAlignment = Alignment.TopEnd
-                                ) {
-                                    Icon(
-                                        imageVector = Icons.Outlined.FileDownload,
-                                        contentDescription = "DownloadHd",
+                                        .padding(vertical = 8.dp)
+                                        .pointerInput(Unit) {
+                                            detectTapGestures(onLongPress = { })
+                                        }) {
+                                    Box(
                                         modifier = Modifier
-                                            .size(24.dp)
-                                            .align(Alignment.Center),
-                                        tint = Color.Blue
-                                    )
-                                }
-                                Text(
-                                    text = "DownloadHd", fontSize = 12.sp, color = Color(0XFF0077ff)
-                                )
-                            }
-                        }
-
-                        item {
-                            Column(horizontalAlignment = Alignment.CenterHorizontally,
-                                modifier = Modifier
-                                    .padding(vertical = 8.dp)
-                                    .pointerInput(Unit) {
-                                        detectTapGestures(onLongPress = { /* Trigger tooltip */ })
-                                    }) {
-                                Box(
-                                    modifier = Modifier
-                                        .clip(CircleShape)
-                                        .size(45.dp)
-                                        .clickable {
-                                            addBg = true
-                                        }, contentAlignment = Alignment.TopEnd
-                                ) {
-                                    Icon(
-                                        imageVector = Icons.Outlined.Add,
-                                        contentDescription = "Add",
-                                        modifier = Modifier
-                                            .size(24.dp)
-                                            .align(Alignment.Center),
-                                    )
-                                }
-                                Text(
-                                    text = "Add", fontSize = 12.sp,
-                                )
-                            }
-                        }
-
-
-                        item {
-                            Column(horizontalAlignment = Alignment.CenterHorizontally,
-                                modifier = Modifier
-                                    .padding(vertical = 8.dp)
-                                    .pointerInput(Unit) {
-                                        detectTapGestures(onLongPress = { /* Trigger tooltip */ })
-                                    }) {
-                                Box(modifier = Modifier
-                                    .size(45.dp)
-                                    .clickable {
-                                        // isBrushSelected = !isBrushSelected
-                                    }
-                                    .background(
-                                        Color.Transparent, shape = RoundedCornerShape(50)
-                                    ), contentAlignment = Alignment.TopEnd) {
-                                    Icon(
-                                        imageVector = Icons.Outlined.Brush,
-                                        contentDescription = "Erase/Restore",
-                                        modifier = Modifier
-                                            .size(24.dp)
-                                            .align(Alignment.Center),
-                                    )
-                                }
-                                Text(
-                                    text = "Erase/Restore",
-                                    fontSize = 12.sp,
-                                )
-                            }
-                        }
-
-                        item {
-                            Column(horizontalAlignment = Alignment.CenterHorizontally,
-                                modifier = Modifier
-                                    .padding(vertical = 8.dp)
-                                    .pointerInput(Unit) {
-                                        detectTapGestures(onLongPress = { /* Trigger tooltip */ })
-                                    }) {
-
-                                Box(
-                                    modifier = Modifier
-                                        .size(45.dp)
-                                        .clickable {
-                                            effect = !effect
-                                        }, contentAlignment = Alignment.TopEnd
-                                ) {
-                                    Icon(
-                                        imageVector = Icons.Outlined.JoinLeft,
-                                        contentDescription = "Effects",
-                                        modifier = Modifier
-                                            .size(24.dp)
-                                            .align(Alignment.Center),
-                                    )
-                                }
-                                Text(
-                                    text = "Effects",
-                                    fontSize = 12.sp,
-                                )
-                            }
-                        }
-
-                        item {
-                            val context = LocalContext.current
-                            Column(
-                                horizontalAlignment = Alignment.CenterHorizontally,
-                                modifier = Modifier
-                                    .padding(vertical = 8.dp)
-                                    .pointerInput(Unit) {
-                                        detectTapGestures(onLongPress = { /* Trigger tooltip */ })
-                                    }
-                            ) {
-                                Box(
-                                    modifier = Modifier
-                                        .size(45.dp)
-                                        .clickable {
-                                            val imageUrl = "$bgremoveimage"
-                                            val encodedImageUrl = Uri.encode(imageUrl)
-                                            val canvaUrl =
-                                                "https://www.canva.com/create/design?upload=$encodedImageUrl"
-
-                                            val intent = Intent(Intent.ACTION_VIEW, Uri.parse(canvaUrl))
-                                            intent.setPackage("com.android.chrome")
-
-                                            try {
-                                                context.startActivity(intent)
-                                            } catch (e: ActivityNotFoundException) {
-                                                e.printStackTrace()
-
-                                                val fallbackIntent = Intent(Intent.ACTION_VIEW, Uri.parse(canvaUrl))
-                                                try {
-                                                    context.startActivity(fallbackIntent)
-                                                } catch (e: Exception) {
-                                                    Toast.makeText(
-                                                        context,
-                                                        "No browser found to open the link",
-                                                        Toast.LENGTH_SHORT
-                                                    ).show()
+                                            .clip(CircleShape)
+                                            .size(45.dp)
+                                            .background(Color(0XFF0077ff))
+                                            .clickable {
+                                                interstitialAd?.show(context as Activity)
+                                                bgremoveimage?.let { base64 ->
+                                                    val imageBytes =
+                                                        Base64.decode(base64, Base64.DEFAULT)
+                                                    val bitmap = BitmapFactory.decodeByteArray(
+                                                        imageBytes, 0, imageBytes.size
+                                                    )
+                                                    saveImage(
+                                                        bitmap,
+                                                        context = context,
+                                                        false,
+                                                        selectedColor,
+                                                        selectedPhoto,
+                                                        galleryBitmap = selectedGallery,
+                                                        blurRadius
+                                                    )
                                                 }
-                                            }
-                                        },
-                                    contentAlignment = Alignment.TopEnd
-                                ) {
-                                    Image(
-                                        painter = painterResource(id = R.drawable.canva),
-                                        contentDescription = "Canva",
-                                        modifier = Modifier
-                                            .size(24.dp)
-                                            .align(Alignment.Center),
+                                            }, contentAlignment = Alignment.TopEnd
+                                    ) {
+                                        Icon(
+                                            imageVector = Icons.Outlined.FileDownload,
+                                            contentDescription = "Download",
+                                            modifier = Modifier
+                                                .size(24.dp)
+                                                .align(Alignment.Center),
+                                            tint = Color.White
+                                        )
+                                    }
+                                    Text(
+                                        text = "Download",
+                                        fontSize = 12.sp,
+                                        color = Color(0XFF0077ff)
                                     )
                                 }
-                                Text(
-                                    text = "Canva",
-                                    fontSize = 12.sp,
-                                )
                             }
+
+                            item {
+                                val context = LocalContext.current
+
+                                Column(horizontalAlignment = Alignment.CenterHorizontally,
+                                    modifier = Modifier
+                                        .padding(vertical = 8.dp)
+                                        .pointerInput(Unit) {
+                                            detectTapGestures(onLongPress = { /* Trigger tooltip */ })
+                                        }) {
+                                    Box(
+                                        modifier = Modifier
+                                            .clip(CircleShape)
+                                            .size(45.dp)
+                                            .background(Color(0XFFc1dff5))
+                                            .clickable {
+                                                interstitialAd?.show(context as Activity)
+
+                                                bgremoveimage?.let { base64 ->
+                                                    val imageBytes =
+                                                        Base64.decode(base64, Base64.DEFAULT)
+                                                    val bitmap = BitmapFactory.decodeByteArray(
+                                                        imageBytes, 0, imageBytes.size
+                                                    )
+
+                                                    saveImage(
+                                                        bitmap,
+                                                        context = context,
+                                                        true,
+                                                        selectedColor,
+                                                        selectedPhoto,
+                                                        galleryBitmap = selectedGallery,
+                                                        blurRadius
+                                                    )
+                                                }
+
+                                            }, contentAlignment = Alignment.TopEnd
+                                    ) {
+                                        Icon(
+                                            imageVector = Icons.Outlined.FileDownload,
+                                            contentDescription = "DownloadHd",
+                                            modifier = Modifier
+                                                .size(24.dp)
+                                                .align(Alignment.Center),
+                                            tint = Color.Blue
+                                        )
+                                    }
+                                    Text(
+                                        text = "DownloadHd",
+                                        fontSize = 12.sp,
+                                        color = Color(0XFF0077ff)
+                                    )
+                                }
+                            }
+
+                            item {
+                                Column(horizontalAlignment = Alignment.CenterHorizontally,
+                                    modifier = Modifier
+                                        .padding(vertical = 8.dp)
+                                        .pointerInput(Unit) {
+                                            detectTapGestures(onLongPress = { /* Trigger tooltip */ })
+                                        }) {
+                                    Box(
+                                        modifier = Modifier
+                                            .clip(CircleShape)
+                                            .size(45.dp)
+                                            .clickable {
+                                                addBg = true
+                                            }, contentAlignment = Alignment.TopEnd
+                                    ) {
+                                        Icon(
+                                            imageVector = Icons.Outlined.Add,
+                                            contentDescription = "Add",
+                                            modifier = Modifier
+                                                .size(24.dp)
+                                                .align(Alignment.Center),
+                                        )
+                                    }
+                                    Text(
+                                        text = "Add", fontSize = 12.sp,
+                                    )
+                                }
+                            }
+
+
+                            item {
+                                Column(horizontalAlignment = Alignment.CenterHorizontally,
+                                    modifier = Modifier
+                                        .padding(vertical = 8.dp)
+                                        .pointerInput(Unit) {
+                                            detectTapGestures(onLongPress = { /* Trigger tooltip */ })
+                                        }) {
+                                    Box(modifier = Modifier
+                                        .size(45.dp)
+                                        .clickable {
+                                            brush = !brush
+                                        }
+                                        .background(
+                                            Color.Transparent, shape = RoundedCornerShape(50)
+                                        ), contentAlignment = Alignment.TopEnd) {
+                                        Icon(
+                                            imageVector = Icons.Outlined.Brush,
+                                            contentDescription = "Erase/Restore",
+                                            modifier = Modifier
+                                                .size(24.dp)
+                                                .align(Alignment.Center),
+                                        )
+                                    }
+                                    Text(
+                                        text = "Erase/Restore",
+                                        fontSize = 12.sp,
+                                    )
+                                }
+                            }
+
+                            item {
+                                Column(horizontalAlignment = Alignment.CenterHorizontally,
+                                    modifier = Modifier
+                                        .padding(vertical = 8.dp)
+                                        .pointerInput(Unit) {
+                                            detectTapGestures(onLongPress = { /* Trigger tooltip */ })
+                                        }) {
+
+                                    Box(
+                                        modifier = Modifier
+                                            .size(45.dp)
+                                            .clickable {
+                                                effect = !effect
+                                            }, contentAlignment = Alignment.TopEnd
+                                    ) {
+                                        Icon(
+                                            imageVector = Icons.Outlined.JoinLeft,
+                                            contentDescription = "Effects",
+                                            modifier = Modifier
+                                                .size(24.dp)
+                                                .align(Alignment.Center),
+                                        )
+                                    }
+                                    Text(
+                                        text = "Effects",
+                                        fontSize = 12.sp,
+                                    )
+                                }
+                            }
+
+                            item {
+                                val context = LocalContext.current
+                                Column(
+                                    horizontalAlignment = Alignment.CenterHorizontally,
+                                    modifier = Modifier
+                                        .padding(vertical = 8.dp)
+                                        .pointerInput(Unit) {
+                                            detectTapGestures(onLongPress = { /* Trigger tooltip */ })
+                                        }
+                                ) {
+                                    Box(
+                                        modifier = Modifier
+                                            .size(45.dp)
+                                            .clickable {
+                                                val imageUrl = "$bgremoveimage"
+                                                val encodedImageUrl = Uri.encode(imageUrl)
+                                                val canvaUrl =
+                                                    "https://www.canva.com/create/design?upload=$encodedImageUrl"
+
+                                                val intent =
+                                                    Intent(Intent.ACTION_VIEW, Uri.parse(canvaUrl))
+                                                intent.setPackage("com.android.chrome")
+
+                                                try {
+                                                    context.startActivity(intent)
+                                                } catch (e: ActivityNotFoundException) {
+                                                    e.printStackTrace()
+
+                                                    val fallbackIntent =
+                                                        Intent(
+                                                            Intent.ACTION_VIEW,
+                                                            Uri.parse(canvaUrl)
+                                                        )
+                                                    try {
+                                                        context.startActivity(fallbackIntent)
+                                                    } catch (e: Exception) {
+                                                        Toast
+                                                            .makeText(
+                                                                context,
+                                                                "No browser found to open the link",
+                                                                Toast.LENGTH_SHORT
+                                                            )
+                                                            .show()
+                                                    }
+                                                }
+                                            },
+                                        contentAlignment = Alignment.TopEnd
+                                    ) {
+                                        Image(
+                                            painter = painterResource(id = R.drawable.canva),
+                                            contentDescription = "Canva",
+                                            modifier = Modifier
+                                                .size(24.dp)
+                                                .align(Alignment.Center),
+                                        )
+                                    }
+                                    Text(
+                                        text = "Canva",
+                                        fontSize = 12.sp,
+                                    )
+                                }
+                            }
+
+
                         }
-
-
                     }
+
+
                 }
             }
         }
