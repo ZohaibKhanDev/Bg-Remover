@@ -432,7 +432,6 @@ fun BgDetail(
                                 }
                             }
                         } ?: run {
-
                             Text(
                                 text = "No background removed image available",
                                 color = Color.Red,
@@ -443,7 +442,6 @@ fun BgDetail(
                     }
                 }
             } ?: run {
-
                 Text(
                     text = "Image Not Detected",
                     color = Color.Red,
@@ -451,7 +449,6 @@ fun BgDetail(
                     fontWeight = FontWeight.Bold
                 )
             }
-
 
             if (addBg) {
 
