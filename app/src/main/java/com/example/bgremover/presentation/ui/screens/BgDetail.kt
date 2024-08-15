@@ -61,6 +61,7 @@ import androidx.compose.ui.input.pointer.pointerInput
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.layout.onSizeChanged
 import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.platform.LocalDensity
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.text.font.FontWeight
@@ -87,7 +88,6 @@ fun BgDetail(
     var showBgRemovedImage by remember { mutableStateOf(false) }
     var selectedGallery by remember { mutableStateOf<Bitmap?>(null) }
     var blurRadius by remember { mutableStateOf(0f) }
-    var brushSize by remember { mutableStateOf(0f) }
     val context = LocalContext.current
     var brush by remember {
         mutableStateOf(false)
@@ -134,6 +134,8 @@ fun BgDetail(
                 Log.d("ADD", "onAdLoaded: True")
             }
         })
+
+    val density = LocalDensity.current.density
     var slider by remember { mutableStateOf(0f) }
     var split by remember {
         mutableStateOf(false)
@@ -153,6 +155,7 @@ fun BgDetail(
             }
         )
 
+    var brushSize by remember { mutableStateOf(100.dp) }
     LaunchedEffect(Unit) {
         delay(3000)
         showBgRemovedImage = true
@@ -425,23 +428,17 @@ fun BgDetail(
                                                             pointerOffset += dragAmount
                                                         }
                                                     }
-                                                    .onSizeChanged {
-                                                        pointerOffset = Offset(it.width / 2f, it.height / 2f)
-                                                    }
                                                     .drawWithContent {
                                                         drawContent()
                                                         drawRect(
                                                             Brush.radialGradient(
-                                                                listOf(Color.Transparent, Color.Black),
+                                                                listOf(Color.Yellow, Color.Transparent),
                                                                 center = pointerOffset,
-                                                                radius = 100.dp.toPx(),
+                                                                radius = brushSize.toPx()
                                                             )
                                                         )
                                                     }
-
-                                            ) {
-
-                                            }
+                                            ) { }
                                         }
                                     }
                                 } else {
@@ -950,16 +947,16 @@ fun BgDetail(
                                         )
 
                                         Slider(
-                                            value = brushSize,
+                                            value = brushSize.value,
                                             onValueChange = {
-                                                brushSize = it
+                                                brushSize = it.dp
                                             },
-                                            modifier = Modifier.weight(1f),
-                                            valueRange = 0f..100f,
+                                            valueRange = 0f..300f,
                                             colors = SliderDefaults.colors(
                                                 thumbColor = Color(0xFFFFC107),
                                                 activeTrackColor = Color(0xFF8D6E63)
-                                            )
+                                            ),
+                                            modifier = Modifier.padding(16.dp)
                                         )
                                     }
 
