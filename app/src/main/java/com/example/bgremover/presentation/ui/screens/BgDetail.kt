@@ -81,6 +81,7 @@ fun BgDetail(
     var showBgRemovedImage by remember { mutableStateOf(false) }
     var selectedGallery by remember { mutableStateOf<Bitmap?>(null) }
     var blurRadius by remember { mutableStateOf(0f) }
+    var brushSize by remember { mutableStateOf(0f) }
     val context = LocalContext.current
     var brush by remember {
         mutableStateOf(false)
@@ -91,8 +92,7 @@ fun BgDetail(
     var showImageAnimation by remember { mutableStateOf(true) }
     var showDialog by remember { mutableStateOf(false) }
     var selectedColor by remember { mutableStateOf(Color.Transparent) }
-    var isPressing by remember { mutableStateOf(false) }
-    var colorRest = Color.Transparent
+    var isMagicBrushEnabled by remember { mutableStateOf(false) }
     var isMore by remember {
         mutableStateOf(false)
     }
@@ -128,20 +128,22 @@ fun BgDetail(
             }
         })
     var slider by remember { mutableStateOf(0f) }
-
-    val launcher = rememberLauncherForActivityResult(
-        contract = ActivityResultContracts.GetContent(),
-        onResult = { uri ->
-            uri?.let { uri ->
-                val inputStream = context.contentResolver.openInputStream(uri)
-                val selectedBitmap = BitmapFactory.decodeStream(inputStream)
-                selectedBitmap?.let { bitmap ->
-                    selectedPhoto = null
-                    selectedGallery = bitmap
+    var split by remember {
+        mutableStateOf(false)
+    }
+    var isBackgroundRemoved by remember { mutableStateOf(false) }
+    val launcher =
+        rememberLauncherForActivityResult(contract = ActivityResultContracts.GetContent(),
+            onResult = { uri ->
+                uri?.let { uri ->
+                    val inputStream = context.contentResolver.openInputStream(uri)
+                    val selectedBitmap = BitmapFactory.decodeStream(inputStream)
+                    selectedBitmap?.let { bitmap ->
+                        selectedPhoto = null
+                        selectedGallery = bitmap
+                    }
                 }
-            }
-        }
-    )
+            })
 
 
 
@@ -188,9 +190,14 @@ fun BgDetail(
                     .size(60.dp),
             )
         }, actions = {
-            IconButton(onClick = { showBgRemovedImage = !showBgRemovedImage }) {
+            IconButton(onClick = {
+                split = !split
+                showImageAnimation = split
+                showBgRemovedImage = !split
+            }) {
                 Icon(imageVector = Icons.Filled.Splitscreen, contentDescription = "")
             }
+
 
             IconButton(onClick = { /* TODO */ }) {
                 Icon(
@@ -299,8 +306,10 @@ fun BgDetail(
                         .background(
                             if (selectedColor != Color.Transparent) selectedColor
                             else Color.Transparent
-                        ), contentAlignment = Alignment.Center
+                        ),
+                    contentAlignment = Alignment.Center
                 ) {
+
                     androidx.compose.animation.AnimatedVisibility(
                         visible = showImageAnimation,
                         enter = fadeIn(animationSpec = tween(durationMillis = 1500)),
@@ -317,6 +326,7 @@ fun BgDetail(
                         )
                     }
 
+
                     androidx.compose.animation.AnimatedVisibility(
                         visible = showBgRemovedImage,
                         enter = slideInHorizontally(initialOffsetX = { it }),
@@ -326,7 +336,6 @@ fun BgDetail(
                             var scale by remember { mutableStateOf(1f) }
                             var offset by remember { mutableStateOf(Offset.Zero) }
 
-
                             Box(
                                 modifier = Modifier
                                     .size(400.dp, 550.dp)
@@ -334,7 +343,6 @@ fun BgDetail(
                                     .background(Color.Transparent),
                                 contentAlignment = Alignment.Center
                             ) {
-
                                 Box(
                                     modifier = Modifier
                                         .fillMaxSize()
@@ -342,66 +350,89 @@ fun BgDetail(
                                             if (switch) Modifier.blur(radius = slider.dp) else Modifier
                                         )
                                 ) {
-                                    if (selectedPhoto != null) {
-                                        Image(
-                                            painter = painterResource(id = selectedPhoto!!),
-                                            contentDescription = null,
-                                            modifier = Modifier.fillMaxSize(),
-                                            contentScale = ContentScale.Crop
-                                        )
-                                    } else {
-                                        if (selectedGallery != null) {
+
+                                    when {
+                                        selectedPhoto != null -> {
+                                            Image(
+                                                painter = painterResource(id = selectedPhoto!!),
+                                                contentDescription = null,
+                                                modifier = Modifier.fillMaxSize(),
+                                                contentScale = ContentScale.Crop
+                                            )
+                                        }
+                                        selectedGallery != null -> {
                                             Image(
                                                 bitmap = selectedGallery!!.asImageBitmap(),
                                                 contentDescription = null,
                                                 contentScale = ContentScale.Crop,
                                                 modifier = Modifier.fillMaxSize()
                                             )
-                                        } else {
+                                        }
+                                        else -> {
                                             Image(
                                                 painter = painterResource(id = R.drawable.transparntbg),
                                                 contentDescription = "",
                                                 modifier = Modifier.fillMaxSize(),
                                                 contentScale = ContentScale.Crop
                                             )
-                                            selectedColor?.let { color ->
-                                                Box(
-                                                    modifier = Modifier
-                                                        .clip(RoundedCornerShape(11.dp))
-                                                        .fillMaxSize()
-                                                        .background(color)
-                                                        .graphicsLayer {
-                                                            alpha = slider1
-                                                        }
-                                                )
-                                            }
+                                            Box(
+                                                modifier = Modifier
+                                                    .clip(RoundedCornerShape(11.dp))
+                                                    .fillMaxSize()
+                                                    .background(selectedColor)
+                                                    .graphicsLayer {
+                                                        alpha = slider1
+                                                    }
+                                            )
                                         }
                                     }
                                 }
 
-                                bgremoveimage?.let { base64 ->
-                                    val imageBytes = Base64.decode(base64, Base64.DEFAULT)
-                                    val bitmap = BitmapFactory.decodeByteArray(
-                                        imageBytes, 0, imageBytes.size
-                                    )
 
-                                    Image(
-                                        bitmap = bitmap.asImageBitmap(),
-                                        contentDescription = null,
-                                        modifier = Modifier
-                                            .graphicsLayer(
-                                                scaleX = scale,
-                                                scaleY = scale,
-                                                translationX = offset.x,
-                                                translationY = offset.y
-                                            )
-                                            .fillMaxSize()
-                                    )
+                                if (isBackgroundRemoved) {
+                                    bgremoveimage?.let { base64 ->
+                                        val imageBytes = Base64.decode(base64, Base64.DEFAULT)
+                                        val bitmap = BitmapFactory.decodeByteArray(
+                                            imageBytes, 0, imageBytes.size
+                                        )
+
+                                        Image(
+                                            bitmap = bitmap.asImageBitmap(),
+                                            contentDescription = null,
+                                            modifier = Modifier
+                                                .graphicsLayer(
+                                                    scaleX = scale,
+                                                    scaleY = scale,
+                                                    translationX = offset.x,
+                                                    translationY = offset.y
+                                                )
+                                                .fillMaxSize()
+                                        )
+                                    }
+                                } else {
+                                    bgremoveimage?.let { base64 ->
+                                        val imageBytes = Base64.decode(base64, Base64.DEFAULT)
+                                        val bitmap = BitmapFactory.decodeByteArray(
+                                            imageBytes, 0, imageBytes.size
+                                        )
+
+                                        Image(
+                                            bitmap = bitmap.asImageBitmap(),
+                                            contentDescription = null,
+                                            modifier = Modifier
+                                                .graphicsLayer(
+                                                    scaleX = scale,
+                                                    scaleY = scale,
+                                                    translationX = offset.x,
+                                                    translationY = offset.y
+                                                )
+                                                .fillMaxSize()
+                                        )
+                                    }
                                 }
-
                             }
-
                         } ?: run {
+
                             Text(
                                 text = "No background removed image available",
                                 color = Color.Red,
@@ -412,6 +443,7 @@ fun BgDetail(
                     }
                 }
             } ?: run {
+
                 Text(
                     text = "Image Not Detected",
                     color = Color.Red,
@@ -419,6 +451,7 @@ fun BgDetail(
                     fontWeight = FontWeight.Bold
                 )
             }
+
 
             if (addBg) {
 
@@ -581,15 +614,13 @@ fun BgDetail(
                                                 R.drawable.phone,
                                             )
                                         ) { photoResId ->
-                                            Box(
-                                                modifier = Modifier
-                                                    .clip(RoundedCornerShape(6.dp))
-                                                    .width(60.dp)
-                                                    .height(50.dp)
-                                                    .clickable {
-                                                        selectedPhoto = photoResId
-                                                    }
-                                            ) {
+                                            Box(modifier = Modifier
+                                                .clip(RoundedCornerShape(6.dp))
+                                                .width(60.dp)
+                                                .height(50.dp)
+                                                .clickable {
+                                                    selectedPhoto = photoResId
+                                                }) {
                                                 Image(
                                                     painter = painterResource(id = photoResId),
                                                     contentDescription = null,
@@ -699,8 +730,7 @@ fun BgDetail(
                                             value = slider,
                                             onValueChange = { newValue ->
                                                 slider = newValue
-                                                blurRadius =
-                                                    newValue * 10
+                                                blurRadius = newValue * 10
                                             },
                                             valueRange = 0f..10f,
                                             modifier = Modifier
@@ -769,13 +799,136 @@ fun BgDetail(
                         }
                     }
                 } else {
-                    if (brush){
-                        Card {
 
+
+                    if (brush) {
+                        Card(
+                            modifier = Modifier.fillMaxWidth(),
+                            elevation = CardDefaults.cardElevation(2.dp),
+                            colors = CardDefaults.cardColors(Color.White)
+                        ) {
+                            LazyColumn(
+                                modifier = Modifier
+                                    .fillMaxWidth()
+                                    .height(130.dp)
+                                    .padding(16.dp)
+                            ) {
+                                item {
+                                    Row(
+                                        modifier = Modifier
+                                            .fillMaxWidth()
+                                            .padding(vertical = 6.dp),
+                                        horizontalArrangement = Arrangement.SpaceBetween,
+                                        verticalAlignment = Alignment.CenterVertically
+                                    ) {
+                                        Text(
+                                            text = "Reset",
+                                            fontSize = 15.sp,
+                                            fontWeight = FontWeight.Medium,
+                                            modifier = Modifier.clickable {
+                                                selectedPhoto = null
+                                                selectedColor = Color.Transparent
+                                                selectedGallery = null
+                                            }
+                                        )
+
+                                        Text(
+                                            text = "Done",
+                                            fontSize = 15.sp,
+                                            fontWeight = FontWeight.Medium,
+                                            color = Color(0xFF03A9F4),
+                                            modifier = Modifier.clickable {
+                                                brush = false
+                                            }
+                                        )
+                                    }
+
+                                    Spacer(modifier = Modifier.height(16.dp))
+
+                                    Row(
+                                        modifier = Modifier
+                                            .fillMaxWidth(),
+                                        horizontalArrangement = Arrangement.SpaceEvenly,
+                                        verticalAlignment = Alignment.CenterVertically
+                                    ) {
+                                        OutlinedButton(
+                                            onClick = {
+                                                isBackgroundRemoved = true
+                                            },
+                                            modifier = Modifier
+                                                .width(120.dp)
+                                                .height(43.dp),
+                                            shape = RoundedCornerShape(7.dp),
+                                            colors = ButtonDefaults.buttonColors(
+                                                containerColor = Color(0XFF6e4c03)
+                                            )
+                                        ) {
+                                            Text(text = "Erase")
+                                        }
+
+                                        OutlinedButton(
+                                            onClick = {
+                                                isBackgroundRemoved = false
+                                            },
+                                            modifier = Modifier
+                                                .width(120.dp)
+                                                .height(43.dp),
+                                            shape = RoundedCornerShape(7.dp),
+                                        ) {
+                                            Text(text = "Restore")
+                                        }
+                                    }
+
+                                    Spacer(modifier = Modifier.height(16.dp))
+
+                                    Row(
+                                        modifier = Modifier
+                                            .fillMaxWidth(),
+                                        verticalAlignment = Alignment.CenterVertically
+                                    ) {
+                                        Text(
+                                            text = "Brush Size",
+                                            fontSize = 15.sp,
+                                            fontWeight = FontWeight.Medium
+                                        )
+
+                                        Slider(
+                                            value = brushSize,
+                                            onValueChange = {
+                                                brushSize = it
+                                            },
+                                            modifier = Modifier.weight(1f),
+                                            valueRange = 0f..100f,
+                                            colors = SliderDefaults.colors(
+                                                thumbColor = Color(0xFFFFC107),
+                                                activeTrackColor = Color(0xFF8D6E63)
+                                            )
+                                        )
+                                    }
+
+                                    Spacer(modifier = Modifier.height(16.dp))
+
+                                    Row(
+                                        modifier = Modifier.fillMaxWidth(),
+                                        verticalAlignment = Alignment.CenterVertically
+                                    ) {
+                                        Text(
+                                            text = "Magic Brush",
+                                            fontSize = 15.sp,
+                                            fontWeight = FontWeight.Medium
+                                        )
+                                        Switch(
+                                            checked = isMagicBrushEnabled,
+                                            onCheckedChange = { isMagicBrushEnabled = it },
+                                            colors = SwitchDefaults.colors(
+                                                checkedThumbColor = Color(0xFFFFC107),
+                                            )
+                                        )
+                                    }
+                                }
+                            }
                         }
-                        
-
-                    }else{
+                    } else {
                         LazyRow(
                             modifier = Modifier
                                 .fillMaxWidth()
@@ -979,14 +1132,12 @@ fun BgDetail(
 
                             item {
                                 val context = LocalContext.current
-                                Column(
-                                    horizontalAlignment = Alignment.CenterHorizontally,
+                                Column(horizontalAlignment = Alignment.CenterHorizontally,
                                     modifier = Modifier
                                         .padding(vertical = 8.dp)
                                         .pointerInput(Unit) {
                                             detectTapGestures(onLongPress = { /* Trigger tooltip */ })
-                                        }
-                                ) {
+                                        }) {
                                     Box(
                                         modifier = Modifier
                                             .size(45.dp)
@@ -1005,11 +1156,9 @@ fun BgDetail(
                                                 } catch (e: ActivityNotFoundException) {
                                                     e.printStackTrace()
 
-                                                    val fallbackIntent =
-                                                        Intent(
-                                                            Intent.ACTION_VIEW,
-                                                            Uri.parse(canvaUrl)
-                                                        )
+                                                    val fallbackIntent = Intent(
+                                                        Intent.ACTION_VIEW, Uri.parse(canvaUrl)
+                                                    )
                                                     try {
                                                         context.startActivity(fallbackIntent)
                                                     } catch (e: Exception) {
@@ -1022,8 +1171,7 @@ fun BgDetail(
                                                             .show()
                                                     }
                                                 }
-                                            },
-                                        contentAlignment = Alignment.TopEnd
+                                            }, contentAlignment = Alignment.TopEnd
                                     ) {
                                         Image(
                                             painter = painterResource(id = R.drawable.canva),
