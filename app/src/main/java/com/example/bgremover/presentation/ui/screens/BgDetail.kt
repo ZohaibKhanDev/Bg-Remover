@@ -138,7 +138,7 @@ fun BgDetail(
         mutableStateOf(false)
     }
     var isBackgroundRemoved by remember { mutableStateOf(false) }
-        val launcher =
+    val launcher =
         rememberLauncherForActivityResult(contract = ActivityResultContracts.GetContent(),
             onResult = { uri ->
                 uri?.let { uri ->
@@ -363,6 +363,7 @@ fun BgDetail(
                                                 contentScale = ContentScale.Crop
                                             )
                                         }
+
                                         selectedGallery != null -> {
                                             Image(
                                                 bitmap = selectedGallery!!.asImageBitmap(),
@@ -371,6 +372,7 @@ fun BgDetail(
                                                 modifier = Modifier.fillMaxSize()
                                             )
                                         }
+
                                         else -> {
                                             Image(
                                                 painter = painterResource(id = R.drawable.transparntbg),
@@ -416,7 +418,10 @@ fun BgDetail(
                                         }
 
                                         if (isBackgroundRemoved) {
-                                            Box {
+                                            Box(
+                                                modifier = Modifier.fillMaxSize(),
+                                                contentAlignment = Alignment.Center
+                                            ) {
                                                 Canvas(
                                                     modifier = Modifier
                                                         .fillMaxSize()
@@ -446,7 +451,7 @@ fun BgDetail(
                                     }
                                 } else {
 
-                                    if (restore){
+                                    if (restore) {
                                         imageUrl?.let {
                                             androidx.compose.animation.AnimatedVisibility(
                                                 visible = showImageAnimation,
@@ -464,7 +469,7 @@ fun BgDetail(
                                                 )
                                             }
                                         }
-                                    }else{
+                                    } else {
                                         bgremoveimage?.let { base64 ->
                                             val imageBytes = Base64.decode(base64, Base64.DEFAULT)
                                             val bitmap = BitmapFactory.decodeByteArray(
@@ -680,7 +685,9 @@ fun BgDetail(
                                                 .width(60.dp)
                                                 .height(50.dp)
                                                 .clickable {
+                                                    selectedColor = Color.Transparent
                                                     selectedPhoto = photoResId
+                                                    selectedGallery = null
                                                 }) {
                                                 Image(
                                                     painter = painterResource(id = photoResId),
@@ -735,7 +742,9 @@ fun BgDetail(
                     LazyColumn {
                         item {
                             TextButton(
-                                onClick = { effect = false },
+                                onClick = {
+                                    effect = false
+                                },
                                 modifier = Modifier
                                     .align(Alignment.End)
                                     .padding(16.dp)
@@ -885,7 +894,6 @@ fun BgDetail(
                                             fontSize = 15.sp,
                                             fontWeight = FontWeight.Medium,
                                             modifier = Modifier.clickable {
-
                                                 isBackgroundRemoved = false
                                                 showBgRemovedImage = !restore
                                             }
@@ -898,7 +906,8 @@ fun BgDetail(
                                             color = Color(0xFF03A9F4),
                                             modifier = Modifier.clickable {
                                                 brush = false
-                                                isBackgroundRemoved=false
+                                                isBackgroundRemoved = false
+                                                restore = false
                                             }
                                         )
                                     }
@@ -914,7 +923,7 @@ fun BgDetail(
                                         OutlinedButton(
                                             onClick = {
                                                 isBackgroundRemoved = true
-                                                restore=false
+                                                restore = false
                                             },
                                             modifier = Modifier
                                                 .width(120.dp)
@@ -1143,7 +1152,8 @@ fun BgDetail(
                                             detectTapGestures(onLongPress = { /* Trigger tooltip */ })
                                         }) {
                                     Box(modifier = Modifier
-                                        .size(45.dp).clip(CircleShape)
+                                        .size(45.dp)
+                                        .clip(CircleShape)
                                         .clickable {
                                             brush = !brush
                                         }
@@ -1175,7 +1185,8 @@ fun BgDetail(
 
                                     Box(
                                         modifier = Modifier
-                                            .size(45.dp).clip(CircleShape)
+                                            .size(45.dp)
+                                            .clip(CircleShape)
                                             .clickable {
                                                 effect = !effect
                                             }, contentAlignment = Alignment.TopEnd
@@ -1205,7 +1216,8 @@ fun BgDetail(
                                         }) {
                                     Box(
                                         modifier = Modifier
-                                            .size(45.dp).clip(CircleShape)
+                                            .size(45.dp)
+                                            .clip(CircleShape)
                                             .clickable {
                                                 val imageUrl = "$bgremoveimage"
                                                 val encodedImageUrl = Uri.encode(imageUrl)
