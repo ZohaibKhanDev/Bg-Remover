@@ -418,7 +418,6 @@ fun BgDetail(
                                             mutableStateOf(Offset(0f, 0f))
                                         }
 
-
                                         if (isBackgroundRemoved) {
                                             Box {
                                                 Canvas(
