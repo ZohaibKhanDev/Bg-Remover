@@ -4,7 +4,7 @@ plugins {
     alias(libs.plugins.kotlinxSerialization)
     id("kotlin-kapt")
 }
-  
+
 android {
     namespace = "com.example.bgremover"
     compileSdk = 34
