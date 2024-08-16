@@ -913,6 +913,8 @@ fun BgDetail(
                                             onClick = {
                                                 isBackgroundRemoved = true
                                                 restore = false
+                                                showBgRemovedImage = !restore
+
                                             },
                                             modifier = Modifier
                                                 .width(120.dp)
@@ -930,7 +932,6 @@ fun BgDetail(
                                                 restore = !restore
                                                 showImageAnimation = restore
                                                 showBgRemovedImage = !restore
-
                                                 isBackgroundRemoved = false
                                             },
                                             modifier = Modifier
