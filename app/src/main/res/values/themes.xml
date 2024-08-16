@@ -5,7 +5,7 @@
         <item name="android:windowSplashScreenBackground" tools:targetApi="s">#fcfcfa</item>
         <item name="android:windowSplashScreenAnimatedIcon" tools:targetApi="s">@drawable/newlogo</item>
         <item name="android:windowSplashScreenAnimationDuration" tools:targetApi="s">3000</item>
-
+        <item name="android:windowSplashScreenIconBackgroundColor" tools:targetApi="s">#fcfcfa</item>
     </style>
     
 </resources>

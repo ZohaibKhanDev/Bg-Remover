@@ -138,19 +138,18 @@ fun BgDetail(
         mutableStateOf(false)
     }
     var isBackgroundRemoved by remember { mutableStateOf(false) }
-    val launcher =
-        rememberLauncherForActivityResult(contract = ActivityResultContracts.GetContent(),
-            onResult = { uri ->
-                uri?.let { uri ->
-                    val inputStream = context.contentResolver.openInputStream(uri)
-                    val selectedBitmap = BitmapFactory.decodeStream(inputStream)
-                    selectedBitmap?.let { bitmap ->
-                        selectedPhoto = null
-                        selectedGallery = bitmap
-                    }
+    val launcher = rememberLauncherForActivityResult(
+        contract = ActivityResultContracts.GetContent(),
+        onResult = { uri ->
+            uri?.let { uri ->
+                val inputStream = context.contentResolver.openInputStream(uri)
+                val selectedBitmap = BitmapFactory.decodeStream(inputStream)
+                selectedBitmap?.let { bitmap ->
+                    selectedPhoto = null
+                    selectedGallery = bitmap
                 }
             }
-        )
+        })
 
     var brushSize by remember { mutableStateOf(100.dp) }
     LaunchedEffect(Unit) {
@@ -310,8 +309,7 @@ fun BgDetail(
                         .background(
                             if (selectedColor != Color.Transparent) selectedColor
                             else Color.Transparent
-                        ),
-                    contentAlignment = Alignment.Center
+                        ), contentAlignment = Alignment.Center
                 ) {
 
                     androidx.compose.animation.AnimatedVisibility(
@@ -380,15 +378,13 @@ fun BgDetail(
                                                 modifier = Modifier.fillMaxSize(),
                                                 contentScale = ContentScale.Crop
                                             )
-                                            Box(
-                                                modifier = Modifier
-                                                    .clip(RoundedCornerShape(11.dp))
-                                                    .fillMaxSize()
-                                                    .background(selectedColor)
-                                                    .graphicsLayer {
-                                                        alpha = slider1
-                                                    }
-                                            )
+                                            Box(modifier = Modifier
+                                                .clip(RoundedCornerShape(11.dp))
+                                                .fillMaxSize()
+                                                .background(selectedColor)
+                                                .graphicsLayer {
+                                                    alpha = slider1
+                                                })
                                         }
                                     }
                                 }
@@ -422,28 +418,25 @@ fun BgDetail(
                                                 modifier = Modifier.fillMaxSize(),
                                                 contentAlignment = Alignment.Center
                                             ) {
-                                                Canvas(
-                                                    modifier = Modifier
-                                                        .fillMaxSize()
-                                                        .pointerInput("dragging") {
-                                                            detectDragGestures { change, dragAmount ->
-                                                                pointerOffset += dragAmount
-                                                            }
+                                                Canvas(modifier = Modifier
+                                                    .fillMaxSize()
+                                                    .pointerInput("dragging") {
+                                                        detectDragGestures { change, dragAmount ->
+                                                            pointerOffset += dragAmount
                                                         }
-                                                        .drawWithContent {
-                                                            drawContent()
-                                                            drawRect(
-                                                                Brush.radialGradient(
-                                                                    listOf(
-                                                                        Color.Yellow,
-                                                                        Color.Transparent
-                                                                    ),
-                                                                    center = pointerOffset,
-                                                                    radius = brushSize.toPx()
-                                                                )
+                                                    }
+                                                    .drawWithContent {
+                                                        drawContent()
+                                                        drawRect(
+                                                            Brush.radialGradient(
+                                                                listOf(
+                                                                    Color.Yellow, Color.Transparent
+                                                                ),
+                                                                center = pointerOffset,
+                                                                radius = brushSize.toPx()
                                                             )
-                                                        }
-                                                ) {
+                                                        )
+                                                    }.align(Alignment.Center)) {
 
                                                 }
                                             }
@@ -744,8 +737,7 @@ fun BgDetail(
                             TextButton(
                                 onClick = {
                                     effect = false
-                                },
-                                modifier = Modifier
+                                }, modifier = Modifier
                                     .align(Alignment.End)
                                     .padding(16.dp)
                             ) {
@@ -873,7 +865,7 @@ fun BgDetail(
                         Card(
                             modifier = Modifier
                                 .fillMaxWidth()
-                                .height(200.dp),
+                                .height(250.dp),
                             elevation = CardDefaults.cardElevation(2.dp),
                             colors = CardDefaults.cardColors(Color.White)
                         ) {
@@ -890,18 +882,16 @@ fun BgDetail(
                                         horizontalArrangement = Arrangement.SpaceBetween,
                                         verticalAlignment = Alignment.CenterVertically
                                     ) {
-                                        Text(
-                                            text = "Reset",
+                                        Text(text = "Reset",
                                             fontSize = 15.sp,
                                             fontWeight = FontWeight.Medium,
                                             modifier = Modifier.clickable {
                                                 isBackgroundRemoved = false
                                                 showBgRemovedImage = !restore
-                                            }
-                                        )
+                                                restore = false
+                                            })
 
-                                        Text(
-                                            text = "Done",
+                                        Text(text = "Done",
                                             fontSize = 15.sp,
                                             fontWeight = FontWeight.Medium,
                                             color = Color(0xFF03A9F4),
@@ -909,15 +899,13 @@ fun BgDetail(
                                                 brush = false
                                                 isBackgroundRemoved = false
                                                 restore = false
-                                            }
-                                        )
+                                            })
                                     }
 
                                     Spacer(modifier = Modifier.height(16.dp))
 
                                     Row(
-                                        modifier = Modifier
-                                            .fillMaxWidth(),
+                                        modifier = Modifier.fillMaxWidth(),
                                         horizontalArrangement = Arrangement.SpaceEvenly,
                                         verticalAlignment = Alignment.CenterVertically
                                     ) {
@@ -957,8 +945,7 @@ fun BgDetail(
                                     Spacer(modifier = Modifier.height(16.dp))
 
                                     Row(
-                                        modifier = Modifier
-                                            .fillMaxWidth(),
+                                        modifier = Modifier.fillMaxWidth(),
                                         verticalAlignment = Alignment.CenterVertically
                                     ) {
                                         Text(
@@ -1124,7 +1111,12 @@ fun BgDetail(
                                         }) {
                                     Box(
                                         modifier = Modifier
-                                            .clip(CircleShape)
+                                            .border(
+                                                BorderStroke(
+                                                    2.dp,
+                                                    color = Color.LightGray.copy(alpha = 0.50f)
+                                                ), shape = CircleShape
+                                            )
                                             .size(45.dp)
                                             .clickable {
                                                 addBg = true
@@ -1154,7 +1146,11 @@ fun BgDetail(
                                         }) {
                                     Box(modifier = Modifier
                                         .size(45.dp)
-                                        .clip(CircleShape)
+                                        .border(
+                                            BorderStroke(
+                                                2.dp, color = Color.LightGray.copy(alpha = 0.50f)
+                                            ), shape = CircleShape
+                                        )
                                         .clickable {
                                             brush = !brush
                                         }
@@ -1187,7 +1183,12 @@ fun BgDetail(
                                     Box(
                                         modifier = Modifier
                                             .size(45.dp)
-                                            .clip(CircleShape)
+                                            .border(
+                                                BorderStroke(
+                                                    2.dp,
+                                                    color = Color.LightGray.copy(alpha = 0.50f)
+                                                ), shape = CircleShape
+                                            )
                                             .clickable {
                                                 effect = !effect
                                             }, contentAlignment = Alignment.TopEnd
@@ -1218,15 +1219,18 @@ fun BgDetail(
                                     Box(
                                         modifier = Modifier
                                             .size(45.dp)
-                                            .clip(CircleShape)
+                                            .border(
+                                                BorderStroke(
+                                                    2.dp,
+                                                    color = Color.LightGray.copy(alpha = 0.50f)
+                                                ), shape = CircleShape
+                                            )
                                             .clickable {
-                                                val imageUrl = "$bgremoveimage"
+                                                val imageUrl = "https://your-public-url.com/path-to-image.jpg"
                                                 val encodedImageUrl = Uri.encode(imageUrl)
-                                                val canvaUrl =
-                                                    "https://www.canva.com/create/design?upload=$encodedImageUrl"
+                                                val canvaUrl = "https://www.canva.com/create/design?upload=$encodedImageUrl"
 
-                                                val intent =
-                                                    Intent(Intent.ACTION_VIEW, Uri.parse(canvaUrl))
+                                                val intent = Intent(Intent.ACTION_VIEW, Uri.parse(canvaUrl))
                                                 intent.setPackage("com.android.chrome")
 
                                                 try {
@@ -1234,9 +1238,7 @@ fun BgDetail(
                                                 } catch (e: ActivityNotFoundException) {
                                                     e.printStackTrace()
 
-                                                    val fallbackIntent = Intent(
-                                                        Intent.ACTION_VIEW, Uri.parse(canvaUrl)
-                                                    )
+                                                    val fallbackIntent = Intent(Intent.ACTION_VIEW, Uri.parse(canvaUrl))
                                                     try {
                                                         context.startActivity(fallbackIntent)
                                                     } catch (e: Exception) {
@@ -1249,6 +1251,7 @@ fun BgDetail(
                                                             .show()
                                                     }
                                                 }
+
                                             }, contentAlignment = Alignment.TopEnd
                                     ) {
                                         Image(
@@ -1259,18 +1262,15 @@ fun BgDetail(
                                                 .align(Alignment.Center),
                                         )
                                     }
+
                                     Text(
                                         text = "Canva",
                                         fontSize = 12.sp,
                                     )
                                 }
                             }
-
-
                         }
                     }
-
-
                 }
             }
         }
