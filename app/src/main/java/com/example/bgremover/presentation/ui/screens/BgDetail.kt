@@ -871,14 +871,15 @@ fun BgDetail(
                 } else {
                     if (brush) {
                         Card(
-                            modifier = Modifier.fillMaxWidth(),
+                            modifier = Modifier
+                                .fillMaxWidth()
+                                .height(200.dp),
                             elevation = CardDefaults.cardElevation(2.dp),
                             colors = CardDefaults.cardColors(Color.White)
                         ) {
                             LazyColumn(
                                 modifier = Modifier
-                                    .fillMaxWidth()
-                                    .height(180.dp)
+                                    .fillMaxSize()
                                     .padding(16.dp)
                             ) {
                                 item {
