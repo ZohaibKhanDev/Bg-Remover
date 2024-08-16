@@ -59,18 +59,15 @@ import androidx.compose.ui.graphics.asImageBitmap
 import androidx.compose.ui.graphics.graphicsLayer
 import androidx.compose.ui.input.pointer.pointerInput
 import androidx.compose.ui.layout.ContentScale
-import androidx.compose.ui.layout.onSizeChanged
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.platform.LocalDensity
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.text.font.FontWeight
-import androidx.compose.ui.unit.IntOffset
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.navigation.NavController
 import coil.compose.AsyncImage
-import coil.decode.DecodeUtils.calculateInSampleSize
 import com.example.bgremover.R
 import com.example.bgremover.presentation.ui.navigation.Screens
 import com.google.android.gms.ads.AdRequest
@@ -670,6 +667,12 @@ fun BgDetail(
                                                 R.drawable.cat,
                                                 R.drawable.women,
                                                 R.drawable.phone,
+                                                R.drawable.car1,
+                                                R.drawable.bg1,
+                                                R.drawable.bg2,
+                                                R.drawable.bg3,
+                                                R.drawable.bg4,
+                                                R.drawable.sunset
                                             )
                                         ) { photoResId ->
                                             Box(modifier = Modifier
