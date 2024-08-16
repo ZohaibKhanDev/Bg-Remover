@@ -1140,7 +1140,7 @@ fun BgDetail(
                                             detectTapGestures(onLongPress = { /* Trigger tooltip */ })
                                         }) {
                                     Box(modifier = Modifier
-                                        .size(45.dp)
+                                        .size(45.dp).clip(CircleShape)
                                         .clickable {
                                             brush = !brush
                                         }
@@ -1172,7 +1172,7 @@ fun BgDetail(
 
                                     Box(
                                         modifier = Modifier
-                                            .size(45.dp)
+                                            .size(45.dp).clip(CircleShape)
                                             .clickable {
                                                 effect = !effect
                                             }, contentAlignment = Alignment.TopEnd
@@ -1202,7 +1202,7 @@ fun BgDetail(
                                         }) {
                                     Box(
                                         modifier = Modifier
-                                            .size(45.dp)
+                                            .size(45.dp).clip(CircleShape)
                                             .clickable {
                                                 val imageUrl = "$bgremoveimage"
                                                 val encodedImageUrl = Uri.encode(imageUrl)
@@ -1261,24 +1261,6 @@ fun BgDetail(
     }
 }
 
-
-fun calculateInSampleSize(options: BitmapFactory.Options, reqWidth: Int, reqHeight: Int): Int {
-
-    val (height: Int, width: Int) = options.run { outHeight to outWidth }
-    var inSampleSize = 1
-
-    if (height > reqHeight || width > reqWidth) {
-
-        val halfHeight: Int = height / 2
-        val halfWidth: Int = width / 2
-
-        while (halfHeight / inSampleSize >= reqHeight && halfWidth / inSampleSize >= reqWidth) {
-            inSampleSize *= 2
-        }
-    }
-
-    return inSampleSize
-}
 
 
 

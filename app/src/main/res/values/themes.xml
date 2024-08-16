@@ -1,5 +1,11 @@
 <?xml version="1.0" encoding="utf-8"?>
-<resources>
+<resources xmlns:tools="http://schemas.android.com/tools">
 
-    <style name="Theme.BgRemover" parent="android:Theme.Material.Light.NoActionBar" />
+    <style name="Theme.BgRemover" parent="android:Theme.Material.Light.NoActionBar">
+        <item name="android:windowSplashScreenBackground" tools:targetApi="s">#fcfcfa</item>
+        <item name="android:windowSplashScreenAnimatedIcon" tools:targetApi="s">@drawable/newlogo</item>
+        <item name="android:windowSplashScreenAnimationDuration" tools:targetApi="s">3000</item>
+
+    </style>
+    
 </resources>

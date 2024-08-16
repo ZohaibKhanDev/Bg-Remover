@@ -46,6 +46,10 @@ import com.example.bgremover.presentation.ui.screens.BgRemover
 import com.example.bgremover.ui.theme.BgRemoverTheme
 import com.slowmac.autobackgroundremover.BackgroundRemover
 import com.slowmac.autobackgroundremover.OnBackgroundChangeListener
+import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.delay
+import kotlinx.coroutines.launch
 import org.koin.android.ext.koin.androidContext
 import org.koin.android.ext.koin.androidLogger
 import org.koin.core.context.startKoin
@@ -59,7 +63,14 @@ class MainActivity : ComponentActivity() {
             androidLogger()
             modules(appModule)
         }
-        installSplashScreen()
+      val splahscreen=installSplashScreen()
+
+        splahscreen.setKeepOnScreenCondition{true}
+
+        CoroutineScope(Dispatchers.Main).launch {
+            delay(3000L)
+            splahscreen.setKeepOnScreenCondition{false}
+        }
         setContent {
             BgRemoverTheme {
                 Navigation()
