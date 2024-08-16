@@ -24,6 +24,5 @@ Let's chat about potential projects, job opportunities, or any other collaborati
 | ![Screenshot 7](https://github.com/ZohaibKhanDev/Bg-Remover/blob/master/screenshots/7.png) | ![Screenshot 8](https://github.com/ZohaibKhanDev/Bg-Remover/blob/master/screenshots/8.png) | ![Screenshot 9](https://github.com/ZohaibKhanDev/Bg-Remover/blob/master/screenshots/9.png) 
 | --- | --- | ---|
 | ![Screenshot 10](https://github.com/ZohaibKhanDev/Bg-Remover/blob/master/screenshots/10.png) | ![Screenshot 11](https://github.com/ZohaibKhanDev/Bg-Remover/blob/master/screenshots/11.png) | ![Screenshot 12](https://github.com/ZohaibKhanDev/Bg-Remover/blob/master/screenshots/12.png) 
-| --- | --- | ---|
 
 
