@@ -101,4 +101,6 @@ dependencies {
     implementation("com.google.android.gms:play-services-ads:23.2.0")
     implementation("androidx.core:core-splashscreen:1.0.0")
 
+    implementation("androidx.biometric:biometric:1.1.0")
+    implementation("androidx.appcompat:appcompat:1.6.1")
 }

@@ -1,6 +1,8 @@
- package com.example.bgremover.presentation.ui.navigation
+package com.example.bgremover.presentation.ui.navigation
 
 import androidx.compose.runtime.Composable
+import androidx.navigation.NavController
+import androidx.navigation.NavHostController
 import androidx.navigation.NavType
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
@@ -10,9 +12,7 @@ import com.example.bgremover.presentation.ui.screens.BgDetail
 import com.example.bgremover.presentation.ui.screens.BgRemover
 
 @Composable
-fun Navigation() {
-    val navController = rememberNavController()
-
+fun Navigation(navController: NavHostController) {
     NavHost(navController = navController, startDestination = Screens.BgRemover.route) {
         composable(Screens.BgRemover.route) {
             BgRemover(navController)
@@ -29,15 +29,12 @@ fun Navigation() {
                 }
             )
         ) { backStackEntry ->
-
             val imageurl = backStackEntry.arguments?.getString("imageUrl")
             val bgremoveimage = backStackEntry.arguments?.getString("bgremoveimage")
             BgDetail(navController = navController, imageurl, bgremoveimage)
-
         }
     }
 }
-
 
 
 sealed class Screens(
