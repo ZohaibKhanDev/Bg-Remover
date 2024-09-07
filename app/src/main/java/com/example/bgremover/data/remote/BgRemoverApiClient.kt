@@ -91,7 +91,8 @@ object BgRemoverApiClient {
 
 
 
-    suspend fun enhanceImage(imageFile: File): ImageEnhancer {
+
+    suspend fun getImageEnhance(imageFile: File): ImageEnhancer {
         val url =
             "https://AI-Face-Enhancer.proxy-production.allthingsdev.co/face/editing/enhance-face"
         val response: HttpResponse = client.post(url) {
@@ -110,7 +111,7 @@ object BgRemoverApiClient {
             ))
         }
         val responseBody = response.bodyAsText()
-        return Json.decodeFromString<ImageEnhancer>(responseBody)
+        return Json.decodeFromString(responseBody)
     }
 
 

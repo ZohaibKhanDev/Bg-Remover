@@ -3,15 +3,18 @@ package com.example.bgremover.presentation.ui.screens
 import android.annotation.SuppressLint
 import android.app.Activity
 import android.content.ActivityNotFoundException
+import android.content.Context
 import android.content.Intent
 import android.graphics.Bitmap
 import android.graphics.BitmapFactory
 import android.net.Uri
+import android.os.Build
 import android.util.Base64
 import android.util.Log
 import android.widget.Toast
 import androidx.activity.compose.rememberLauncherForActivityResult
 import androidx.activity.result.contract.ActivityResultContracts
+import androidx.annotation.RequiresApi
 import androidx.compose.animation.core.LinearOutSlowInEasing
 import androidx.compose.animation.core.animateFloatAsState
 import androidx.compose.animation.core.tween
@@ -63,6 +66,7 @@ import androidx.compose.material3.Button
 import androidx.compose.material3.ButtonDefaults
 import androidx.compose.material3.Card
 import androidx.compose.material3.CardDefaults
+import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.DropdownMenu
 import androidx.compose.material3.DropdownMenuItem
 import androidx.compose.material3.ExperimentalMaterial3Api
@@ -80,6 +84,7 @@ import androidx.compose.material3.TopAppBar
 import androidx.compose.material3.TopAppBarDefaults
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
@@ -105,15 +110,21 @@ import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import androidx.core.net.toUri
 import androidx.navigation.NavController
 import coil.compose.AsyncImage
 import com.example.bgremover.R
+import com.example.bgremover.domain.model.imageenhance.ImageEnhancer
+import com.example.bgremover.domain.usecase.ResultState
 import com.example.bgremover.presentation.ui.navigation.Screens
+import com.example.bgremover.presentation.viewmodel.MainViewModel
 import com.google.android.gms.ads.AdRequest
 import com.google.android.gms.ads.LoadAdError
 import com.google.android.gms.ads.interstitial.InterstitialAd
 import com.google.android.gms.ads.interstitial.InterstitialAdLoadCallback
 import kotlinx.coroutines.delay
+import org.koin.compose.koinInject
+import java.io.File
 
 @OptIn(ExperimentalMaterial3Api::class)
 @SuppressLint("UnusedMaterial3ScaffoldPaddingParameter", "InvalidColorHexValue")
@@ -121,6 +132,10 @@ import kotlinx.coroutines.delay
 fun BgDetail(
     navController: NavController, imageUrl: String?, bgremoveimage: String?
 ) {
+    var isLoading by remember {
+        mutableStateOf(false)
+    }
+    val viewModel: MainViewModel = koinInject()
     var showBgRemovedImage by remember { mutableStateOf(false) }
     var selectedGallery by remember { mutableStateOf<Bitmap?>(null) }
     var blurRadius by remember { mutableStateOf(0f) }
@@ -130,6 +145,34 @@ fun BgDetail(
     }
     var aiDialog by remember {
         mutableStateOf(false)
+    }
+
+    var aiLoading by remember {
+        mutableStateOf(false)
+    }
+
+    var aiData by remember {
+        mutableStateOf<ImageEnhancer?>(null)
+    }
+    val state by viewModel.allImageEnhancer.collectAsState()
+    when (state) {
+        is ResultState.Error -> {
+            isLoading = false
+            val error = (state as ResultState.Error).error
+            Text(text = error.toString())
+        }
+
+        ResultState.Loading -> {
+            if (isLoading) {
+                isLoading = true
+            }
+        }
+
+        is ResultState.Success -> {
+            isLoading = false
+            val success = (state as ResultState.Success).success
+            aiData = success
+        }
     }
     var showPhoto by remember { mutableStateOf(true) }
     var showColor by remember { mutableStateOf(false) }
@@ -180,18 +223,18 @@ fun BgDetail(
         mutableStateOf(false)
     }
     var isBackgroundRemoved by remember { mutableStateOf(false) }
-    val launcher = rememberLauncherForActivityResult(
-        contract = ActivityResultContracts.GetContent(),
-        onResult = { uri ->
-            uri?.let { uri ->
-                val inputStream = context.contentResolver.openInputStream(uri)
-                val selectedBitmap = BitmapFactory.decodeStream(inputStream)
-                selectedBitmap?.let { bitmap ->
-                    selectedPhoto = null
-                    selectedGallery = bitmap
+    val launcher =
+        rememberLauncherForActivityResult(contract = ActivityResultContracts.GetContent(),
+            onResult = { uri ->
+                uri?.let { uri ->
+                    val inputStream = context.contentResolver.openInputStream(uri)
+                    val selectedBitmap = BitmapFactory.decodeStream(inputStream)
+                    selectedBitmap?.let { bitmap ->
+                        selectedPhoto = null
+                        selectedGallery = bitmap
+                    }
                 }
-            }
-        })
+            })
 
     var brushSize by remember { mutableStateOf(100.dp) }
     LaunchedEffect(Unit) {
@@ -480,8 +523,7 @@ fun BgDetail(
                                                             )
                                                         )
                                                     }
-                                                    .align(Alignment.Center)
-                                                ) {
+                                                    .align(Alignment.Center)) {
 
                                                 }
                                             }
@@ -1289,8 +1331,7 @@ fun BgDetail(
                                                     e.printStackTrace()
 
                                                     val fallbackIntent = Intent(
-                                                        Intent.ACTION_VIEW,
-                                                        Uri.parse(canvaUrl)
+                                                        Intent.ACTION_VIEW, Uri.parse(canvaUrl)
                                                     )
                                                     try {
                                                         context.startActivity(fallbackIntent)
@@ -1366,37 +1407,62 @@ fun BgDetail(
                 }
             }
         }
+        if (aiLoading) {
+            AlertDialog(onDismissRequest = {
+                isLoading = false
+            }, confirmButton = {
 
-        if (aiDialog){
-            AlertDialog(
-                onDismissRequest = { aiDialog = false },
-                confirmButton = {
-                    TextButton(onClick = {
-                        aiDialog = false
-                    }) {
-                        Text(text = "Yes")
+            }, title = {
+                CircularProgressIndicator()
+            })
+        }
+
+        if (aiDialog) {
+            AlertDialog(onDismissRequest = { aiDialog = false }, confirmButton = {
+                TextButton(onClick = {
+                    aiDialog = false
+                    val file = getFileFromUri(context, bgremoveimage?.toUri()!!)
+                    if (file != null) {
+                        viewModel.EnhanceImage(file)
+                    } else {
+
                     }
-                },
-                dismissButton = {
-                    TextButton(onClick = { aiDialog = false }) {
-                        Text(text = "No")
-                    }
-                },
-                title = {
-                    Text(text = "AI Photo Enhancement Confirmation")
-                },
-                text = {
-                    Text(
-                        text = "Enhance your photo quality using our AI-powered enhancement tool. This process will improve resolution, adjust sharpness, and optimize details for the best possible output. Confirm to apply enhancements, or cancel to keep the original image."
-                    )
+                }) {
+                    Text(text = "Yes")
                 }
-            )
+            }, dismissButton = {
+                TextButton(onClick = { aiDialog = false }) {
+                    Text(text = "No")
+                }
+            }, title = {
+                Text(text = "AI Photo Enhancement Confirmation")
+            }, text = {
+                Text(
+                    text = "Enhance your photo quality using our AI-powered enhancement tool. Confirm to apply enhancements, or cancel to keep the original image."
+                )
+            })
         }
 
 
     }
 }
 
+@RequiresApi(Build.VERSION_CODES.KITKAT)
+fun getFileFromUri(context: Context, uri: Uri): File? {
+    return try {
+        val inputStream = context.contentResolver.openInputStream(uri)
+        val file = File(context.cacheDir, "enhanced_image.jpg")
+        val outputStream = file.outputStream()
 
-
+        inputStream?.use { input ->
+            outputStream.use { output ->
+                input.copyTo(output)
+            }
+        }
+        file
+    } catch (e: Exception) {
+        e.printStackTrace()
+        null
+    }
+}
 
