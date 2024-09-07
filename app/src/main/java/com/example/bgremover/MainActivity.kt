@@ -17,18 +17,12 @@ import androidx.navigation.compose.rememberNavController
 import com.example.bgremover.di.appModule
 import com.example.bgremover.presentation.ui.navigation.Navigation
 import com.example.bgremover.presentation.ui.navigation.Screens
-import com.example.bgremover.presentation.ui.screens.BiometricPromptManager
 import com.example.bgremover.ui.theme.BgRemoverTheme
 import org.koin.android.ext.koin.androidContext
 import org.koin.android.ext.koin.androidLogger
 import org.koin.core.context.startKoin
 
 class MainActivity : AppCompatActivity() {
-
-    private val promptManager by lazy {
-        BiometricPromptManager(this)
-    }
-
     @SuppressLint("SuspiciousIndentation")
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -38,47 +32,13 @@ class MainActivity : AppCompatActivity() {
             androidLogger()
             modules(appModule)
         }
-
-        val splashScreen = installSplashScreen()
-        splashScreen.setKeepOnScreenCondition { true }
-
-        promptManager.showBiometricPrompt(
-            title = "Fingerprint Authentication",
-            description = "Authenticate to continue"
-        )
-
         setContent {
-            val biometricResult by promptManager.promptResult.collectAsState(initial = null)
-
-
-            val navController = rememberNavController()
-
-            LaunchedEffect(key1 = biometricResult) {
-                when (biometricResult) {
-                    is BiometricPromptManager.BiometricResult.AuthenticationSuccess -> {
-                        splashScreen.setKeepOnScreenCondition { false }
-                        navController.navigate(Screens.BgRemover.route) {
-                            popUpTo(Screens.BgRemover.route) { inclusive = true }
-                        }
-                    }
-                    is BiometricPromptManager.BiometricResult.AuthenticationError,
-                    BiometricPromptManager.BiometricResult.AuthenticationFailed -> {
-                        finish()
-                    }
-                    else -> Unit
-                }
-            }
-
             BgRemoverTheme {
-                Navigation(navController)
+                Navigation()
             }
         }
     }
 }
-
-
-
-
 
 fun createNotificationChannel(context: Context) {
     if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {

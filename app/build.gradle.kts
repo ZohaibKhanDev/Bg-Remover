@@ -2,7 +2,7 @@ plugins {
     alias(libs.plugins.android.application)
     alias(libs.plugins.jetbrains.kotlin.android)
     alias(libs.plugins.kotlinxSerialization)
-    id("kotlin-kapt")
+
 }
 
 android {
@@ -78,29 +78,40 @@ dependencies {
     implementation(libs.ktor.client.content.negotiation)
     implementation(libs.ktor.client.serialization.kotlinx.json)
     implementation(libs.ktor.client.android)
+
     val nav_version = "2.7.7"
     implementation("androidx.navigation:navigation-compose:$nav_version")
     implementation("io.coil-kt:coil-compose:2.6.0")
     implementation("androidx.compose.material:material-icons-extended:1.6.3")
+
     // Room
     val room_version = "2.6.1"
-
     implementation("androidx.room:room-runtime:$room_version")
-    kapt("androidx.room:room-compiler:$room_version")
     implementation("androidx.room:room-ktx:$room_version")
+
+
     implementation("androidx.core:core-splashscreen:1.0.0")
-    implementation(project.dependencies.platform("io.insert-koin:koin-bom:3.5.4"))
+    implementation(platform("io.insert-koin:koin-bom:3.5.4"))
     implementation("io.insert-koin:koin-core")
     implementation("io.insert-koin:koin-android")
     implementation("io.insert-koin:koin-compose")
     implementation("io.insert-koin:koin-annotations:1.3.1")
-    implementation("com.github.GhayasAhmad:auto-background-remover:1.0.3")
-    implementation("androidx.media3:media3-transformer:1.1.1")
-    implementation ("com.github.bumptech.glide:glide:4.12.0")
-    annotationProcessor ("com.github.bumptech.glide:compiler:4.12.0")
-    implementation("com.google.android.gms:play-services-ads:23.2.0")
+
+    implementation("androidx.core:core-ktx:1.13.1")
+    implementation("androidx.lifecycle:lifecycle-runtime-ktx:2.8.4")
+    implementation("androidx.activity:activity-compose:1.9.1")
+    implementation("androidx.compose.ui:ui:1.6.3")
+    implementation("androidx.compose.ui:ui-graphics:1.6.3")
+    implementation("androidx.compose.ui:ui-tooling-preview:1.6.3")
+    implementation("androidx.compose.material3:material3:1.2.1")
     implementation("androidx.core:core-splashscreen:1.0.0")
+    implementation(platform("androidx.compose:compose-bom:2024.08.00"))
+    implementation("io.coil-kt:coil-gif:2.4.0")
+    implementation("com.google.android.exoplayer:exoplayer:2.18.2")
 
     implementation("androidx.biometric:biometric:1.1.0")
     implementation("androidx.appcompat:appcompat:1.6.1")
+
+    implementation("com.google.android.gms:play-services-ads:23.3.0")
+
 }

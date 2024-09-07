@@ -118,11 +118,25 @@ fun BgRemover(navController: NavController) {
     )
 
     rewardedAd?.fullScreenContentCallback = object : FullScreenContentCallback() {
-        override fun onAdClicked() { super.onAdClicked() }
-        override fun onAdDismissedFullScreenContent() { super.onAdDismissedFullScreenContent() }
-        override fun onAdFailedToShowFullScreenContent(p0: AdError) { super.onAdFailedToShowFullScreenContent(p0) }
-        override fun onAdImpression() { super.onAdImpression() }
-        override fun onAdShowedFullScreenContent() { super.onAdShowedFullScreenContent() }
+        override fun onAdClicked() {
+            super.onAdClicked()
+        }
+
+        override fun onAdDismissedFullScreenContent() {
+            super.onAdDismissedFullScreenContent()
+        }
+
+        override fun onAdFailedToShowFullScreenContent(p0: AdError) {
+            super.onAdFailedToShowFullScreenContent(p0)
+        }
+
+        override fun onAdImpression() {
+            super.onAdImpression()
+        }
+
+        override fun onAdShowedFullScreenContent() {
+            super.onAdShowedFullScreenContent()
+        }
     }
 
     val launcher = rememberLauncherForActivityResult(ActivityResultContracts.GetContent()) { uri ->
@@ -154,9 +168,11 @@ fun BgRemover(navController: NavController) {
                 val error = (bgRemovalState as ResultState.Error).error
                 Toast.makeText(context, "$error", Toast.LENGTH_SHORT).show()
             }
+
             ResultState.Loading -> {
                 isLoading = true
             }
+
             is ResultState.Success -> {
                 isLoading = false
                 bgRemovedImageBase64 = (bgRemovalState as ResultState.Success<String>).success
@@ -275,16 +291,20 @@ fun BgRemover(navController: NavController) {
                                     val inputStream = context.contentResolver.openInputStream(it)
                                     inputStream?.let { stream ->
                                         val file = File(context.cacheDir, "dragged_image.png")
-                                        file.outputStream().use { output ->
-                                            stream.copyTo(output)
-                                        }
+                                        file
+                                            .outputStream()
+                                            .use { output ->
+                                                stream.copyTo(output)
+                                            }
                                         file
                                     }
                                 }
                                 imageFile?.let { file ->
                                     isLoading = true
                                     viewModel.removeBackground(file)
-                                    rewardedAd?.show(context as Activity, OnUserEarnedRewardListener {})
+                                    rewardedAd?.show(
+                                        context as Activity,
+                                        OnUserEarnedRewardListener {})
                                 }
                             }
                         }
@@ -403,7 +423,6 @@ fun Offset.toUri(context: Context): Uri? {
 }
 
 
-
 fun compositeBackground(
     bitmap: Bitmap?,
     backgroundColor: Color?,
@@ -463,7 +482,6 @@ fun applyBlurToBitmap(bitmap: Bitmap, radius: Float, context: Context): Bitmap {
 }
 
 
-
 fun saveImage(
     bitmap: Bitmap?,
     context: Context,
@@ -506,13 +524,19 @@ fun saveImage(
 
             val scaledBitmap = bitmap?.let { original ->
                 if (isHd) {
-                    Bitmap.createScaledBitmap(original, original.width * 2, original.height * 2, true)
+                    Bitmap.createScaledBitmap(
+                        original,
+                        original.width * 2,
+                        original.height * 2,
+                        true
+                    )
                 } else {
                     original
                 }
             }
 
-            val backgroundImageBitmap = galleryBitmap ?: backgroundImageId?.let { getBitmapFromDrawable(context, it) }
+            val backgroundImageBitmap =
+                galleryBitmap ?: backgroundImageId?.let { getBitmapFromDrawable(context, it) }
 
             val finalBackgroundBitmap = if (blurRadius > 0 && backgroundImageBitmap != null) {
                 val clampedBlurRadius = blurRadius.coerceIn(1f, 25f)
@@ -521,10 +545,15 @@ fun saveImage(
                 backgroundImageBitmap
             }
 
-            val finalBitmap = compositeBackground(scaledBitmap, backgroundColor, finalBackgroundBitmap)
+            val finalBitmap =
+                compositeBackground(scaledBitmap, backgroundColor, finalBackgroundBitmap)
 
 
-            finalBitmap.compress(Bitmap.CompressFormat.PNG, 80, outputStream)  // Use lower quality to reduce size
+            finalBitmap.compress(
+                Bitmap.CompressFormat.PNG,
+                80,
+                outputStream
+            )  // Use lower quality to reduce size
             Toast.makeText(context, "Image saved to Pictures", Toast.LENGTH_SHORT).show()
 
             notificationBuilder.setContentText("Download complete").setProgress(0, 0, false)
