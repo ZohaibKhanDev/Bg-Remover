@@ -1,5 +1,6 @@
 package com.example.bgremover.presentation.viewmodel
 
+import android.content.Context
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.example.bgremover.domain.model.imageenhance.ImageEnhancer
@@ -19,11 +20,11 @@ class MainViewModel(private val repository: Repository) : ViewModel() {
     private val _allEnhancer = MutableStateFlow<ResultState<ImageEnhancer>>(ResultState.Loading)
     val allEnhcer: StateFlow<ResultState<ImageEnhancer>> = _allEnhancer.asStateFlow()
 
-    fun getAiEnhancer(imageFile: File) {
+    fun getAiEnhancer(context: Context, imagePath: Any) {
         viewModelScope.launch {
             _allEnhancer.value = ResultState.Loading
             try {
-                val response = repository.enhanceImage(imageFile)
+                val response = repository.enhanceImage(context, imagePath)
                 _allEnhancer.value = ResultState.Success(response)
             } catch (e: Exception) {
                 _allEnhancer.value = ResultState.Error(e)

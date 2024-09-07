@@ -1,5 +1,6 @@
 package com.example.bgremover.domain.repository
 
+import android.content.Context
 import com.example.bgremover.data.remote.BgRemoverApiClient
 import com.example.bgremover.data.repository.ApiClient
 import com.example.bgremover.domain.model.imageenhance.ImageEnhancer
@@ -10,8 +11,8 @@ class Repository : ApiClient {
         return BgRemoverApiClient.removeBackground(imageFile)
     }
 
-    override suspend fun enhanceImage(imageFile: File): ImageEnhancer {
-        return BgRemoverApiClient.enhanceImage(imageFile)
+    override suspend fun enhanceImage(context: Context, imagePath: Any): ImageEnhancer {
+        return BgRemoverApiClient.enhanceImage(context, imagePath)
     }
 
 }

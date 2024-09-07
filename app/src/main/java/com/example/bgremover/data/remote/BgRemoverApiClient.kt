@@ -1,5 +1,7 @@
 package com.example.bgremover.data.remote
 
+import android.content.Context
+import android.net.Uri
 import com.example.bgremover.domain.model.imageenhance.ImageEnhancer
 import com.example.bgremover.utils.constant.TIMEOUT
 import io.ktor.client.HttpClient
@@ -31,6 +33,7 @@ import kotlinx.serialization.json.jsonObject
 import kotlinx.serialization.json.jsonPrimitive
 import org.koin.core.annotation.Single
 import java.io.File
+import java.io.InputStream
 
 
 @Single
@@ -89,9 +92,25 @@ object BgRemoverApiClient {
         }
     }
 
-    suspend fun enhanceImage(imageFile: File): ImageEnhancer {
-        val url =
-            "https://AI-Face-Enhancer.proxy-production.allthingsdev.co/face/editing/enhance-face"
+
+
+    suspend fun enhanceImage(context: Context, imagePath: Any): ImageEnhancer {
+        val imageFile = when (imagePath) {
+            is String -> File(imagePath)
+            is Uri -> {
+                val inputStream: InputStream? = context.contentResolver.openInputStream(imagePath)
+                val tempFile = File.createTempFile("tempImage", ".jpg", context.cacheDir)
+                inputStream?.use { input ->
+                    tempFile.outputStream().use { output ->
+                        input.copyTo(output)
+                    }
+                }
+                tempFile
+            }
+            else -> throw IllegalArgumentException("Unsupported type: ${imagePath::class.simpleName}")
+        }
+
+        val url = "https://AI-Face-Enhancer.proxy-production.allthingsdev.co/face/editing/enhance-face"
         val response: HttpResponse = client.post(url) {
             headers {
                 append("x-apihub-key", "0inWhA3c0XhNU5KZFOWfvxWF4GzUhVvx6BcIZoIuuU-YONINRS")
@@ -110,6 +129,4 @@ object BgRemoverApiClient {
         val responseBody = response.bodyAsText()
         return Json.decodeFromString<ImageEnhancer>(responseBody)
     }
-
-
 }

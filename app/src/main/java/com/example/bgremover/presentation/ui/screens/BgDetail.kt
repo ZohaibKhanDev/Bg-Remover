@@ -172,7 +172,9 @@ fun BgDetail(
         }
 
         ResultState.Loading -> {
-            isLoading = true
+            if (isLoading) {
+                isLoading = true
+            }
         }
 
         is ResultState.Success -> {
@@ -1397,6 +1399,13 @@ fun BgDetail(
                                 Column(
                                     horizontalAlignment = Alignment.CenterHorizontally,
                                     modifier = Modifier
+                                        .clickable {
+                                            isLoading = true
+                                            aiDialog = true
+                                            if (bgremoveimage != null) {
+                                                viewModel.getAiEnhancer(context, bgremoveimage)
+                                            }
+                                        }
                                         .padding(vertical = 8.dp)
                                         .pointerInput(Unit) {
                                             detectTapGestures(onLongPress = { })
@@ -1412,14 +1421,7 @@ fun BgDetail(
                                                 ), shape = CircleShape
                                             )
                                             .clickable {
-                                                val file = bgremoveimage?.let { path ->
-                                                    File(path)
-                                                }
-                                                if (file != null && file.exists()) {
-                                                    viewModel.getAiEnhancer(file)
-                                                } else {
 
-                                                }
                                             },
                                         contentAlignment = Alignment.TopEnd
                                     ) {
@@ -1448,23 +1450,24 @@ fun BgDetail(
                 AlertDialog(
                     onDismissRequest = { aiDialog = false },
                     confirmButton = {
-                        TextButton(onClick = {
-                            aiDialog = false
-
-                        }) {
-                            Text(text = "Yes")
+                        if (isLoading) {
+                            CircularProgressIndicator()
                         }
                     },
                     dismissButton = {
-                        TextButton(onClick = { aiDialog = false }) {
-                            Text(text = "No")
+                        if (isLoading) {
+                            CircularProgressIndicator()
                         }
                     },
-                    title = { Text(text = "AI Photo Enhancement Confirmation") },
+                    title = {
+                        if (isLoading) {
+                            CircularProgressIndicator()
+                        }
+                    },
                     text = {
-                        Text(
-                            text = "Enhance your photo quality using our AI-powered enhancement tool. Confirm to apply enhancements, or cancel to keep the original image."
-                        )
+                        if (isLoading) {
+                            CircularProgressIndicator()
+                        }
                     }
                 )
             }
