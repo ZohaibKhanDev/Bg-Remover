@@ -118,8 +118,9 @@ import androidx.compose.ui.unit.sp
 import androidx.core.net.toUri
 import androidx.navigation.NavController
 import coil.compose.AsyncImage
+import coil.compose.rememberImagePainter
 import com.example.bgremover.R
-import com.example.bgremover.domain.model.imageenhance.ImageEnhancer
+import com.example.bgremover.domain.model.imageenhance.EnhanceResponse
 import com.example.bgremover.domain.usecase.ResultState
 import com.example.bgremover.presentation.ui.navigation.Screens
 import com.example.bgremover.presentation.viewmodel.MainViewModel
@@ -157,7 +158,7 @@ fun BgDetail(
     }
 
     var downloadData by remember {
-        mutableStateOf<ImageEnhancer?>(null)
+        mutableStateOf<EnhanceResponse?>(null)
     }
 
     val state by viewModel.allEnhcer.collectAsState()
@@ -234,18 +235,18 @@ fun BgDetail(
         mutableStateOf(false)
     }
     var isBackgroundRemoved by remember { mutableStateOf(false) }
-    val launcher =
-        rememberLauncherForActivityResult(contract = ActivityResultContracts.GetContent(),
-            onResult = { uri ->
-                uri?.let { uri ->
-                    val inputStream = context.contentResolver.openInputStream(uri)
-                    val selectedBitmap = BitmapFactory.decodeStream(inputStream)
-                    selectedBitmap?.let { bitmap ->
-                        selectedPhoto = null
-                        selectedGallery = bitmap
-                    }
+    val launcher = rememberLauncherForActivityResult(
+        contract = ActivityResultContracts.GetContent(),
+        onResult = { uri ->
+            uri?.let { uri ->
+                val inputStream = context.contentResolver.openInputStream(uri)
+                val selectedBitmap = BitmapFactory.decodeStream(inputStream)
+                selectedBitmap?.let { bitmap ->
+                    selectedPhoto = null
+                    selectedGallery = bitmap
                 }
-            })
+            }
+        })
 
     var brushSize by remember { mutableStateOf(100.dp) }
     LaunchedEffect(Unit) {
@@ -526,8 +527,7 @@ fun BgDetail(
                                                         drawRect(
                                                             Brush.radialGradient(
                                                                 listOf(
-                                                                    Color.Yellow,
-                                                                    Color.Transparent
+                                                                    Color.Yellow, Color.Transparent
                                                                 ),
                                                                 center = pointerOffset,
                                                                 radius = brushSize.toPx()
@@ -563,7 +563,7 @@ fun BgDetail(
                                         if (downloadData != null) {
                                             downloadData?.let {
                                                 AsyncImage(
-                                                    model = it.data.imageUrl,
+                                                    model = it.data.image,
                                                     contentDescription = "",
                                                     modifier = Modifier
                                                         .graphicsLayer(
@@ -1265,8 +1265,7 @@ fun BgDetail(
                                         .size(45.dp)
                                         .border(
                                             BorderStroke(
-                                                2.dp,
-                                                color = Color.LightGray.copy(alpha = 0.50f)
+                                                2.dp, color = Color.LightGray.copy(alpha = 0.50f)
                                             ), shape = CircleShape
                                         )
                                         .clickable {
@@ -1394,87 +1393,56 @@ fun BgDetail(
                             }
 
 
-
-                            item {
-                                Column(
-                                    horizontalAlignment = Alignment.CenterHorizontally,
-                                    modifier = Modifier
-                                        .clickable {
-                                            isLoading = true
-                                            aiDialog = true
-                                            if (bgremoveimage != null) {
-                                                viewModel.getAiEnhancer(context, bgremoveimage)
-                                            }
-                                        }
-                                        .padding(vertical = 8.dp)
-                                        .pointerInput(Unit) {
-                                            detectTapGestures(onLongPress = { })
-                                        }
-                                ) {
-                                    Box(
-                                        modifier = Modifier
-                                            .size(45.dp)
-                                            .border(
-                                                BorderStroke(
-                                                    2.dp,
-                                                    color = Color.LightGray.copy(alpha = 0.50f)
-                                                ), shape = CircleShape
-                                            )
-                                            .clickable {
-
-                                            },
-                                        contentAlignment = Alignment.TopEnd
-                                    ) {
-                                        Image(
-                                            painter = painterResource(id = R.drawable.enhance),
-                                            contentDescription = "Enhance",
-                                            modifier = Modifier
-                                                .size(24.dp)
-                                                .align(Alignment.Center),
-                                            colorFilter = ColorFilter.tint(color = Color.Black)
-                                        )
-                                    }
-
-                                    Text(
-                                        text = "Ai Enhance",
-                                        fontSize = 12.sp,
-                                    )
+                            if (isLoading) {
+                                item {
+                                    CircularProgressIndicator()
                                 }
+                            } else {
+                                item {
+                                    Column(horizontalAlignment = Alignment.CenterHorizontally) {
+                                        Box(
+                                            modifier = Modifier
+                                                .size(45.dp)
+                                                .border(
+                                                    BorderStroke(
+                                                        2.dp, Color.LightGray.copy(alpha = 0.50f)
+                                                    ), shape = CircleShape
+                                                )
+                                                .clickable {
+                                                    aiDialog = true
+                                                    if (bgremoveimage != null) {
+                                                        isLoading = true
+                                                        viewModel.getAiEnhancer("https://ai-result-001.ailabtools.com/faceBody/enhanceFace/2024-09-07/122701-79a99cb2-0330-aa89-fe1a-f4c5cec442c8-1725712021.jp")
+                                                    }
+                                                }, contentAlignment = Alignment.TopEnd
+                                        ) {
+                                            Image(
+                                                painter = painterResource(id = R.drawable.enhance),
+                                                contentDescription = "Enhance",
+                                                modifier = Modifier
+                                                    .size(24.dp)
+                                                    .align(Alignment.Center),
+                                                colorFilter = ColorFilter.tint(color = Color.Black)
+                                            )
+                                        }
+
+                                        Text(text = "Ai Enhance", fontSize = 12.sp)
+                                    }
+                                }
+
                             }
+
                         }
                     }
                 }
             }
-
-            if (aiDialog) {
-                AlertDialog(
-                    onDismissRequest = { aiDialog = false },
-                    confirmButton = {
-                        if (isLoading) {
-                            CircularProgressIndicator()
-                        }
-                    },
-                    dismissButton = {
-                        if (isLoading) {
-                            CircularProgressIndicator()
-                        }
-                    },
-                    title = {
-                        if (isLoading) {
-                            CircularProgressIndicator()
-                        }
-                    },
-                    text = {
-                        if (isLoading) {
-                            CircularProgressIndicator()
-                        }
-                    }
-                )
-            }
-
-
         }
     }
+}
+
+
+fun stringToFile(filePath: String): File {
+    return File(filePath)
 }
 
 @RequiresApi(Build.VERSION_CODES.KITKAT)
@@ -1492,8 +1460,7 @@ fun getRealPathFromURI(context: Context, uri: Uri): String? {
         } else if (isDownloadsDocument(uri)) {
             val id = DocumentsContract.getDocumentId(uri)
             val contentUri = ContentUris.withAppendedId(
-                Uri.parse("content://downloads/public_downloads"),
-                id.toLong()
+                Uri.parse("content://downloads/public_downloads"), id.toLong()
             )
             filePath = getDataColumn(context, contentUri, null, null)
         } else if (isMediaDocument(uri)) {
@@ -1522,10 +1489,7 @@ fun getRealPathFromURI(context: Context, uri: Uri): String? {
 }
 
 private fun getDataColumn(
-    context: Context,
-    uri: Uri?,
-    selection: String?,
-    selectionArgs: Array<String>?
+    context: Context, uri: Uri?, selection: String?, selectionArgs: Array<String>?
 ): String? {
     var cursor: Cursor? = null
     val column = "_data"

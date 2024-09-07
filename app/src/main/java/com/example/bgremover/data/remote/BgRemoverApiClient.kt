@@ -2,7 +2,7 @@ package com.example.bgremover.data.remote
 
 import android.content.Context
 import android.net.Uri
-import com.example.bgremover.domain.model.imageenhance.ImageEnhancer
+import com.example.bgremover.domain.model.imageenhance.EnhanceResponse
 import com.example.bgremover.utils.constant.TIMEOUT
 import io.ktor.client.HttpClient
 import io.ktor.client.call.body
@@ -92,41 +92,26 @@ object BgRemoverApiClient {
         }
     }
 
-
-
-    suspend fun enhanceImage(context: Context, imagePath: Any): ImageEnhancer {
-        val imageFile = when (imagePath) {
-            is String -> File(imagePath)
-            is Uri -> {
-                val inputStream: InputStream? = context.contentResolver.openInputStream(imagePath)
-                val tempFile = File.createTempFile("tempImage", ".jpg", context.cacheDir)
-                inputStream?.use { input ->
-                    tempFile.outputStream().use { output ->
-                        input.copyTo(output)
-                    }
-                }
-                tempFile
-            }
-            else -> throw IllegalArgumentException("Unsupported type: ${imagePath::class.simpleName}")
-        }
-
-        val url = "https://AI-Face-Enhancer.proxy-production.allthingsdev.co/face/editing/enhance-face"
-        val response: HttpResponse = client.post(url) {
+    suspend fun enhanceImage(imageUrl: String): EnhanceResponse {
+        val response: HttpResponse = client.post("https://techhk.aoscdn.com/api/tasks/visual/scale") {
             headers {
-                append("x-apihub-key", "0inWhA3c0XhNU5KZFOWfvxWF4GzUhVvx6BcIZoIuuU-YONINRS")
-                append("x-apihub-host", "AI-Face-Enhancer.allthingsdev.co")
-                append("x-apihub-endpoint", "384cba1f-0e2d-4bc9-b549-e8609ba02cab")
+                append("X-API-KEY", "wxiaj6kdky4abi1mk")
             }
             setBody(MultiPartFormDataContent(
                 formData {
-                    append("image", imageFile.readBytes(), Headers.build {
-                        append(HttpHeaders.ContentType, ContentType.Image.PNG.toString())
-                        append(HttpHeaders.ContentDisposition, "filename=${imageFile.name}")
-                    })
+                    append("sync", "1")
+                    append("image_url", imageUrl)
                 }
             ))
         }
-        val responseBody = response.bodyAsText()
-        return Json.decodeFromString<ImageEnhancer>(responseBody)
+
+        return if (response.status.isSuccess()) {
+            val responseBody = response.bodyAsText()
+            Json.decodeFromString<EnhanceResponse>(responseBody)
+        } else {
+            throw Exception("Failed to enhance image: ${response.status} - ${response.bodyAsText()}")
+        }
     }
+
+
 }

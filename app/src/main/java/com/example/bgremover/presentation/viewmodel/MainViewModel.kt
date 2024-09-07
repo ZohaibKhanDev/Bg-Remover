@@ -1,9 +1,8 @@
 package com.example.bgremover.presentation.viewmodel
 
-import android.content.Context
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
-import com.example.bgremover.domain.model.imageenhance.ImageEnhancer
+import com.example.bgremover.domain.model.imageenhance.EnhanceResponse
 import com.example.bgremover.domain.repository.Repository
 import com.example.bgremover.domain.usecase.ResultState
 import kotlinx.coroutines.flow.MutableStateFlow
@@ -17,14 +16,14 @@ class MainViewModel(private val repository: Repository) : ViewModel() {
     val bgRemoval: StateFlow<ResultState<String>> = _bgRemoval.asStateFlow()
 
 
-    private val _allEnhancer = MutableStateFlow<ResultState<ImageEnhancer>>(ResultState.Loading)
-    val allEnhcer: StateFlow<ResultState<ImageEnhancer>> = _allEnhancer.asStateFlow()
+    private val _allEnhancer = MutableStateFlow<ResultState<EnhanceResponse>>(ResultState.Loading)
+    val allEnhcer: StateFlow<ResultState<EnhanceResponse>> = _allEnhancer.asStateFlow()
 
-    fun getAiEnhancer(context: Context, imagePath: Any) {
+    fun getAiEnhancer(imageUrl:String) {
         viewModelScope.launch {
             _allEnhancer.value = ResultState.Loading
             try {
-                val response = repository.enhanceImage(context, imagePath)
+                val response = repository.inhanceImage(imageUrl)
                 _allEnhancer.value = ResultState.Success(response)
             } catch (e: Exception) {
                 _allEnhancer.value = ResultState.Error(e)
