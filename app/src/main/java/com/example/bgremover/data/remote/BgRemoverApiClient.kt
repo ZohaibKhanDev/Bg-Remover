@@ -76,7 +76,7 @@ object BgRemoverApiClient {
         }
         val response: HttpResponse = client.post("https://api.remove.bg/v1.0/removebg") {
             headers {
-                append("X-API-Key", "1SqD1jgfH91Z9rYWuNTBENeZ")
+                append("X-API-Key", "Sk6KjRkjFobTsC8tATmhdHtU")
             }
             setBody(MultiPartFormDataContent(formData))
         }
@@ -89,15 +89,12 @@ object BgRemoverApiClient {
         }
     }
 
-
-
-
-    suspend fun getImageEnhance(imageFile: File): ImageEnhancer {
+    suspend fun enhanceImage(imageFile: File): ImageEnhancer {
         val url =
             "https://AI-Face-Enhancer.proxy-production.allthingsdev.co/face/editing/enhance-face"
         val response: HttpResponse = client.post(url) {
             headers {
-                append("x-apihub-key", "nYzgJy42iDiU92pH7lUEnXEGNpUdi30ayan9j6Lduc6737Bar4")
+                append("x-apihub-key", "0inWhA3c0XhNU5KZFOWfvxWF4GzUhVvx6BcIZoIuuU-YONINRS")
                 append("x-apihub-host", "AI-Face-Enhancer.allthingsdev.co")
                 append("x-apihub-endpoint", "384cba1f-0e2d-4bc9-b549-e8609ba02cab")
             }
@@ -111,7 +108,7 @@ object BgRemoverApiClient {
             ))
         }
         val responseBody = response.bodyAsText()
-        return Json.decodeFromString(responseBody)
+        return Json.decodeFromString<ImageEnhancer>(responseBody)
     }
 
 

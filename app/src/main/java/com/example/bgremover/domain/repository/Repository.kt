@@ -10,7 +10,8 @@ class Repository : ApiClient {
         return BgRemoverApiClient.removeBackground(imageFile)
     }
 
-    override suspend fun getImageEnhance(imageFile: File): ImageEnhancer {
-        return BgRemoverApiClient.getImageEnhance(imageFile)
+    override suspend fun enhanceImage(imageFile: File): ImageEnhancer {
+        return BgRemoverApiClient.enhanceImage(imageFile)
     }
+
 }

@@ -16,17 +16,17 @@ class MainViewModel(private val repository: Repository) : ViewModel() {
     val bgRemoval: StateFlow<ResultState<String>> = _bgRemoval.asStateFlow()
 
 
-    private val _allImageEnhance = MutableStateFlow<ResultState<ImageEnhancer>>(ResultState.Loading)
-    val allImageEnhancer: StateFlow<ResultState<ImageEnhancer>> = _allImageEnhance.asStateFlow()
+    private val _allEnhancer = MutableStateFlow<ResultState<ImageEnhancer>>(ResultState.Loading)
+    val allEnhcer: StateFlow<ResultState<ImageEnhancer>> = _allEnhancer.asStateFlow()
 
-    fun EnhanceImage(imageFile: File) {
+    fun getAiEnhancer(imageFile: File) {
         viewModelScope.launch {
-            _allImageEnhance.value = ResultState.Loading
+            _allEnhancer.value = ResultState.Loading
             try {
-                val response = repository.getImageEnhance(imageFile)
-                _allImageEnhance.value = ResultState.Success(response)
+                val response = repository.enhanceImage(imageFile)
+                _allEnhancer.value = ResultState.Success(response)
             } catch (e: Exception) {
-                _allImageEnhance.value = ResultState.Error(e)
+                _allEnhancer.value = ResultState.Error(e)
             }
         }
     }

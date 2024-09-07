@@ -7,5 +7,5 @@ interface ApiClient {
 
     suspend fun removeBackground(imageFile: File): String
 
-    suspend fun getImageEnhance(imageFile: File): ImageEnhancer
+    suspend fun enhanceImage(imageFile: File): ImageEnhancer
 }

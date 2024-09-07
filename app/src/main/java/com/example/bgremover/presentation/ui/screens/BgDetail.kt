@@ -3,12 +3,17 @@ package com.example.bgremover.presentation.ui.screens
 import android.annotation.SuppressLint
 import android.app.Activity
 import android.content.ActivityNotFoundException
+import android.content.ContentUris
 import android.content.Context
 import android.content.Intent
+import android.database.Cursor
 import android.graphics.Bitmap
 import android.graphics.BitmapFactory
 import android.net.Uri
 import android.os.Build
+import android.os.Environment
+import android.provider.DocumentsContract
+import android.provider.MediaStore
 import android.util.Base64
 import android.util.Log
 import android.widget.Toast
@@ -151,10 +156,14 @@ fun BgDetail(
         mutableStateOf(false)
     }
 
-    var aiData by remember {
+    var downloadData by remember {
         mutableStateOf<ImageEnhancer?>(null)
     }
-    val state by viewModel.allImageEnhancer.collectAsState()
+
+    val state by viewModel.allEnhcer.collectAsState()
+
+
+
     when (state) {
         is ResultState.Error -> {
             isLoading = false
@@ -163,17 +172,17 @@ fun BgDetail(
         }
 
         ResultState.Loading -> {
-            if (isLoading) {
-                isLoading = true
-            }
+            isLoading = true
         }
 
         is ResultState.Success -> {
             isLoading = false
             val success = (state as ResultState.Success).success
-            aiData = success
+            downloadData = success
         }
     }
+
+
     var showPhoto by remember { mutableStateOf(true) }
     var showColor by remember { mutableStateOf(false) }
     var addBg by remember { mutableStateOf(false) }
@@ -530,7 +539,6 @@ fun BgDetail(
                                         }
                                     }
                                 } else {
-
                                     if (restore) {
                                         imageUrl?.let {
                                             androidx.compose.animation.AnimatedVisibility(
@@ -550,26 +558,45 @@ fun BgDetail(
                                             }
                                         }
                                     } else {
-                                        bgremoveimage?.let { base64 ->
-                                            val imageBytes = Base64.decode(base64, Base64.DEFAULT)
-                                            val bitmap = BitmapFactory.decodeByteArray(
-                                                imageBytes, 0, imageBytes.size
-                                            )
+                                        if (downloadData != null) {
+                                            downloadData?.let {
+                                                AsyncImage(
+                                                    model = it.data.imageUrl,
+                                                    contentDescription = "",
+                                                    modifier = Modifier
+                                                        .graphicsLayer(
+                                                            scaleX = scale,
+                                                            scaleY = scale,
+                                                            translationX = offset.x,
+                                                            translationY = offset.y
+                                                        )
+                                                        .fillMaxSize()
+                                                )
+                                            }
+                                        } else {
+                                            bgremoveimage?.let { base64 ->
+                                                val imageBytes =
+                                                    Base64.decode(base64, Base64.DEFAULT)
+                                                val bitmap = BitmapFactory.decodeByteArray(
+                                                    imageBytes, 0, imageBytes.size
+                                                )
 
-                                            Image(
-                                                bitmap = bitmap.asImageBitmap(),
-                                                contentDescription = null,
-                                                modifier = Modifier
-                                                    .graphicsLayer(
-                                                        scaleX = scale,
-                                                        scaleY = scale,
-                                                        translationX = offset.x,
-                                                        translationY = offset.y
-                                                    )
-                                                    .fillMaxSize()
-                                            )
+                                                Image(
+                                                    bitmap = bitmap.asImageBitmap(),
+                                                    contentDescription = null,
+                                                    modifier = Modifier
+                                                        .graphicsLayer(
+                                                            scaleX = scale,
+                                                            scaleY = scale,
+                                                            translationX = offset.x,
+                                                            translationY = offset.y
+                                                        )
+                                                        .fillMaxSize()
+                                                )
 
+                                            }
                                         }
+
                                     }
 
                                 }
@@ -1367,12 +1394,14 @@ fun BgDetail(
 
 
                             item {
-                                Column(horizontalAlignment = Alignment.CenterHorizontally,
+                                Column(
+                                    horizontalAlignment = Alignment.CenterHorizontally,
                                     modifier = Modifier
                                         .padding(vertical = 8.dp)
                                         .pointerInput(Unit) {
                                             detectTapGestures(onLongPress = { })
-                                        }) {
+                                        }
+                                ) {
                                     Box(
                                         modifier = Modifier
                                             .size(45.dp)
@@ -1383,8 +1412,16 @@ fun BgDetail(
                                                 ), shape = CircleShape
                                             )
                                             .clickable {
-                                                aiDialog = true
-                                            }, contentAlignment = Alignment.TopEnd
+                                                val file = bgremoveimage?.let { path ->
+                                                    File(path)
+                                                }
+                                                if (file != null && file.exists()) {
+                                                    viewModel.getAiEnhancer(file)
+                                                } else {
+
+                                                }
+                                            },
+                                        contentAlignment = Alignment.TopEnd
                                     ) {
                                         Image(
                                             painter = painterResource(id = R.drawable.enhance),
@@ -1406,63 +1443,111 @@ fun BgDetail(
                     }
                 }
             }
-        }
-        if (aiLoading) {
-            AlertDialog(onDismissRequest = {
-                isLoading = false
-            }, confirmButton = {
 
-            }, title = {
-                CircularProgressIndicator()
-            })
-        }
+            if (aiDialog) {
+                AlertDialog(
+                    onDismissRequest = { aiDialog = false },
+                    confirmButton = {
+                        TextButton(onClick = {
+                            aiDialog = false
 
-        if (aiDialog) {
-            AlertDialog(onDismissRequest = { aiDialog = false }, confirmButton = {
-                TextButton(onClick = {
-                    aiDialog = false
-                    val file = getFileFromUri(context, bgremoveimage?.toUri()!!)
-                    if (file != null) {
-                        viewModel.EnhanceImage(file)
-                    } else {
-
+                        }) {
+                            Text(text = "Yes")
+                        }
+                    },
+                    dismissButton = {
+                        TextButton(onClick = { aiDialog = false }) {
+                            Text(text = "No")
+                        }
+                    },
+                    title = { Text(text = "AI Photo Enhancement Confirmation") },
+                    text = {
+                        Text(
+                            text = "Enhance your photo quality using our AI-powered enhancement tool. Confirm to apply enhancements, or cancel to keep the original image."
+                        )
                     }
-                }) {
-                    Text(text = "Yes")
-                }
-            }, dismissButton = {
-                TextButton(onClick = { aiDialog = false }) {
-                    Text(text = "No")
-                }
-            }, title = {
-                Text(text = "AI Photo Enhancement Confirmation")
-            }, text = {
-                Text(
-                    text = "Enhance your photo quality using our AI-powered enhancement tool. Confirm to apply enhancements, or cancel to keep the original image."
                 )
-            })
+            }
+
+
         }
-
-
     }
 }
 
 @RequiresApi(Build.VERSION_CODES.KITKAT)
-fun getFileFromUri(context: Context, uri: Uri): File? {
-    return try {
-        val inputStream = context.contentResolver.openInputStream(uri)
-        val file = File(context.cacheDir, "enhanced_image.jpg")
-        val outputStream = file.outputStream()
+fun getRealPathFromURI(context: Context, uri: Uri): String? {
+    var filePath: String? = null
 
-        inputStream?.use { input ->
-            outputStream.use { output ->
-                input.copyTo(output)
+    if (DocumentsContract.isDocumentUri(context, uri)) {
+        if (isExternalStorageDocument(uri)) {
+            val docId = DocumentsContract.getDocumentId(uri)
+            val split = docId.split(":")
+            val type = split[0]
+            if ("primary".equals(type, ignoreCase = true)) {
+                filePath = "${Environment.getExternalStorageDirectory()}/${split[1]}"
             }
+        } else if (isDownloadsDocument(uri)) {
+            val id = DocumentsContract.getDocumentId(uri)
+            val contentUri = ContentUris.withAppendedId(
+                Uri.parse("content://downloads/public_downloads"),
+                id.toLong()
+            )
+            filePath = getDataColumn(context, contentUri, null, null)
+        } else if (isMediaDocument(uri)) {
+            val docId = DocumentsContract.getDocumentId(uri)
+            val split = docId.split(":")
+            val type = split[0]
+            var contentUri: Uri? = null
+            if ("image" == type) {
+                contentUri = MediaStore.Images.Media.EXTERNAL_CONTENT_URI
+            } else if ("video" == type) {
+                contentUri = MediaStore.Video.Media.EXTERNAL_CONTENT_URI
+            } else if ("audio" == type) {
+                contentUri = MediaStore.Audio.Media.EXTERNAL_CONTENT_URI
+            }
+            val selection = "_id=?"
+            val selectionArgs = arrayOf(split[1])
+            filePath = getDataColumn(context, contentUri, selection, selectionArgs)
         }
-        file
-    } catch (e: Exception) {
-        e.printStackTrace()
-        null
+    } else if ("content".equals(uri.scheme, ignoreCase = true)) {
+        filePath = getDataColumn(context, uri, null, null)
+    } else if ("file".equals(uri.scheme, ignoreCase = true)) {
+        filePath = uri.path
     }
+
+    return filePath
+}
+
+private fun getDataColumn(
+    context: Context,
+    uri: Uri?,
+    selection: String?,
+    selectionArgs: Array<String>?
+): String? {
+    var cursor: Cursor? = null
+    val column = "_data"
+    val projection = arrayOf(column)
+    try {
+        cursor = context.contentResolver.query(uri!!, projection, selection, selectionArgs, null)
+        if (cursor != null && cursor.moveToFirst()) {
+            val columnIndex = cursor.getColumnIndexOrThrow(column)
+            return cursor.getString(columnIndex)
+        }
+    } finally {
+        cursor?.close()
+    }
+    return null
+}
+
+private fun isExternalStorageDocument(uri: Uri): Boolean {
+    return "com.android.externalstorage.documents" == uri.authority
+}
+
+private fun isDownloadsDocument(uri: Uri): Boolean {
+    return "com.android.providers.downloads.documents" == uri.authority
+}
+
+private fun isMediaDocument(uri: Uri): Boolean {
+    return "com.android.providers.media.documents" == uri.authority
 }
 
