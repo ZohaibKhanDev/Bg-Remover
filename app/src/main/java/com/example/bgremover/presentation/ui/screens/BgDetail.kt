@@ -14,7 +14,7 @@ import androidx.activity.compose.rememberLauncherForActivityResult
 import androidx.activity.result.contract.ActivityResultContracts
 import androidx.compose.animation.core.LinearOutSlowInEasing
 import androidx.compose.animation.core.animateFloatAsState
-import androidx.compose.animation.core.tween 
+import androidx.compose.animation.core.tween
 import androidx.compose.animation.fadeIn
 import androidx.compose.animation.fadeOut
 import androidx.compose.animation.slideInHorizontally
@@ -27,7 +27,18 @@ import androidx.compose.foundation.border
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.gestures.detectDragGestures
 import androidx.compose.foundation.gestures.detectTapGestures
-import androidx.compose.foundation.layout.*
+import androidx.compose.foundation.layout.Arrangement
+import androidx.compose.foundation.layout.Box
+import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.Row
+import androidx.compose.foundation.layout.Spacer
+import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.height
+import androidx.compose.foundation.layout.offset
+import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.size
+import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.LazyRow
 import androidx.compose.foundation.lazy.grid.GridCells
@@ -43,9 +54,36 @@ import androidx.compose.material.icons.filled.MoreVert
 import androidx.compose.material.icons.filled.Redo
 import androidx.compose.material.icons.filled.Splitscreen
 import androidx.compose.material.icons.filled.Undo
-import androidx.compose.material.icons.outlined.*
-import androidx.compose.material3.*
-import androidx.compose.runtime.*
+import androidx.compose.material.icons.outlined.Add
+import androidx.compose.material.icons.outlined.Brush
+import androidx.compose.material.icons.outlined.FileDownload
+import androidx.compose.material.icons.outlined.JoinLeft
+import androidx.compose.material3.AlertDialog
+import androidx.compose.material3.Button
+import androidx.compose.material3.ButtonDefaults
+import androidx.compose.material3.Card
+import androidx.compose.material3.CardDefaults
+import androidx.compose.material3.DropdownMenu
+import androidx.compose.material3.DropdownMenuItem
+import androidx.compose.material3.ExperimentalMaterial3Api
+import androidx.compose.material3.Icon
+import androidx.compose.material3.IconButton
+import androidx.compose.material3.OutlinedButton
+import androidx.compose.material3.Scaffold
+import androidx.compose.material3.Slider
+import androidx.compose.material3.SliderDefaults
+import androidx.compose.material3.Switch
+import androidx.compose.material3.SwitchDefaults
+import androidx.compose.material3.Text
+import androidx.compose.material3.TextButton
+import androidx.compose.material3.TopAppBar
+import androidx.compose.material3.TopAppBarDefaults
+import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.blur
@@ -55,6 +93,7 @@ import androidx.compose.ui.draw.scale
 import androidx.compose.ui.geometry.Offset
 import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.graphics.ColorFilter
 import androidx.compose.ui.graphics.asImageBitmap
 import androidx.compose.ui.graphics.graphicsLayer
 import androidx.compose.ui.input.pointer.pointerInput
@@ -87,6 +126,9 @@ fun BgDetail(
     var blurRadius by remember { mutableStateOf(0f) }
     val context = LocalContext.current
     var brush by remember {
+        mutableStateOf(false)
+    }
+    var aiDialog by remember {
         mutableStateOf(false)
     }
     var showPhoto by remember { mutableStateOf(true) }
@@ -430,13 +472,16 @@ fun BgDetail(
                                                         drawRect(
                                                             Brush.radialGradient(
                                                                 listOf(
-                                                                    Color.Yellow, Color.Transparent
+                                                                    Color.Yellow,
+                                                                    Color.Transparent
                                                                 ),
                                                                 center = pointerOffset,
                                                                 radius = brushSize.toPx()
                                                             )
                                                         )
-                                                    }.align(Alignment.Center)) {
+                                                    }
+                                                    .align(Alignment.Center)
+                                                ) {
 
                                                 }
                                             }
@@ -1149,7 +1194,8 @@ fun BgDetail(
                                         .size(45.dp)
                                         .border(
                                             BorderStroke(
-                                                2.dp, color = Color.LightGray.copy(alpha = 0.50f)
+                                                2.dp,
+                                                color = Color.LightGray.copy(alpha = 0.50f)
                                             ), shape = CircleShape
                                         )
                                         .clickable {
@@ -1227,11 +1273,14 @@ fun BgDetail(
                                                 ), shape = CircleShape
                                             )
                                             .clickable {
-                                                val imageUrl = "https://your-public-url.com/path-to-image.jpg"
+                                                val imageUrl =
+                                                    "https://your-public-url.com/path-to-image.jpg"
                                                 val encodedImageUrl = Uri.encode(imageUrl)
-                                                val canvaUrl = "https://www.canva.com/create/design?upload=$encodedImageUrl"
+                                                val canvaUrl =
+                                                    "https://www.canva.com/create/design?upload=$encodedImageUrl"
 
-                                                val intent = Intent(Intent.ACTION_VIEW, Uri.parse(canvaUrl))
+                                                val intent =
+                                                    Intent(Intent.ACTION_VIEW, Uri.parse(canvaUrl))
                                                 intent.setPackage("com.android.chrome")
 
                                                 try {
@@ -1239,7 +1288,10 @@ fun BgDetail(
                                                 } catch (e: ActivityNotFoundException) {
                                                     e.printStackTrace()
 
-                                                    val fallbackIntent = Intent(Intent.ACTION_VIEW, Uri.parse(canvaUrl))
+                                                    val fallbackIntent = Intent(
+                                                        Intent.ACTION_VIEW,
+                                                        Uri.parse(canvaUrl)
+                                                    )
                                                     try {
                                                         context.startActivity(fallbackIntent)
                                                     } catch (e: Exception) {
@@ -1270,11 +1322,78 @@ fun BgDetail(
                                     )
                                 }
                             }
+
+
+
+                            item {
+                                Column(horizontalAlignment = Alignment.CenterHorizontally,
+                                    modifier = Modifier
+                                        .padding(vertical = 8.dp)
+                                        .pointerInput(Unit) {
+                                            detectTapGestures(onLongPress = { })
+                                        }) {
+                                    Box(
+                                        modifier = Modifier
+                                            .size(45.dp)
+                                            .border(
+                                                BorderStroke(
+                                                    2.dp,
+                                                    color = Color.LightGray.copy(alpha = 0.50f)
+                                                ), shape = CircleShape
+                                            )
+                                            .clickable {
+                                                aiDialog = true
+                                            }, contentAlignment = Alignment.TopEnd
+                                    ) {
+                                        Image(
+                                            painter = painterResource(id = R.drawable.enhance),
+                                            contentDescription = "Enhance",
+                                            modifier = Modifier
+                                                .size(24.dp)
+                                                .align(Alignment.Center),
+                                            colorFilter = ColorFilter.tint(color = Color.Black)
+                                        )
+                                    }
+
+                                    Text(
+                                        text = "Ai Enhance",
+                                        fontSize = 12.sp,
+                                    )
+                                }
+                            }
                         }
                     }
                 }
             }
         }
+
+        if (aiDialog){
+            AlertDialog(
+                onDismissRequest = { aiDialog = false },
+                confirmButton = {
+                    TextButton(onClick = {
+                        aiDialog = false
+                    }) {
+                        Text(text = "Yes")
+                    }
+                },
+                dismissButton = {
+                    TextButton(onClick = { aiDialog = false }) {
+                        Text(text = "No")
+                    }
+                },
+                title = {
+                    Text(text = "AI Photo Enhancement Confirmation")
+                },
+                text = {
+                    Text(
+                        text = "Enhance your photo quality using our AI-powered enhancement tool. This process will improve resolution, adjust sharpness, and optimize details for the best possible output. Confirm to apply enhancements, or cancel to keep the original image."
+                    )
+                }
+            )
+        }
+
+
     }
 }
 

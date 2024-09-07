@@ -1,5 +1,6 @@
 package com.example.bgremover.data.remote
 
+import com.example.bgremover.domain.model.imageenhance.ImageEnhancer
 import com.example.bgremover.utils.constant.TIMEOUT
 import io.ktor.client.HttpClient
 import io.ktor.client.call.body
@@ -87,4 +88,30 @@ object BgRemoverApiClient {
             throw Exception("Failed to remove background: ${response.status}")
         }
     }
+
+
+
+    suspend fun enhanceImage(imageFile: File): ImageEnhancer {
+        val url =
+            "https://AI-Face-Enhancer.proxy-production.allthingsdev.co/face/editing/enhance-face"
+        val response: HttpResponse = client.post(url) {
+            headers {
+                append("x-apihub-key", "nYzgJy42iDiU92pH7lUEnXEGNpUdi30ayan9j6Lduc6737Bar4")
+                append("x-apihub-host", "AI-Face-Enhancer.allthingsdev.co")
+                append("x-apihub-endpoint", "384cba1f-0e2d-4bc9-b549-e8609ba02cab")
+            }
+            setBody(MultiPartFormDataContent(
+                formData {
+                    append("image", imageFile.readBytes(), Headers.build {
+                        append(HttpHeaders.ContentType, ContentType.Image.PNG.toString())
+                        append(HttpHeaders.ContentDisposition, "filename=${imageFile.name}")
+                    })
+                }
+            ))
+        }
+        val responseBody = response.bodyAsText()
+        return Json.decodeFromString<ImageEnhancer>(responseBody)
+    }
+
+
 }
